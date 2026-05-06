@@ -6,16 +6,16 @@
   
   <title>C++ Basic | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Hello everyone! This is my first blog. In this blog, I wanna to record the valuable points in C++, especially those always mentioned during the interview   C++基础内存与数据类型 sizeof和strlen区别：sizeof看的是“占多少内存">
+  <meta name="description" content="Hello everyone! This is my first blog. In this blog, I want to record the valuable points in C++, especially those always mentioned during the interview.   C++基础内存与数据类型 sizeof和strlen区别：sizeof看的是“占多少内存">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++ Basic">
 <meta property="og:url" content="http://example.com/2026/05/04/blog1-cpp/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Hello everyone! This is my first blog. In this blog, I wanna to record the valuable points in C++, especially those always mentioned during the interview   C++基础内存与数据类型 sizeof和strlen区别：sizeof看的是“占多少内存">
+<meta property="og:description" content="Hello everyone! This is my first blog. In this blog, I want to record the valuable points in C++, especially those always mentioned during the interview.   C++基础内存与数据类型 sizeof和strlen区别：sizeof看的是“占多少内存">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2026/05/04/blog1-cpp/ENDFIELD_SHARE_1776597902.png">
 <meta property="article:published_time" content="2026-05-04T15:25:26.000Z">
-<meta property="article:modified_time" content="2026-05-06T14:49:30.123Z">
+<meta property="article:modified_time" content="2026-05-06T14:53:22.220Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -100,7 +100,7 @@
       
         <p>Hello everyone!</p>
 <p>This is my first blog.</p>
-<p>In this blog, I wanna to record the valuable points in C++, especially those always mentioned during the interview</p>
+<p>In this blog, I want to record the valuable points in C++, especially those always mentioned during the interview.</p>
 <img src="/2026/05/04/blog1-cpp/ENDFIELD_SHARE_1776597902.png" class="" title="庄与武陵">
 
 <h1 id="C-基础"><a href="#C-基础" class="headerlink" title="C++基础"></a>C++基础</h1><h2 id="内存与数据类型"><a href="#内存与数据类型" class="headerlink" title="内存与数据类型"></a>内存与数据类型</h2><ol>
@@ -303,8 +303,26 @@ int x;
 <li>字节序：大端序和小端序</li>
 </ol>
 <p>字节序：多字节数据在内存中的存放顺序。</p>
-<p>类型	含义	内存低地址 → 高地址<br>大端（Big Endian）	高位在前	12 34 56 78<br>小端（Little Endian）	低位在前	78 56 34 12</p>
-<p>📌 x86 &#x2F; x64：小端（Little Endian）​</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+<th>内存低地址 → 高地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>大端（Big Endian）</td>
+<td>高位在前</td>
+<td>12 34 56 78</td>
+</tr>
+<tr>
+<td>小端（Little Endian）</td>
+<td>低位在前</td>
+<td>78 56 34 12</td>
+</tr>
+</tbody></table>
+<p>📌 x86 &#x2F; x64：小端（Little Endian）</p>
 <p>📌 网络协议：大端（Network Byte Order）</p>
 <span id="more"></span>
       
