@@ -137,6 +137,51 @@
 <p>This is my first blog.</p>
 <p>In this blog, I wanna to record the valuable points in C++, especially those always mentioned during the interview</p>
 <img src="/2026/05/04/blog1-cpp/ENDFIELD_SHARE_1776597902.png" class="" title="庄与武陵">
+
+<h1 id="C-基础"><a href="#C-基础" class="headerlink" title="C++基础"></a>C++基础</h1><p>内存与数据类型</p>
+<ol>
+<li>sizeof和strlen区别：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">对比项</th>
+<th align="center">sizeof</th>
+<th align="center">strlen</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">本质</td>
+<td align="center">运算符（非函数）</td>
+<td align="center">标准库函数</td>
+</tr>
+<tr>
+<td align="center">头文件</td>
+<td align="center">不需要</td>
+<td align="center">&lt;string.h&gt;（C）&#x2F; <cstring>（C++）</td>
+</tr>
+<tr>
+<td align="center">作用对象</td>
+<td align="center">任意类型 &#x2F; 变量 &#x2F; 表达式</td>
+<td align="center">仅 以 \0结尾的字符串</td>
+</tr>
+<tr>
+<td align="center">计算内容</td>
+<td align="center">所占内存大小（字节）</td>
+<td align="center">字符串长度（不含 ‘\0’）</td>
+</tr>
+<tr>
+<td align="center">计算时机</td>
+<td align="center">编译期（大多数情况）</td>
+<td align="center">运行期</td>
+</tr>
+<tr>
+<td align="center">返回值类型</td>
+<td align="center">size_t</td>
+<td align="center">size_t</td>
+</tr>
+</tbody></table>
+<p>2. </p>
         
           <p class="article-more-link">
             <a href="/2026/05/04/blog1-cpp/#more">Read More</a>
