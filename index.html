@@ -138,9 +138,8 @@
 <p>In this blog, I wanna to record the valuable points in C++, especially those always mentioned during the interview</p>
 <img src="/2026/05/04/blog1-cpp/ENDFIELD_SHARE_1776597902.png" class="" title="庄与武陵">
 
-<h1 id="C-基础"><a href="#C-基础" class="headerlink" title="C++基础"></a>C++基础</h1><p>内存与数据类型</p>
-<ol>
-<li>sizeof和strlen区别：</li>
+<h1 id="C-基础"><a href="#C-基础" class="headerlink" title="C++基础"></a>C++基础</h1><h2 id="内存与数据类型"><a href="#内存与数据类型" class="headerlink" title="内存与数据类型"></a>内存与数据类型</h2><ol>
+<li>sizeof和strlen区别：sizeof看的是“占多少内存”，strlen数的是“字符串有几个字符”。</li>
 </ol>
 <table>
 <thead>
@@ -158,17 +157,17 @@
 <tr>
 <td align="center">头文件</td>
 <td align="center">不需要</td>
-<td align="center">&lt;string.h&gt;（C）&#x2F; <cstring>（C++）</td>
+<td align="center"><code>&lt;string.h&gt;</code>（C）&#x2F; <code>&lt;cstring&gt;</code>（C++）</td>
 </tr>
 <tr>
 <td align="center">作用对象</td>
 <td align="center">任意类型 &#x2F; 变量 &#x2F; 表达式</td>
-<td align="center">仅 以 \0结尾的字符串</td>
+<td align="center">仅 以<code>\0</code>结尾的字符串</td>
 </tr>
 <tr>
 <td align="center">计算内容</td>
 <td align="center">所占内存大小（字节）</td>
-<td align="center">字符串长度（不含 ‘\0’）</td>
+<td align="center">字符串长度（不含<code>\0</code>）</td>
 </tr>
 <tr>
 <td align="center">计算时机</td>
@@ -181,7 +180,167 @@
 <td align="center">size_t</td>
 </tr>
 </tbody></table>
-<p>2. </p>
+<pre><code>int a;
+printf(&quot;%zu\n&quot;, sizeof(a));   // 输出 int 占用的字节数（通常 4）
+//编译器在编译阶段就知道类型大小;与数据内容无关
+char s[] = &quot;hello&quot;;
+printf(&quot;%zu\n&quot;, sizeof(s));   // 6（h e l l o \0）
+//包含 &#39;\0&#39;
+
+char s[] = &quot;hello&quot;;
+printf(&quot;%zu\n&quot;, strlen(s));  // 5
+//从首地址开始;一直数到第一个 &#39;\0&#39;;不把 &#39;\0&#39;计入长度
+</code></pre>
+<p>常见易错示例</p>
+<pre><code>char *p = &quot;hello&quot;;
+printf(&quot;%zu\n&quot;, sizeof(p));   // ❌ 指针大小（4 或 8）
+printf(&quot;%zu\n&quot;, strlen(p));   // ✅ 5
+</code></pre>
+<p>sizeof(p)是指针本身的大小，不是字符串长度</p>
+<ol start="2">
+<li><p>数组作参数退化为指针</p>
+<p> void func(char s[]) {<br> printf(“%zu\n”, sizeof(s));  &#x2F;&#x2F; ❌ 指针大小<br> }<br> char s[] &#x3D; “hello”;<br> printf(“sizeof&#x3D;%zu\n”, sizeof(s)); &#x2F;&#x2F; ✅ 6<br> printf(“strlen&#x3D;%zu\n”, strlen(s)); &#x2F;&#x2F; ✅ 5</p>
+</li>
+<li><p>字节对齐：数据在内存中的起始地址必须是某个值（通常是数据类型大小）的整数倍，以提高 CPU 访问效率。</p>
+</li>
+</ol>
+<p>一次内存读取即可完成（不对齐可能需要多次读取 + 拼接）</p>
+<p>📌 空间换时间</p>
+<p>对齐规则（重点）<br>✅ 通用规则（最常见）</p>
+<p>基本类型对齐值 &#x3D; 自身大小</p>
+<pre><code>char→ 1 字节
+short→ 2 字节
+int→ 4 字节
+double→ 8 字节
+</code></pre>
+<p>每个成员的对齐值 &#x3D; 👉 min(自身大小, 编译器默认对齐值)（通常默认 4 或 8（64位常见））</p>
+<p>结构体对齐值 &#x3D; 成员中最大对齐值，结构体总大小必须是其对齐值的整数倍</p>
+<pre><code>struct A &#123;
+    char c;     // 1 字节
+    int i;      // 4 字节
+&#125;;
+
+偏移量：  0   1   2   3   4   5   6   7
+      [c] [pad] [pad] [pad] [i][i][i][i]
+
+sizeof(struct A) == 8 //📌 char后面填充 3 个字节
+</code></pre>
+<p>结构体嵌套的对齐规则：按自身最大成员对齐</p>
+<pre><code>struct Inner &#123;
+    double d;   // 8
+    char c;     // 1
+&#125;;
+
+struct Outer &#123;
+    int i;      // 4
+    struct Inner in;
+&#125;;
+</code></pre>
+<p>Outer对齐值 &#x3D; max(4(int), 8(struct Inner)) &#x3D; 8</p>
+<pre><code>sizeof(struct Outer) == 24（常见结果）
+</code></pre>
+<p>#pragma pack 的影响</p>
+<pre><code>#pragma pack(1)
+struct D &#123;
+char c;
+int i;
+&#125;;
+#pragma pack() // 恢复默认对齐
+// #pragma pack(pop)是 弹出之前保存的对齐
+sizeof(struct D) == 5
+</code></pre>
+<p>📌 常用于： 网络通信 协议数据 二进制存储</p>
+<p>⚠️ 缺点：性能下降、引发平台问题</p>
+<p>结构体成员应按“对齐值从大到小”排列，以减少内存补齐，提高内存利用率和访问效率。</p>
+<pre><code>struct X &#123;
+    char c;
+    int i;
+    short s;
+&#125;;
+//[c][pad*3][i*4][s*2][pad*2]
+//sizeof = 12
+struct Y &#123;
+    int i;
+    short s;
+    char c;
+&#125;;
+//[i*4][s*2][c][pad]
+//sizeof = 8
+</code></pre>
+<p>结构体内部成员的补齐，是按“自身对齐值”来的，不是统一补齐到结构体中最大的那个类型。</p>
+<p>C++11 后的显式对齐</p>
+<pre><code>struct alignas(16) S &#123; //显式指定对齐值（只能 ≥ 自然对齐），S的地址是 16 的倍数
+    int x;
+&#125;;
+alignof(int);   // 通常 4
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>#pragma pack</th>
+<th>alignas</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>标准属性</td>
+<td>编译器指令</td>
+<td>C++11 标准</td>
+</tr>
+<tr>
+<td>作用方向</td>
+<td>降低 &#x2F; 取消对齐</td>
+<td>提高 &#x2F; 指定对齐</td>
+</tr>
+<tr>
+<td>主要目的</td>
+<td>节省内存、兼容协议</td>
+<td>提升性能、满足硬件要求</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>结构体 &#x2F; 类整体</td>
+<td>类型 &#x2F; 成员</td>
+</tr>
+<tr>
+<td>是否影响 padding</td>
+<td>✅ 是</td>
+<td>❌ 不直接</td>
+</tr>
+<tr>
+<td>是否影响大小</td>
+<td>✅ 明显</td>
+<td>✅（可能增加）</td>
+</tr>
+<tr>
+<td>推荐程度</td>
+<td>⚠️ 慎用</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>是否安全</td>
+<td>⚠️ 有风险</td>
+<td>✅ 更安全</td>
+</tr>
+</tbody></table>
+<p>空类 &#x2F; 空基类优化（EBO）</p>
+<pre><code>struct Empty &#123;&#125;;
+struct A : Empty &#123;
+int x;
+&#125;;
+//sizeof(A)通常为 4（空基类不占空间）
+</code></pre>
+<p>❓ 5. 内存映射 &#x2F; 网络传输要注意什么？</p>
+<p>✅ 禁止依赖内存布局</p>
+<p>✅ 显式序列化</p>
+<p>❌ 不要直接 <code>memcpy</code>结构体</p>
+<ol start="5">
+<li>字节序：大端序和小端序</li>
+</ol>
+<p>字节序：多字节数据在内存中的存放顺序。</p>
+<p>类型	含义	内存低地址 → 高地址<br>大端（Big Endian）	高位在前	12 34 56 78<br>小端（Little Endian）	低位在前	78 56 34 12</p>
+<p>📌 x86 &#x2F; x64：小端（Little Endian）​</p>
+<p>📌 网络协议：大端（Network Byte Order）</p>
         
           <p class="article-more-link">
             <a href="/2026/05/04/blog1-cpp/#more">Read More</a>
