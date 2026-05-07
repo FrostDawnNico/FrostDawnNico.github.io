@@ -15,7 +15,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2026/05/04/blog1-cpp/ENDFIELD_SHARE_1776597902.png">
 <meta property="article:published_time" content="2026-05-04T15:25:26.000Z">
-<meta property="article:modified_time" content="2026-05-07T07:15:56.805Z">
+<meta property="article:modified_time" content="2026-05-07T14:47:15.087Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -103,9 +103,7 @@
 <p>In this blog, I want to record the valuable points in C++, especially those always mentioned during the interview.</p>
 <img src="/2026/05/04/blog1-cpp/ENDFIELD_SHARE_1776597902.png" class="" title="庄与武陵">
 <span id="more"></span>
-<h1 id="C-基础"><a href="#C-基础" class="headerlink" title="C++基础"></a>C++基础</h1><h2 id="内存与数据类型"><a href="#内存与数据类型" class="headerlink" title="内存与数据类型"></a>内存与数据类型</h2><ol>
-<li>sizeof和strlen区别：sizeof看的是“占多少内存”，strlen数的是“字符串有几个字符”。</li>
-</ol>
+<h1 id="C-基础"><a href="#C-基础" class="headerlink" title="C++基础"></a>C++基础</h1><h2 id="内存与数据类型"><a href="#内存与数据类型" class="headerlink" title="内存与数据类型"></a>内存与数据类型</h2><p>1️⃣ sizeof和strlen区别：sizeof看的是“占多少内存”，strlen数的是“字符串有几个字符”。</p>
 <table>
 <thead>
 <tr>
@@ -162,13 +160,15 @@ printf(&quot;%zu\n&quot;, sizeof(p));   // ❌ 指针大小（4 或 8）
 printf(&quot;%zu\n&quot;, strlen(p));   // ✅ 5
 </code></pre>
 <p>sizeof(p)是指针本身的大小，不是字符串长度</p>
-<ol start="2">
-<li><p>数组作参数退化为指针</p>
-<p> void func(char s[]) {<br> printf(“%zu\n”, sizeof(s));  &#x2F;&#x2F; ❌ 指针大小<br> }<br> char s[] &#x3D; “hello”;<br> printf(“sizeof&#x3D;%zu\n”, sizeof(s)); &#x2F;&#x2F; ✅ 6<br> printf(“strlen&#x3D;%zu\n”, strlen(s)); &#x2F;&#x2F; ✅ 5</p>
-</li>
-<li><p>字节对齐：数据在内存中的起始地址必须是某个值（通常是数据类型大小）的整数倍，以提高 CPU 访问效率。</p>
-</li>
-</ol>
+<p>2️⃣  数组作参数退化为指针</p>
+<pre><code>void func(char s[]) &#123;
+printf(&quot;%zu\n&quot;, sizeof(s));  // ❌ 指针大小
+&#125;
+char s[] = &quot;hello&quot;;
+printf(&quot;sizeof=%zu\n&quot;, sizeof(s)); // ✅ 6
+printf(&quot;strlen=%zu\n&quot;, strlen(s)); // ✅ 5
+</code></pre>
+<p>3️⃣  字节对齐：数据在内存中的起始地址必须是某个值（通常是数据类型大小）的整数倍，以提高 CPU 访问效率。</p>
 <p>一次内存读取即可完成（不对齐可能需要多次读取 + 拼接）</p>
 <p>📌 空间换时间</p>
 <p>对齐规则（重点）<br>✅ 通用规则（最常见）</p>
@@ -295,13 +295,11 @@ int x;
 &#125;;
 //sizeof(A)通常为 4（空基类不占空间）
 </code></pre>
-<p>❓ 5. 内存映射 &#x2F; 网络传输要注意什么？</p>
+<p>❓ 内存映射 &#x2F; 网络传输要注意什么？</p>
 <p>✅ 禁止依赖内存布局</p>
 <p>✅ 显式序列化</p>
 <p>❌ 不要直接 <code>memcpy</code>结构体</p>
-<ol start="5">
-<li>字节序（Byte Order &#x2F; Endianness）：大端序和小端序</li>
-</ol>
+<p>4️⃣  字节序（Byte Order &#x2F; Endianness）：大端序和小端序</p>
 <p>字节序：多字节数据在内存中的存放顺序。</p>
 <pre><code>int x = 0x12345678;//包含 4 个字节。从左到右看：0x12是第1个字节，0x34是第2个字节，0x56是第3个字节，0x78是第4个字节。
 </code></pre>
@@ -448,7 +446,7 @@ int main() &#123;
 <td>就算是 const，我也得改</td>
 </tr>
 <tr>
-<td>1️⃣ constvs volatile</td>
+<td>1️⃣ <code>const</code>vs <code>volatile</code></td>
 <td></td>
 <td></td>
 </tr>
@@ -513,6 +511,421 @@ int main() &#123;
 <td>没有 this指针，只能访问 static 成员</td>
 </tr>
 </tbody></table>
+<p>3️⃣ <code>extern</code>vs <code>extern &quot;C&quot;</code></p>
+<p>这是链接层面的区别。</p>
+<table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>层级</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>extern</td>
+<td>变量&#x2F;函数</td>
+<td>声明变量&#x2F;函数在其他编译单元定义</td>
+</tr>
+<tr>
+<td>extern “C”</td>
+<td>链接规范</td>
+<td>禁用 C++ 的 name mangling（名称修饰）</td>
+</tr>
+</tbody></table>
+<pre><code>// 告诉 C++ 编译器：这个函数是用 C 写的，别改名
+#ifdef __cplusplus
+extern &quot;C&quot; &#123;
+#endif
+
+void c_function();
+
+#ifdef __cplusplus
+&#125;
+#endif
+</code></pre>
+<p>4️⃣ explicit：单参数构造函数的守护者：防止构造函数进行隐式类型转换。</p>
+<pre><code>class A &#123;
+public:
+    explicit A(int x) &#123;&#125; // 禁止隐式转换
+&#125;;
+
+A a = 10; // ❌ 编译错误
+A b(10);  // ✅ OK
+</code></pre>
+<p>📌 如果不加 explicit，可能会导致意想不到的函数重载匹配。</p>
+<p>5️⃣ mutable：打破 const 的特例：允许在 const成员函数中修改成员变量。<br>📌 使用场景：缓存、日志计数、互斥锁（mutex）等不影响对象逻辑状态的字段。</p>
+<p>❓ <code>static const</code>vs <code>#define</code></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>static const</th>
+<th>#define</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>类型检查</td>
+<td>✅ 有</td>
+<td>❌ 无</td>
+</tr>
+<tr>
+<td>作用域</td>
+<td>✅ 有</td>
+<td>❌ 无</td>
+</tr>
+<tr>
+<td>调试</td>
+<td>✅ 可见</td>
+<td>❌ 不可见</td>
+</tr>
+</tbody></table>
+<p>✅ 结论：C++ 中优先使用 static const或 constexpr。</p>
+<p>❓ <code>const static</code>成员变量：类共享，值不变，整型可内初，取址需外定。</p>
+<p>当你需要一个属于类且不可变的常量时。替代宏定义，具有类型安全和作用域。</p>
+<pre><code>class A &#123;
+public:
+    static const int x = 5; // 类内初始化
+    //因为它们是常量，且属于类，编译器可以在编译期知道它们的值，不需要每个对象都存储一份。
+&#125;;
+</code></pre>
+<p>非 const static成员：必须在类外定义（分配内存）。</p>
+<p>C++11 之前，只有 int、char、bool等整型 const static成员才能在类内初始化。</p>
+<p>C++11 起，可以使用 constexpr static来支持非整型：</p>
+<p>即使你在类内初始化了 const static成员，如果你需要它的地址（或引用），你仍然需要在类外提供一个定义（不重新初始化）。</p>
+<p>❓volatile int* p和 int* volatile p区别？</p>
+<p>前者：指向的数据易变。 后者：指针本身易变。</p>
+<p>❓static变量线程安全吗？</p>
+<p>C++11 起：局部 static 变量初始化是线程安全的。</p>
+<p>❓为什么 extern “C”不能重载？</p>
+<p>因为 C 语言不支持函数重载，没有 name mangling。</p>
+<h2 id="类与结构体"><a href="#类与结构体" class="headerlink" title="类与结构体"></a>类与结构体</h2><h3 id="class与struct区别"><a href="#class与struct区别" class="headerlink" title="class与struct区别"></a>class与struct区别</h3><p>📌 C++ 中唯一的硬性区别就是默认访问权限。</p>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>class</th>
+<th>struct</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>默认访问权限</td>
+<td>private</td>
+<td>public</td>
+</tr>
+<tr>
+<td>默认继承方式</td>
+<td>private</td>
+<td>public</td>
+</tr>
+<tr>
+<td>设计意图</td>
+<td>封装 + 抽象</td>
+<td>数据聚合 (POD)</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td>业务逻辑、资源管理、复杂对象</td>
+<td>数据传输、配置、轻量级结构</td>
+</tr>
+</tbody></table>
+<p>📌 若忘记写 public，会导致无法通过基类指针访问派生类。</p>
+<pre><code>class Base &#123;
+public:
+    int x;
+&#125;;
+
+class Derived : Base &#123;   // ❌ 默认 private 继承
+&#125;;
+
+Derived d;
+d.x = 10;   // ❌ 编译错误：x 不可访问
+</code></pre>
+<p>✅ 正确写法：</p>
+<pre><code>class Derived : public Base &#123; &#125;;
+</code></pre>
+<p>补充： 访问权限规则</p>
+<table>
+<thead>
+<tr>
+<th>基类成员</th>
+<th>public 继承</th>
+<th>protected 继承</th>
+<th>private 继承</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>public</td>
+<td>✅ public</td>
+<td>✅ protected</td>
+<td>✅ private</td>
+</tr>
+<tr>
+<td>protected</td>
+<td>✅ protected</td>
+<td>✅ protected</td>
+<td>✅ private</td>
+</tr>
+<tr>
+<td>private</td>
+<td>❌ 不可访问</td>
+<td>❌ 不可访问</td>
+<td>❌ 不可访问</td>
+</tr>
+</tbody></table>
+<p>1️⃣ POD（Plain Old Data）</p>
+<p>兼容 C ；可安全 memcpy ；无虚函数、无自定义构造</p>
+<p>struct更适合做 POD（语义更清晰）</p>
+<p>2️⃣ 内存布局完全一致</p>
+<p>3️⃣ STL 中凡是只包含数据的辅助结构通常用 struct，而具有强封装和资源管理的用 class。</p>
+<pre><code>std::pair、std::tuple→ struct
+std::vector、std::string→ class
+</code></pre>
+<h2 id="预处理与宏"><a href="#预处理与宏" class="headerlink" title="预处理与宏"></a>预处理与宏</h2><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>本质</th>
+<th>一句话记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#define</td>
+<td>预处理宏替换</td>
+<td>无脑文本替换，不管对错</td>
+</tr>
+<tr>
+<td>inline</td>
+<td>编译期函数展开建议</td>
+<td>想快一点，但不一定真 inline</td>
+</tr>
+<tr>
+<td>typedef</td>
+<td>类型别名</td>
+<td>给类型起个新名字</td>
+</tr>
+</tbody></table>
+<p>核心区别</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>#define</th>
+<th>inline</th>
+<th>typedef</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>处理阶段</td>
+<td>预处理</td>
+<td>编译期</td>
+<td>编译期</td>
+</tr>
+<tr>
+<td>类型检查</td>
+<td>❌ 无</td>
+<td>✅ 有</td>
+<td>✅ 有</td>
+</tr>
+<tr>
+<td>作用域</td>
+<td>❌ 无</td>
+<td>✅ 有</td>
+<td>✅ 有</td>
+</tr>
+<tr>
+<td>调试</td>
+<td>❌ 难</td>
+<td>✅ 可调试</td>
+<td>✅ 可调试</td>
+</tr>
+<tr>
+<td>是否安全</td>
+<td>❌ 高风险</td>
+<td>✅ 安全</td>
+<td>✅ 安全</td>
+</tr>
+<tr>
+<td>能否递归</td>
+<td>✅</td>
+<td>❌</td>
+<td>N&#x2F;A</td>
+</tr>
+</tbody></table>
+<pre><code>#define SQUARE(x) x * x
+int a = SQUARE(1 + 2); // 1 + 2 * 1 + 2 = 5 ❌
+</code></pre>
+<p>#define：没有作用域 ;不能调试 ;容易引发隐藏 Bug</p>
+<pre><code>inline int square(int x) &#123;
+    return x * x;
+&#125;
+</code></pre>
+<p>inline特点： 有类型检查 ;有作用域 ;可调试</p>
+<p>❓<code>inline</code> 一定会内联吗？不一定。<br>只是“建议” ;递归、虚函数、复杂函数通常不会 inline ;现代编译器自动决定是否 inline</p>
+<p>inline 常放头文件</p>
+<pre><code>typedef int* INTPTR;
+INTPTR a, b;  // a 和 b 都是 int*
+#define INTPTR int*
+INTPTR a, b;  // a 是 int*, b 是 int ❌
+</code></pre>
+<p>C++11 新宠：<code>using</code></p>
+<pre><code>using INT = int;
+using Vec = vector&lt;int&gt;;
+</code></pre>
+<p>比 typedef更好：可读性更强；支持模板别名</p>
+<p>❓ 用宏写一个 MAX，有什么问题？</p>
+<pre><code>#define MAX(a,b) ((a)&gt;(b)?(a):(b))
+</code></pre>
+<p>❌ 问题： 参数可能被求值两次； 有副作用</p>
+<p>1️⃣ 自增变量</p>
+<pre><code>int a = 1, b = 2;
+int m = MAX(a++, b++);
+</code></pre>
+<p>实际执行： a++和 b++各执行一次比较 ；胜出的那个 再执行一次 ++</p>
+<p>2️⃣ 函数调用作为参数</p>
+<pre><code>int foo() &#123;
+printf(&quot;foo\n&quot;);
+return 3;
+&#125;
+
+int bar() &#123;
+printf(&quot;bar\n&quot;);
+return 2;
+&#125;
+
+int m = MAX(foo(), bar());
+</code></pre>
+<p>📌 输出：</p>
+<pre><code>foo
+bar
+foo   ← 可能被调用两次！
+</code></pre>
+<p>📌 结果不可预测，且违反直觉</p>
+<p>✅ 正确做法：</p>
+<ol>
+<li><p>函数模板（推荐）</p>
+<p> template<typename T><br> inline T max(T a, T b) {<br> return a &gt; b ? a : b;<br> }</p>
+</li>
+</ol>
+<p>泛型；安全；高性能<br>2. inline函数（C 风格）</p>
+<pre><code>inline int max(int a, int b) &#123;
+    return a &gt; b ? a : b;
+&#125;
+</code></pre>
+<p>参数只求值一次 ； 有类型检查 ； 可调试</p>
+<ol start="3">
+<li><p>constexpr（C++11+）</p>
+<p> constexpr int max(int a, int b) {<br> return a &gt; b ? a : b;<br> }</p>
+</li>
+</ol>
+<p>编译期可用</p>
+<p><strong>总结：</strong></p>
+<p>#define是预处理阶段的纯文本替换，没有类型安全和作用域；</p>
+<p>inline是编译期的函数展开建议，保留类型检查和作用域；</p>
+<p>typedef用于为类型定义别名，提升代码可读性。</p>
+<p>现代 C++ 中，应尽量避免宏，使用 inline和 using。</p>
+<h2 id="强制类型转换"><a href="#强制类型转换" class="headerlink" title="强制类型转换"></a>强制类型转换</h2><p>能用 C++ 四种 cast，就不要用 C 风格 (Type)value强转。</p>
+<table>
+<thead>
+<tr>
+<th>转换</th>
+<th>英文</th>
+<th>核心用途</th>
+<th>是否安全</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>static_cast</td>
+<td>静态转换</td>
+<td>良性转换（数值、父子类）</td>
+<td>✅ 相对安全</td>
+</tr>
+<tr>
+<td>dynamic_cast</td>
+<td>动态转换</td>
+<td>多态类型安全检查</td>
+<td>✅ 最安全</td>
+</tr>
+<tr>
+<td>const_cast</td>
+<td>常量转换</td>
+<td>去掉 &#x2F; 加上 const</td>
+<td>⚠️ 高风险</td>
+</tr>
+<tr>
+<td>reinterpret_cast</td>
+<td>重解释转换</td>
+<td>底层比特重解释</td>
+<td>❌ 极危险</td>
+</tr>
+</tbody></table>
+<p>1️⃣ static_cast（最常用）</p>
+<p>✅ 编译期转换，无运行时开销</p>
+<pre><code>double d = 3.14;
+int i = static_cast&lt;int&gt;(d);   // ✅3
+
+class Base &#123;&#125;;
+class Derived : public Base &#123;&#125;;
+
+Base* b = new Derived();
+Derived* d = static_cast&lt;Derived*&gt;(b); // ✅
+
+int* p = static_cast&lt;int*&gt;(b); // ❌ 无关类型
+</code></pre>
+<p>用于相关类型之间的转换，编译期检查，不能去除 const。</p>
+<p>2️⃣ dynamic_cast（多态专用）</p>
+<p>✅ 运行时类型检查（RTTI）</p>
+<pre><code>class Base &#123;
+public:
+    virtual ~Base() &#123;&#125; //必须有虚函数✅
+&#125;;
+
+class Derived : public Base &#123;&#125;;
+
+Base* b = new Derived();
+Derived* d = dynamic_cast&lt;Derived*&gt;(b);
+</code></pre>
+<p>✅ 成功：返回非空指针</p>
+<p>❌ 失败：返回 nullptr（指针）或抛异常（引用）</p>
+<p>❌ 没有虚函数 → 编译失败</p>
+<p>❓dynamic_cast 为什么要求基类有虚函数？</p>
+<p>✅ 因为需要 RTTI（运行时类型信息）</p>
+<p>3️⃣ const_cast（最容易被误用）</p>
+<p>✅ 唯一能改 const &#x2F; volatile 的转换</p>
+<pre><code>const int x = 10;
+int* p = const_cast&lt;int*&gt;(&amp;x); //✅
+
+*p = 20; // ❌ 未定义行为（UB）
+</code></pre>
+<p>const_cast用于移除 const，但修改真正的 const 对象是未定义行为。</p>
+<pre><code>int real_value = 10;          // 原始变量不是 const
+const int&amp; ref = real_value;  // 只是通过 const 引用“承诺”不改
+
+int* p = const_cast&lt;int*&gt;(&amp;ref);
+*p = 20;                     // ✅ 安全，real_value 变为 20
+</code></pre>
+<p>4️⃣ reinterpret_cast（最底层）</p>
+<p>✅ 重新解释比特位</p>
+<pre><code>int x = 0x12345678;
+char* p = reinterpret_cast&lt;char*&gt;(&amp;x);
+</code></pre>
+<p>📌 常用于：网络协议；硬件寄存器；序列化</p>
+<p>❓reinterpret_cast是安全的？ ❌它不做任何检查，完全依赖程序员。</p>
+<p><strong>与 C 风格强制转换对比</strong></p>
+<pre><code>int* p = (int*)&amp;x; // C 风格
+</code></pre>
+<p>❌ 问题：编译器不告诉你做了什么；可能偷偷调用 const_cast+ static_cast</p>
+<pre><code>int* p = static_cast&lt;int*&gt;(...); //✅ C++ 推荐写法
+</code></pre>
+<p><strong>总结：</strong><br>static_cast用于相关类型的静态转换；</p>
+<p>dynamic_cast用于多态类型的安全向下转型（需 RTTI）；</p>
+<p>const_cast用于移除 const 属性，但修改原 const 对象是未定义行为；</p>
+<p>reinterpret_cast用于底层比特重解释，极其危险。</p>
+<p>❓ 什么时候必须用 dynamic_cast？</p>
+<p>✅ 在多态体系中，不确定实际对象类型时。</p>
+<p>❓ static_cast和 dynamic_cast性能差异？</p>
+<p>✅ static_cast无运行时开销，dynamic_cast有 RTTI 开销。</p>
+<p>❓ reinterpret_cast能转函数指针吗？</p>
+<p>✅ 可以，但不可移植，强烈不推荐。</p>
 
       
     </div>
@@ -529,11 +942,11 @@ int main() &#123;
     
 <nav id="article-nav">
   
-    <a href="/2026/05/05/blog2-cpp11/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2026/05/07/blog2-cpp2/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          C++ 11
+          blog2-cpp2
         
       </div>
     </a>
@@ -593,7 +1006,7 @@ int main() &#123;
       <ul>
         
           <li>
-            <a href="/2026/05/05/blog2-cpp11/">C++ 11</a>
+            <a href="/2026/05/07/blog2-cpp2/">blog2-cpp2</a>
           </li>
         
           <li>
