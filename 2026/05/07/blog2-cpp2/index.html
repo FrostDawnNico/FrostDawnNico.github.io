@@ -28,7 +28,7 @@
 <meta property="og:description" content="面向对象">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-05-07T15:03:33.000Z">
-<meta property="article:modified_time" content="2026-05-07T15:44:52.289Z">
+<meta property="article:modified_time" content="2026-05-09T10:50:09.879Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -174,10 +174,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2026-05-07 23:03:33 / Modified: 23:44:52" itemprop="dateCreated datePublished" datetime="2026-05-07T23:03:33+08:00">2026-05-07</time>
+              <time title="Created: 2026-05-07 23:03:33" itemprop="dateCreated datePublished" datetime="2026-05-07T23:03:33+08:00">2026-05-07</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-09 18:50:09" itemprop="dateModified" datetime="2026-05-09T18:50:09+08:00">2026-05-09</time>
+              </span>
 
           
 
@@ -213,9 +219,6 @@
 </tr>
 </tbody></table>
 <h2 id="多态实现原理"><a href="#多态实现原理" class="headerlink" title="多态实现原理"></a>多态实现原理</h2><h3 id="静态联编与动态联编"><a href="#静态联编与动态联编" class="headerlink" title="静态联编与动态联编"></a>静态联编与动态联编</h3><p>静态联编在编译时确定函数调用地址，效率高但不灵活。动态联编在运行时根据对象的实际类型确定函数调用地址，是实现多态的基础。</p>
-<h3 id="虚函数表（vtable）与虚指针（vptr）"><a href="#虚函数表（vtable）与虚指针（vptr）" class="headerlink" title="虚函数表（vtable）与虚指针（vptr）"></a>虚函数表（vtable）与虚指针（vptr）</h3><p>编译器为每个包含虚函数的类生成一个虚函数表，其中存储了该类所有虚函数的地址。该表在程序启动时创建，并在类的所有对象间共享。</p>
-<p>每个包含虚函数的类的实例对象中，都会隐式地包含一个指向其所属类的虚函数表的指针，即vptr。对象通过vptr找到虚函数表，进而调用正确的虚函数。</p>
-<p>动态绑定：只有通过基类指针或引用调用虚函数时才会发生动态绑定；直接通过对象调用不会。</p>
 <h3 id="虚函数与抽象类"><a href="#虚函数与抽象类" class="headerlink" title="虚函数与抽象类"></a>虚函数与抽象类</h3><table>
 <thead>
 <tr>
@@ -236,6 +239,68 @@
 <td>抽象类不能被实例化，只能作为基类被继承。派生类必须重写基类中的所有纯虚函数，否则该派生类也是抽象类。抽象类提供了一种定义接口的机制，强制要求子类遵循统一的规范。</td>
 </tr>
 </tbody></table>
+<h4 id="虚函数："><a href="#虚函数：" class="headerlink" title="虚函数："></a>虚函数：</h4><p>虚函数（Virtual Function）的核心作用是实现“运行期多态”（Runtime Polymorphism）。它允许你通过基类的指针或引用调用派生类的方法，从而在不知道对象具体类型的情况下，执行正确的业务逻辑。</p>
+<p>核心机制：动态绑定（Dynamic Binding）：虚函数通过 虚函数表（vtable）和 虚指针（vptr）实现：对象内部有一个指针指向类的虚函数表，运行时通过这个表找到实际的函数地址。</p>
+<p>关键作用：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>作用描述</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>统一接口</td>
+<td>定义一个通用接口（基类），具体实现由不同派生类完成。</td>
+<td>Shape基类定义 draw()，派生类 Circle、Square各自实现绘制逻辑。</td>
+</tr>
+<tr>
+<td>框架设计</td>
+<td>编写通用的算法或框架，允许用户通过继承插入自定义逻辑。</td>
+<td>Qt 的事件处理函数 eventFilter()，游戏引擎的 Update()循环。</td>
+</tr>
+<tr>
+<td>资源安全管理</td>
+<td>基类析构函数必须是虚函数，确保删除基类指针时，派生类的析构函数能被正确调用，防止内存泄漏。</td>
+<td>Base* p &#x3D; new Derived(); delete p;（若 ~Base()非 virtual，则 Derived的资源不会被释放）。</td>
+</tr>
+</tbody></table>
+<p>编译器为每个包含虚函数的类生成一个虚函数表，其中存储了该类所有虚函数的地址。该表在程序启动时创建，并在类的所有对象间共享。</p>
+<p>每个包含虚函数的类的实例对象中，都会隐式地包含一个指向其所属类的虚函数表的指针，即vptr。对象通过vptr找到虚函数表，进而调用正确的虚函数。</p>
+<p>动态绑定：只有通过基类指针或引用调用虚函数时才会发生动态绑定；直接通过对象调用不会。</p>
+<pre><code>class Animal {
+public:
+    virtual void speak() { // 虚函数
+        cout &lt;&lt; &quot;Animal speaks&quot; &lt;&lt; endl;
+    }
+    virtual ~Animal() {} // 虚析构函数（极其重要）
+};
+
+class Dog : public Animal {
+public:
+    void speak() override { // 重写
+        cout &lt;&lt; &quot;Dog barks&quot; &lt;&lt; endl;
+    }
+};
+
+void letItSpeak(Animal* animal) {
+    animal-&gt;speak(); // 运行时决定调用谁
+}
+
+int main() {
+    Dog dog;
+    letItSpeak(&amp;dog); // 输出 &quot;Dog barks&quot;
+}
+</code></pre>
+<p>❓虚函数有什么缺点</p>
+<p>性能开销：调用时需要查表（vtable），比普通函数稍慢（通常可忽略，但在高频循环中需注意）。</p>
+<p>内存开销：每个包含虚函数的类对象都会多存储一个 vptr（通常是 8 字节）。</p>
+<p>无法内联：虚函数通常不能被内联优化（inline）。</p>
+<p>补充：现代 C++ 的替代方案：</p>
+<p>CRTP（奇异递归模板模式）：使用模板在编译期实现多态，消除运行时开销。</p>
+<p>std::variant+ std::visit：用于替代继承体系，实现类型安全的“访问者模式”。</p>
+<p>final关键字：如果某个派生类不需要再被继承，使用 final修饰虚函数可以帮助编译器优化。</p>
 <h3 id="关键关键字"><a href="#关键关键字" class="headerlink" title="关键关键字"></a>关键关键字</h3><table>
 <thead>
 <tr>
@@ -260,13 +325,51 @@
 <h3 id="性能开销"><a href="#性能开销" class="headerlink" title="性能开销"></a>性能开销</h3><p>虚函数调用需要通过vptr和虚函数表进行一次间接寻址，相比普通函数调用有轻微的性能开销。但现代CPU的分支预测能很好地优化这种开销。</p>
 <h3 id="vtable布局"><a href="#vtable布局" class="headerlink" title="vtable布局"></a>vtable布局</h3><p>虚函数表是一个函数指针数组，按虚函数在类中声明的顺序存放。如果类有多个基类，可能会有多个虚函数表。</p>
 <h3 id="vptr初始化"><a href="#vptr初始化" class="headerlink" title="vptr初始化"></a>vptr初始化</h3><p>对象在构造时，其vptr会被初始化为指向其最终派生类的虚函数表。在构造函数执行期间，vptr会指向当前正在构造的类的虚函数表。</p>
-<p>❓重载、重写、隐藏的区别</p>
-<p>重载发生在同一作用域内且函数名相同但参数不同；重写发生在父子类之间且用于实现运行时多态；隐藏是由于作用域遮蔽导致基类函数在派生类中不可见。</p>
-<p>特性	重载 (Overload)	重写 (Override)	隐藏 (Hide)<br>作用域​	同一作用域（如同一个类内）	父子类作用域​	父子类作用域​<br>函数签名​	必须不同（参数类型、个数、顺序不同）	必须完全相同（C++11后支持协变返回类型）	可以相同，也可以不同​<br>Virtual关键字​	无关（有无virtual均可）	基类必须有 virtual​	无关（有无virtual均可）<br>绑定时机​	编译期（早绑定）	运行期（晚绑定，通过vtable）	编译期（静态绑定）<br>目的​	提供同名函数的不同版本	实现多态，改变基类行为	派生类函数屏蔽基类同名函数</p>
+<h2 id="常见考题"><a href="#常见考题" class="headerlink" title="常见考题"></a>常见考题</h2><h3 id="重载、重写、隐藏的区别"><a href="#重载、重写、隐藏的区别" class="headerlink" title="重载、重写、隐藏的区别"></a>重载、重写、隐藏的区别</h3><p>重载发生在同一作用域内且函数名相同但参数不同；重写发生在父子类之间且用于实现运行时多态；隐藏是由于作用域遮蔽导致基类函数在派生类中不可见。</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>重载 (Overload)</th>
+<th>重写 (Override)</th>
+<th>隐藏 (Hide)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>作用域</td>
+<td>同一作用域（如同一个类内）</td>
+<td>父子类作用域</td>
+<td>父子类作用域</td>
+</tr>
+<tr>
+<td>函数签名</td>
+<td>必须不同（参数类型、个数、顺序不同）</td>
+<td>必须完全相同（C++11后支持协变返回类型）</td>
+<td>可以相同，也可以不同</td>
+</tr>
+<tr>
+<td>Virtual关键字</td>
+<td>无关（有无virtual均可）</td>
+<td>基类必须有 virtual</td>
+<td>无关（有无virtual均可）</td>
+</tr>
+<tr>
+<td>绑定时机</td>
+<td>编译期（早绑定）</td>
+<td>运行期（晚绑定，通过vtable）</td>
+<td>编译期（静态绑定）</td>
+</tr>
+<tr>
+<td>目的</td>
+<td>提供同名函数的不同版本</td>
+<td>实现多态，改变基类行为</td>
+<td>派生类函数屏蔽基类同名函数</td>
+</tr>
+</tbody></table>
 <ol>
 <li>重载 (Overload)：编译期的静态多态</li>
 </ol>
-<p>重载关注的是参数的多样性。只要参数列表不同，即使返回值不同，也算重载（但仅返回值不同不算重载）。</p>
+<p>重载关注的是参数的多样性。只要参数列表不同，就算重载。</p>
 <pre><code>class Printer {
 public:
     void print(int i) { cout &lt;&lt; &quot;Int: &quot; &lt;&lt; i &lt;&lt; endl; }
@@ -274,7 +377,6 @@ public:
     void print(string s) { cout &lt;&lt; &quot;String: &quot; &lt;&lt; s &lt;&lt; endl; } // 重载
 };
 </code></pre>
-<p>为什么返回值不能作为重载依据？因为函数调用时可以不接收返回值，编译器无法仅凭返回值判断调用哪个函数。</p>
 <ol start="2">
 <li>重写 (Override)：运行期的动态多态</li>
 </ol>
@@ -290,7 +392,9 @@ public:
 };
 </code></pre>
 <p><strong>关键约束：</strong></p>
-<p>函数签名完全一致（C++11允许返回类型是基类返回类型的派生类，称为协变返回类型 Covariant Return Types）。</p>
+<p>基类函数必须声明为 <code>virtual</code>。</p>
+<p>函数签名完全一致（函数名、参数列表、const属性相同）</p>
+<p>返回类型必须兼容（通常是相同类型，C++11允许返回类型是基类返回类型的派生类，称为协变返回类型 Covariant Return Types）。</p>
 <p>访问权限可以改变（如基类是 private virtual，派生类可以是 public override）。</p>
 <p><code>override</code>关键字：强烈建议使用，能让编译器帮你检查是否真的重写了基类函数，防止因拼写错误或签名不匹配导致的“假重写”。</p>
 <ol start="3">
@@ -322,6 +426,189 @@ d.bar(10);    // 调用 Derived::bar(double)，int 被隐式转换为 double
 <p>A：使用 using声明。在派生类中使用 using Base::funcName;，可以将基类的同名函数引入派生类作用域，从而实现真正的重载，而不是隐藏。</p>
 <p>❓Q：virtual关键字在派生类重写时可以省略吗？</p>
 <p>A：语法上可以（一旦基类声明为 virtual，派生类无论是否加 virtual 都是虚函数），但工程规范上建议加上或配合 override使用，以提高代码可读性。</p>
+<p>现代 C++ 最佳实践：override用于显式声明重写，final用于禁止后续派生类重写该函数，这能有效防止因签名不匹配导致的隐藏错误。</p>
+<h3 id="C-类对象的初始化和析构顺序"><a href="#C-类对象的初始化和析构顺序" class="headerlink" title="C++类对象的初始化和析构顺序"></a>C++类对象的初始化和析构顺序</h3><p>类对象的初始化遵循“由内而外”（先父类后子类），析构遵循“由外而内”（先子类后父类）。此外，成员变量严格按照在类中声明的顺序进行初始化，而非构造函数初始化列表中的顺序</p>
+<p>初始化（Construction）：分配内存-成员初始化（成员变量在类中声明的顺序）-构造函数体执行</p>
+<p>析构（Destruction）：析构函数体执行-成员销毁（声明的逆序）-释放内存</p>
+<h4 id="静态对象与局部对象的生命周期"><a href="#静态对象与局部对象的生命周期" class="headerlink" title="静态对象与局部对象的生命周期"></a>静态对象与局部对象的生命周期</h4><table>
+<thead>
+<tr>
+<th>对象类型</th>
+<th>初始化时机</th>
+<th>析构时机</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>局部对象</td>
+<td>执行到定义语句时</td>
+<td>离开作用域时</td>
+<td>栈上对象，遵循 RAII。</td>
+</tr>
+<tr>
+<td>静态局部对象</td>
+<td>首次执行到定义语句时</td>
+<td>main 函数结束后</td>
+<td>C++11 起线程安全。</td>
+</tr>
+<tr>
+<td>全局&#x2F;静态对象</td>
+<td>main 函数执行之前</td>
+<td>main 函数结束后</td>
+<td>初始化顺序在不同编译单元间是未定义的（经典坑点）。</td>
+</tr>
+</tbody></table>
+<h4 id="重点"><a href="#重点" class="headerlink" title="重点"></a>重点</h4><ol>
+<li><p>初始化列表顺序：始终让初始化列表的顺序与类内声明顺序一致，否则是未定义行为。</p>
+</li>
+<li><p>虚析构函数的必要性:</p>
+<p> Base* p &#x3D; new Derived(); delete p;</p>
+</li>
+</ol>
+<p>如果 Base的析构函数不是 virtual，只会调用 Base::~Base()，导致 Derived部分的资源泄漏。</p>
+<ol start="3">
+<li>委托构造函数：如果一个构造函数调用另一个构造函数（C++11），被调用的构造函数先执行完毕，再执行本体的函数体。</li>
+</ol>
+<h3 id="析构函数可以抛出异常吗？"><a href="#析构函数可以抛出异常吗？" class="headerlink" title="析构函数可以抛出异常吗？"></a>析构函数可以抛出异常吗？</h3><p>析构函数语法上允许抛出异常，但在工程实践和面试回答中，结论必须是：绝对不应该抛出，且应标记为 noexcept。</p>
+<p>如果析构函数在栈展开（Stack Unwinding）过程中抛出异常，会导致程序立即终止（std::terminate）。因此，所有资源释放逻辑必须吞掉异常或在内部处理。</p>
+<h4 id="核心原因：双重异常的致命性"><a href="#核心原因：双重异常的致命性" class="headerlink" title="核心原因：双重异常的致命性"></a>核心原因：双重异常的致命性</h4><p>当程序因异常退出作用域时，会启动栈展开机制，依次调用局部对象的析构函数来清理资源。</p>
+<p>假设第一个异常已经抛出，程序正在执行栈展开。此时，某个对象的析构函数又抛出了第二个异常。C++ 标准规定，同时存在两个活跃异常时，必须调用 std::terminate()终止程序。这意味着资源泄露和调试困难。</p>
+<p>针对析构函数中可能发生的错误，有三种处理方式，其中“吞掉异常”是最常用的保底手段。</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>做法</th>
+<th>适用场景</th>
+<th>评价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>吞掉异常 (Swallow)</td>
+<td>在析构函数内部使用 try-catch捕获所有异常，不向外传播。</td>
+<td>析构函数必须完成的操作（如关闭文件、释放内存）。</td>
+<td>最安全。牺牲错误报告，保全程序不崩溃。</td>
+</tr>
+<tr>
+<td>终止程序 (Abort)</td>
+<td>捕获异常后记录日志，然后调用 std::abort()。</td>
+<td>发生不可恢复的逻辑错误（如数据严重损坏）。</td>
+<td>比 terminate稍好，能留下日志，但程序依然挂掉。</td>
+</tr>
+<tr>
+<td>提供普通接口 (Best Practice)</td>
+<td>提供一个 close()或 release()方法让用户显式处理异常。</td>
+<td>数据库连接、网络套接字等资源。</td>
+<td>最佳设计。将错误处理的责任交给调用者，析构函数只做保底清理。</td>
+</tr>
+</tbody></table>
+<pre><code>class BadExample {
+public:
+    ~BadExample() {
+        // 危险！如果 close() 抛异常，且此时正在栈展开，程序直接 terminate
+        close_resource();
+    }
+}; //❌
+
+class GoodExample {
+public:
+    // C++11 起，析构函数默认是 noexcept(true)
+    // 显式声明是最佳实践
+    ~GoodExample() noexcept {
+        try {
+            // 尝试释放资源
+        release_resource();
+        } catch (...) {
+            // 1. 记录日志
+            // 2. 吞掉异常，绝不让它逃出析构函数
+            // log(&quot;Release resource failed.&quot;);
+        }
+    }
+
+    // 提供显式接口供用户处理异常
+    void close() { 
+        release_resource(); // 这里抛异常由调用者处理
+    }
+};
+</code></pre>
+<h4 id="现代-C-标准与-noexcept"><a href="#现代-C-标准与-noexcept" class="headerlink" title="现代 C++ 标准与 noexcept"></a>现代 C++ 标准与 noexcept</h4><p>自 C++11 起，析构函数默认是 noexcept的。这意味着即使你没有写 throw()，编译器也会阻止异常传出。</p>
+<p>❓析构函数可以声明为 noexcept(false)吗？技术上可以，但这会破坏容器（如 std::vector）在重新分配内存时的异常安全性保证，极度不推荐。</p>
+<p><strong>总结：</strong> 在栈展开期间抛异常会导致 std::terminate，应通过显式接口处理错误，析构函数内部使用 try-catch吞掉异常并标记为 noexcept</p>
+<h3 id="深拷贝和浅拷贝"><a href="#深拷贝和浅拷贝" class="headerlink" title="深拷贝和浅拷贝"></a>深拷贝和浅拷贝</h3><p>核心区别在于是否独立复制指针所指向的动态资源。如果类中含有指针成员，默认的拷贝构造函数执行的是浅拷贝，这会导致多个对象共享同一块内存，极易引发重复释放（Double Free）或内存泄漏。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>浅拷贝 (Shallow Copy)</th>
+<th>深拷贝 (Deep Copy)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>资源占用</td>
+<td>源对象与目标对象共享同一份堆内存地址。</td>
+<td>源对象与目标对象拥有各自独立的堆内存副本。</td>
+</tr>
+<tr>
+<td>默认行为</td>
+<td>C++ 编译器默认生成的拷贝构造函数&#x2F;赋值运算符。</td>
+<td>必须由开发者手动实现。</td>
+</tr>
+<tr>
+<td>风险</td>
+<td>极易导致 Double Free（同一内存被释放两次）或悬空指针。</td>
+<td>实现复杂，若处理不当可能导致内存泄漏或自赋值错误。</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>不含指针成员的类，或明确需要共享资源的场景（如 shared_ptr）。</td>
+<td>Rule of Three&#x2F;Five：只要类管理堆内存，就必须实现深拷贝。</td>
+</tr>
+</tbody></table>
+<pre><code>// 浅拷贝风险
+class Shallow {
+public:
+    int* data;
+    Shallow(int d) { data = new int(d); }
+    // 编译器生成默认拷贝构造函数：data = other.data (仅复制地址)
+    ~Shallow() { delete data; } // 隐患在此
+};
+
+Shallow s1(10);
+Shallow s2 = s1; // 浅拷贝发生
+// s1.data 和 s2.data 指向同一块内存
+// 析构时：s2 先 delete -&gt; s1 再 delete -&gt; 程序崩溃 (Double Free)
+
+//深拷贝实现
+class Deep {
+public:
+    int* data;
+    Deep(int d) { data = new int(d); }
+
+    // 自定义拷贝构造函数（深拷贝）
+    Deep(const Deep&amp; other) {
+        data = new int(*other.data); // 关键：开辟新内存并复制值
+    }
+    
+    // 拷贝赋值运算符（需处理自赋值和旧资源）
+    Deep&amp; operator=(const Deep&amp; other) {
+        if (this == &amp;other) return *this; // 1. 防自赋值
+        delete data;                      // 2. 释放旧资源
+        data = new int(*other.data);      // 3. 分配新资源
+        return *this;
+    }
+    
+    ~Deep() { delete data; }
+};
+</code></pre>
+<h4 id="重点-1"><a href="#重点-1" class="headerlink" title="重点"></a>重点</h4><ol>
+<li>Rule of Three：如果一个类需要自定义析构函数、拷贝构造函数或拷贝赋值运算符中的任何一个，那么它几乎肯定需要全部三个。</li>
+</ol>
+<p>原因：你需要析构函数来释放资源，就需要拷贝构造和赋值运算符来管理资源的复制，防止浅拷贝带来的冲突。</p>
+<ol start="2">
+<li>现代 C++ 的解法（Rule of Zero） ：最好的深拷贝管理方式是不直接管理裸指针。</li>
+</ol>
+<p>使用 std::string、std::vector或 std::unique_ptr。这些标准库容器已经实现了深拷贝语义，你的类只需组合它们，编译器生成的默认拷贝就是安全的（深拷贝）。</p>
+<p>补充：写时拷贝 (COW)：拷贝时暂时共享内存，直到其中一个对象试图修改数据时，才进行深拷贝。历史上（如早期的 std::string），为了优化性能，曾使用“写时拷贝”技术。<br>现代 C++ 标准（C++11 及以后）为了保证线程安全，基本已废弃 COW 机制，现在的 std::string通常是强制深拷贝的。</p>
 <p>补充：进阶与设计思想</p>
 <ol>
 <li>RAII（Resource Acquisition Is Initialization）</li>
@@ -332,11 +619,6 @@ d.bar(10);    // 调用 Derived::bar(double)，int 被隐式转换为 double
 <li>接口隔离与依赖倒置</li>
 </ol>
 <p>面向接口编程，而非面向实现编程。利用抽象类（接口）降低模块间的耦合度。</p>
-<ol start="3">
-<li>多态的替代方案（现代 C++ 视角）</li>
-</ol>
-<p>CRTP（奇异递归模板模式）：用模板实现静态多态，避免虚函数带来的运行时开销。</p>
-<p>std::variant+ std::visit：在某些场景下替代继承和虚函数，提供更安全的类型处理。</p>
 
     </div>
 
@@ -417,7 +699,7 @@ d.bar(10);    // 调用 Derived::bar(double)，int 被隐式转换为 double
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.</span> <span class="nav-text">面向对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E4%B8%89%E5%A4%A7%E7%89%B9%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">核心三大特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">多态实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E8%81%94%E7%BC%96%E4%B8%8E%E5%8A%A8%E6%80%81%E8%81%94%E7%BC%96"><span class="nav-number">1.2.1.</span> <span class="nav-text">静态联编与动态联编</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%EF%BC%88vtable%EF%BC%89%E4%B8%8E%E8%99%9A%E6%8C%87%E9%92%88%EF%BC%88vptr%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">虚函数表（vtable）与虚指针（vptr）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB"><span class="nav-number">1.2.3.</span> <span class="nav-text">虚函数与抽象类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">1.2.4.</span> <span class="nav-text">关键关键字</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%E6%B7%B1%E5%BA%A6%E5%89%96%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">虚函数表深度剖析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8Evptr"><span class="nav-number">1.3.1.</span> <span class="nav-text">多重继承与vptr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%BC%80%E9%94%80"><span class="nav-number">1.3.2.</span> <span class="nav-text">性能开销</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vtable%E5%B8%83%E5%B1%80"><span class="nav-number">1.3.3.</span> <span class="nav-text">vtable布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vptr%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.3.4.</span> <span class="nav-text">vptr初始化</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.</span> <span class="nav-text">面向对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E4%B8%89%E5%A4%A7%E7%89%B9%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">核心三大特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">多态实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E8%81%94%E7%BC%96%E4%B8%8E%E5%8A%A8%E6%80%81%E8%81%94%E7%BC%96"><span class="nav-number">1.2.1.</span> <span class="nav-text">静态联编与动态联编</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB"><span class="nav-number">1.2.2.</span> <span class="nav-text">虚函数与抽象类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">虚函数：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">1.2.3.</span> <span class="nav-text">关键关键字</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8%E6%B7%B1%E5%BA%A6%E5%89%96%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">虚函数表深度剖析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8Evptr"><span class="nav-number">1.3.1.</span> <span class="nav-text">多重继承与vptr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%BC%80%E9%94%80"><span class="nav-number">1.3.2.</span> <span class="nav-text">性能开销</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vtable%E5%B8%83%E5%B1%80"><span class="nav-number">1.3.3.</span> <span class="nav-text">vtable布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vptr%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.3.4.</span> <span class="nav-text">vptr初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E8%80%83%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text">常见考题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E8%BD%BD%E3%80%81%E9%87%8D%E5%86%99%E3%80%81%E9%9A%90%E8%97%8F%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.4.1.</span> <span class="nav-text">重载、重写、隐藏的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#C-%E7%B1%BB%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E5%92%8C%E6%9E%90%E6%9E%84%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.4.2.</span> <span class="nav-text">C++类对象的初始化和析构顺序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E5%B1%80%E9%83%A8%E5%AF%B9%E8%B1%A1%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">静态对象与局部对象的生命周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E7%82%B9"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">重点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E5%8F%AF%E4%BB%A5%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8%E5%90%97%EF%BC%9F"><span class="nav-number">1.4.3.</span> <span class="nav-text">析构函数可以抛出异常吗？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%8E%9F%E5%9B%A0%EF%BC%9A%E5%8F%8C%E9%87%8D%E5%BC%82%E5%B8%B8%E7%9A%84%E8%87%B4%E5%91%BD%E6%80%A7"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">核心原因：双重异常的致命性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%8E%B0%E4%BB%A3-C-%E6%A0%87%E5%87%86%E4%B8%8E-noexcept"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">现代 C++ 标准与 noexcept</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E6%8B%B7%E8%B4%9D%E5%92%8C%E6%B5%85%E6%8B%B7%E8%B4%9D"><span class="nav-number">1.4.4.</span> <span class="nav-text">深拷贝和浅拷贝</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E7%82%B9-1"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">重点</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
