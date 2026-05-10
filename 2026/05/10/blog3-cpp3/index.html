@@ -27,10 +27,12 @@
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
 <meta property="og:description" content="内存管理">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frostdawnnico.github.io/2026/05/10/blog3-cpp3/shared_ptr_structure.png">
 <meta property="article:published_time" content="2026-05-10T02:43:24.000Z">
-<meta property="article:modified_time" content="2026-05-10T05:08:21.781Z">
+<meta property="article:modified_time" content="2026-05-10T09:13:54.967Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frostdawnnico.github.io/2026/05/10/blog3-cpp3/shared_ptr_structure.png">
 
 <link rel="canonical" href="https://frostdawnnico.github.io/2026/05/10/blog3-cpp3/">
 
@@ -175,7 +177,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-05-10 10:43:24 / Modified: 13:08:21" itemprop="dateCreated datePublished" datetime="2026-05-10T10:43:24+08:00">2026-05-10</time>
+              <time title="Created: 2026-05-10 10:43:24 / Modified: 17:13:54" itemprop="dateCreated datePublished" datetime="2026-05-10T10:43:24+08:00">2026-05-10</time>
             </span>
 
           
@@ -286,9 +288,9 @@ p = new int(66);
 
 // 3. 使用前判空（防御性编程）
 if (p != nullptr)
-{
+&#123;
     cout &lt;&lt; *p &lt;&lt; endl;
-}
+&#125;
 
 // 4. 释放 + 立刻置空（关键！）
 delete p;
@@ -390,21 +392,21 @@ obj-&gt;~Object(); // 必须手动调用析构函数，不能 delete
 </ol>
 <p>总结：<code>malloc/free</code>是 C 的遗产，只负责内存；<code>new/delete</code>是 C++ 的，负责对象生命。但在现代 C++ 中，我们应该尽量避免手动使用它们，转而使用 <strong>RAII</strong>和 <strong>智能指针</strong>来确保内存安全。</p>
 <h2 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h2><pre><code>void fun()
-{
+&#123;
     int* p=new int(10);//直接返回未释放，没有delete p，内存泄漏
-}
+&#125;
 </code></pre>
 <p>解决方案：使用<strong>智能指针</strong>（如<code>std::unique_ptr</code>）自动管理内存，避免手动释放的麻烦。</p>
 <pre><code>void func()
-{
+&#123;
     // 使用智能指针    
     std::unique_ptr&lt;int&gt; ptr(new int(10)); 
     if (some_condition) 
-    { 
+    &#123; 
         return; // 智能指针自动释放内存  
-    }   
+    &#125;   
     // 无需手动释放
-}
+&#125;
 </code></pre>
 <h2 id="野指针"><a href="#野指针" class="headerlink" title="野指针"></a>野指针</h2><p>野指针是C++中常见且危险的问题，需谨慎处理</p>
 <p><strong>产生原因：</strong> 指针变量未初始化，或指向的内存被释放后未置空、指针越界指向已销毁栈对象。</p>
@@ -427,9 +429,9 @@ int* p = nullptr;
 // 2. 申请堆内存
 p = new int(66);    
 // 3. 使用前判空（防御性编程）
-if (p != nullptr) {
+if (p != nullptr) &#123;
     cout &lt;&lt; *p &lt;&lt; endl;
-}
+&#125;
 // 4. 释放 + 立刻置空
 delete p;
 p = nullptr;
@@ -437,10 +439,10 @@ p = nullptr;
 <p>杜绝：指向局部栈变量的指针外流（<strong>栈野指针</strong>）</p>
 <pre><code>// ❌ 严重错误：返回局部变量地址
 int* getAddr()
-{
+&#123;
     int a = 10;
     return &amp;a;
-}
+&#125;
 // 函数结束 a 销毁，返回的是野指针
 </code></pre>
 <p><strong>动态数组</strong>标准安全写法：</p>
@@ -606,17 +608,17 @@ int g_var = 10;        // 全局区 (.data)
 static int s_var;      // 全局区 (.bss，自动初始化为0)
 const char* str = &quot;Hi&quot;;// str 在全局区，&quot;Hi&quot; 在常量区
 
-void func() {
+void func() &#123;
 int local = 20;          // 栈区
 int* heap_var = new int; // heap_var 指针在栈区，*heap_var 在堆区
 *heap_var = 30;
 delete heap_var;
-}
+&#125;
 
-int main() {
+int main() &#123;
 func();
 return 0; // 代码区存储 main 和 func 的指令
-}
+&#125;
 </code></pre>
 <h4 id="高频追问"><a href="#高频追问" class="headerlink" title="高频追问"></a>高频追问</h4><p>❓栈和堆的主要区别？</p>
 <table>
@@ -861,7 +863,7 @@ std::string s(p);
 </tr>
 </tbody></table>
 <pre><code>// 定义一个函数，接受 int 返回 int
-int add(int a) { return a + 1; }
+int add(int a) &#123; return a + 1; &#125;
 
 // 声明一个函数指针并赋值
 int (*func_ptr)(int) = &amp;add;
@@ -872,8 +874,11 @@ int (*func_ptr)(int) = &amp;add;
 int result = func_ptr(5); // result = 6
 </code></pre>
 <ol start="3">
-<li>引用（Reference）是某个变量的别名，不单独占内存。</li>
+<li><p>引用（Reference）是某个变量的别名，不单独占内存。</p>
+<p> int a &#x3D; 10;<br> int&amp; r &#x3D; a; &#x2F;&#x2F;操作 r等价于操作 a</p>
+</li>
 </ol>
+<p>三大特性: ✅ 必须初始化✅ 不能重新绑定✅ 本质通常是常量指针（编译器实现）<br>int&amp; r ↔ int* const r</p>
 <h4 id="指针-vs-引用"><a href="#指针-vs-引用" class="headerlink" title="指针 vs 引用"></a>指针 vs 引用</h4><p>重点在于<strong>是否可为空</strong>和<strong>是否可重定向</strong></p>
 <table>
 <thead>
@@ -909,6 +914,310 @@ int result = func_ptr(5); // result = 6
 <td>高（引用必须绑定有效对象）。</td>
 </tr>
 </tbody></table>
+<p>能用引用就不要用指针，除非需要表示“无对象”或动态内存。</p>
+<h4 id="常见代码"><a href="#常见代码" class="headerlink" title="常见代码"></a>常见代码</h4><p>✅ 交换函数</p>
+<pre><code>// 值传递 ❌
+void swap(int a, int b);
+// 指针传递 ✅
+void swap(int* a, int* b) &#123;
+    int t = *a;
+    *a = *b;
+    *b = t;
+&#125;
+// 引用传递 ✅✅
+void swap(int&amp; a, int&amp; b) &#123;
+    int t = a;
+    a = b;
+    b = t;
+&#125;
+</code></pre>
+<p>❌ 指针作为返回值（危险）</p>
+<pre><code>int* func() &#123;
+    int x = 10;
+    return &amp;x; // ❌ 返回局部变量地址，悬垂指针
+&#125;
+</code></pre>
+<p>根本原因：局部变量在栈上分配，函数结束即销毁，返回的地址指向一块 已经不属于你的内存</p>
+<p>❌ 返回局部变量（陷阱）</p>
+<pre><code>int&amp; func() &#123;
+    int x = 10;
+    return x; // ❌ 返回局部变量，悬垂引用
+&#125;
+</code></pre>
+<p>正确做法：</p>
+<p>✅ 方案 1：返回普通值（最推荐）</p>
+<pre><code>int func() &#123;
+    int x = 10;
+    return x;  // 返回拷贝
+&#125;
+</code></pre>
+<p>✅方案 2：使用静态变量（慎用）</p>
+<pre><code>int* func() &#123;
+    static int x = 10;
+    return &amp;x;
+&#125;
+</code></pre>
+<p>⚠️ 缺点：非线程安全；多次调用共享同一变量</p>
+<p>✅ 方案 3：使用动态内存（需手动释放）</p>
+<pre><code>int* func() &#123;
+    int* x = new int(10);
+    return x;
+&#125;
+</code></pre>
+<p>⚠️ 必须：delete p;否则 内存泄漏</p>
+<p>✅ 方案 4（C++11+）：智能指针 ✅✅✅</p>
+<pre><code>#include &lt;memory&gt;
+std::unique_ptr&lt;int&gt; func() &#123;
+    return std::make_unique&lt;int&gt;(10);//应尽量避免裸指针管理资源。
+&#125;
+</code></pre>
+<p>❓ 为什么返回 int可以，返回 int*就不行？</p>
+<p>返回 int→ 返回的是 值的拷贝</p>
+<p>返回 int*→ 返回的是 地址，但地址指向的东西没了</p>
+<p><strong>总结：永远不要返回局部变量的指针或引用。</strong></p>
+<h3 id="指针传递、值传递、引用传递"><a href="#指针传递、值传递、引用传递" class="headerlink" title="指针传递、值传递、引用传递"></a>指针传递、值传递、引用传递</h3><h4 id="值传递（Pass-by-Value）"><a href="#值传递（Pass-by-Value）" class="headerlink" title="值传递（Pass by Value）"></a>值传递（Pass by Value）</h4><p>✅ 定义：把实参的“拷贝”传给函数，函数内操作不影响原变量。</p>
+<p>🔍 内存本质：形参是实参的副本；会调用 拷贝构造函数；修改形参不会影响原变量</p>
+<pre><code>void func(int x) &#123;
+    x = 10;
+&#125;
+
+int main() &#123;
+    int a = 5;
+    func(a);// a 仍然是 5
+&#125;
+</code></pre>
+<p>✅ 优点：安全；无副作用</p>
+<p>❌ 缺点：效率低（大对象拷贝成本高）；无法修改原数据</p>
+<p>对于内置类型（int、double）推荐值传递；对于大对象，避免值传递。</p>
+<h4 id="指针传递（Pass-by-Pointer）"><a href="#指针传递（Pass-by-Pointer）" class="headerlink" title="指针传递（Pass by Pointer）"></a>指针传递（Pass by Pointer）</h4><p>✅ 定义：把变量的地址传给函数，通过指针间接修改原变量。</p>
+<p>🔍 内存本质：传递的是 地址值；形参是一个指针变量；可通过 *p修改原变量</p>
+<pre><code>void func(int* p) &#123;
+    *p = 10;
+&#125;
+
+int main() &#123;
+    int a = 5;
+    func(&amp;a);// a == 10
+&#125;
+</code></pre>
+<p>✅ 本质仍是值传递（地址值）✅ 必须判空✅ 可以为 nullptr ❌ 可读性较差</p>
+<p>指针传递本质是值传递，只不过传的是地址。</p>
+<h4 id="引用传递（Pass-by-Reference）"><a href="#引用传递（Pass-by-Reference）" class="headerlink" title="引用传递（Pass by Reference）"></a>引用传递（Pass by Reference）</h4><p>✅ 一句话定义：给实参起一个别名，函数内操作直接影响原变量。</p>
+<p>🔍 内存本质：不创建新对象；编译器通常实现为 <strong>常量指针</strong>；语法层面更安全</p>
+<pre><code>void func(int&amp; x) &#123;
+    x = 10;
+&#125;
+
+int main() &#123;
+    int a = 5;
+    func(a);// a == 10
+&#125;
+</code></pre>
+<p>❌ 不可以为空 ❌ 不需要判空 ❌ 不可以重新绑定 ✅ 非常推荐</p>
+<p>引用传递兼具效率与安全性，是现代 C++ 的首选。</p>
+<h4 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h4><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>值传递</th>
+<th>指针传递</th>
+<th>引用传递</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>是否拷贝</td>
+<td>✅ 是</td>
+<td>✅ 是（地址）</td>
+<td>❌ 否</td>
+</tr>
+<tr>
+<td>能否改原值</td>
+<td>❌ 否</td>
+<td>✅ 能</td>
+<td>✅ 能</td>
+</tr>
+<tr>
+<td>是否可为空</td>
+<td>❌</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td>✅ 高</td>
+<td>❌ 低</td>
+<td>✅ 高</td>
+</tr>
+<tr>
+<td>可读性</td>
+<td>✅ 好</td>
+<td>❌ 差</td>
+<td>✅ 好</td>
+</tr>
+<tr>
+<td>典型用途</td>
+<td>小对象</td>
+<td>动态内存 &#x2F; 可选参数</td>
+<td>普通参数</td>
+</tr>
+</tbody></table>
+<h4 id="追问"><a href="#追问" class="headerlink" title="追问"></a>追问</h4><p>❓ 引用传递比指针传递好在哪里？</p>
+<p>✅ 答案：无需判空；语法简洁；不易出现野指针；更符合现代 C++ 风格</p>
+<p>❓ 引用传递真的不占内存吗？</p>
+<p>✅ 标准回答：语法层面不占内存，但底层通常由编译器用指针实现。</p>
+<p>❓ 什么时候必须用指针传递？</p>
+<p>✅ 答案：需要表示“无对象”（nullptr）；需要改变指针本身指向；与 C API 交互</p>
+<h3 id="RAII-思想"><a href="#RAII-思想" class="headerlink" title="RAII 思想"></a>RAII 思想</h3><p>RAII 的核心思想是：用对象的生命周期来管理资源。</p>
+<p>核心原则（4 句话）:把资源封装进对象;构造函数中获取资源;析构函数中释放资源；对象离开作用域时自动释放</p>
+<p>📌 本质： 让编译器帮你管理资源</p>
+<p>✅ 手写一个 RAII 类</p>
+<pre><code>class FileRAII &#123;
+public:
+    FileRAII(const char* name) &#123;
+        fp = fopen(name, &quot;r&quot;);
+    &#125;
+    
+    ~FileRAII() &#123;
+        if (fp) &#123;
+            fclose(fp);
+            fp = nullptr;
+        &#125;
+    &#125;
+
+private:
+    FILE* fp;
+&#125;;
+</code></pre>
+<h4 id="C-标准库中的-RAII"><a href="#C-标准库中的-RAII" class="headerlink" title="C++ 标准库中的 RAII"></a>C++ 标准库中的 RAII</h4><table>
+<thead>
+<tr>
+<th>资源</th>
+<th>RAII 类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内存</td>
+<td><code>std::unique_ptr</code>, <code>std::shared_ptr</code></td>
+</tr>
+<tr>
+<td>文件</td>
+<td><code>std::fstream</code></td>
+</tr>
+<tr>
+<td>互斥锁</td>
+<td><code>std::lock_guard</code>, <code>std::unique_lock</code></td>
+</tr>
+<tr>
+<td>线程</td>
+<td><code>std::thread</code></td>
+</tr>
+</tbody></table>
+<p>📌 RAII 提供 基本异常安全保证</p>
+<p>补充：✅ 异常安全级别</p>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基本保证</td>
+<td>不泄漏资源</td>
+</tr>
+<tr>
+<td>强保证</td>
+<td>操作要么成功，要么回滚</td>
+</tr>
+<tr>
+<td>不抛异常</td>
+<td><code>noexcept</code></td>
+</tr>
+</tbody></table>
+<p>❓ RAII 和 GC（垃圾回收）的区别？</p>
+<p>✅ 标准回答：</p>
+<p>RAII 是确定性的资源管理，析构时机明确；GC 是非确定性的，无法及时释放文件、锁等资源。</p>
+<p>C++ 追求零开销抽象，RAII 能在编译期保证资源释放，性能更高，控制更精确。</p>
+<h3 id="智能指针深入解析"><a href="#智能指针深入解析" class="headerlink" title="智能指针深入解析"></a>智能指针深入解析</h3><p>智能指针的本质：用 RAII 管理堆内存，把 delete 交给编译器。通过对象生命周期自动释放资源，解决裸指针的内存安全问题。</p>
+<p>裸指针的问题：忘记 delete——内存泄漏；提前 return &#x2F; throw——泄漏；多次 delete——未定义行为；异常不安全——资源泄漏</p>
+<h4 id="std-unique-ptr（独占所有权）：一份资源，只有一个拥有者"><a href="#std-unique-ptr（独占所有权）：一份资源，只有一个拥有者" class="headerlink" title="std::unique_ptr（独占所有权）：一份资源，只有一个拥有者"></a>std::unique_ptr（独占所有权）：一份资源，只有一个拥有者</h4><pre><code>std::unique_ptr&lt;int&gt; p = std::make_unique&lt;int&gt;(10);
+</code></pre>
+<p>❌ 不能拷贝✅ 只能移动</p>
+<p>拷贝会导致双重释放（double free）</p>
+<pre><code>std::unique_ptr&lt;int&gt; p1 = std::make_unique&lt;int&gt;(10);
+std::unique_ptr&lt;int&gt; p2 = std::move(p1);// p1 == nullptr
+</code></pre>
+<p>✅ 默认首选 ✅ 性能零额外开销 ✅ 禁止滥用 shared_ptr</p>
+<h4 id="std-shared-ptr（引用计数）：多个指针共享同一份资源"><a href="#std-shared-ptr（引用计数）：多个指针共享同一份资源" class="headerlink" title="std::shared_ptr（引用计数）：多个指针共享同一份资源"></a>std::shared_ptr（引用计数）：多个指针共享同一份资源</h4><pre><code>std::shared_ptr&lt;int&gt; p1 = std::make_shared&lt;int&gt;(10);
+std::shared_ptr&lt;int&gt; p2 = p1;
+</code></pre>
+<p>❓引用计数是怎么实现的？</p>
+<p>✅ 控制块（Control Block）</p>
+<pre><code>shared_ptr
+┌──────────────┐
+│  ptr ────────┼─► 资源
+│  control ────┼─► [strong_ref | weak_ref]
+└──────────────┘
+</code></pre>
+<p>强引用计数：决定资源是否释放</p>
+<p>弱引用计数：决定控制块是否释放</p>
+<p>❓<code>make_shared</code>vs <code>new</code></p>
+<pre><code>shared_ptr&lt;int&gt; p(new int(10));//❌ 不推荐
+auto p = make_shared&lt;int&gt;(10);//✅ 推荐
+</code></pre>
+<p>异常安全:防止构造失败泄漏;一次分配:减少内存碎片;性能更好:控制块 + 对象一起分配</p>
+<p>❓引用计数是否是线程安全的？</p>
+<p>✅ 是的，引用计数的增减是 <strong>原子操作</strong>，但对象本身的线程安全仍需你自己保证</p>
+<h4 id="std-weak-ptr（解决循环引用）"><a href="#std-weak-ptr（解决循环引用）" class="headerlink" title="std::weak_ptr（解决循环引用）"></a>std::weak_ptr（解决循环引用）</h4><pre><code>// 循环引用
+struct B;
+
+struct A &#123;
+shared_ptr&lt;B&gt; b;
+&#125;;
+
+struct B &#123;
+shared_ptr&lt;A&gt; a;
+&#125;;// ❌ 引用计数永远不为 0 → 内存泄漏
+
+struct B &#123;
+weak_ptr&lt;A&gt; a;  
+&#125;;// ✅ weak_ptr 不增加引用计数
+</code></pre>
+<p>使用 weak_ptr</p>
+<pre><code>if (auto sp = wp.lock()) &#123;
+    // 安全访问
+&#125;
+</code></pre>
+<h4 id="智能指针的底层实现"><a href="#智能指针的底层实现" class="headerlink" title="智能指针的底层实现"></a>智能指针的底层实现</h4><p>1️⃣ shared_ptr 简化模型</p>
+<pre><code>template&lt;typename T&gt;
+class shared_ptr &#123;
+    T* ptr;
+    ControlBlock* cb;
+&#125;;
+struct ControlBlock &#123;
+    atomic&lt;int&gt; strong_count;
+    atomic&lt;int&gt; weak_count;
+&#125;;
+</code></pre>
+<p>2️⃣ 析构顺序</p>
+<ol>
+<li>strong_count– </li>
+<li>若为 0 → 释放 资源 </li>
+<li>weak_count– </li>
+<li>若为 0 → 释放 控制块</li>
+</ol>
+<h4 id="追问-1"><a href="#追问-1" class="headerlink" title="追问"></a>追问</h4><p>❓ shared_ptr 一定比 unique_ptr 慢吗？</p>
+<p>✅ 是的。原子操作，控制块访问</p>
+<p>❓ 可以把 unique_ptr 转成 shared_ptr 吗？</p>
+<p>✅ 可以</p>
+<pre><code>unique_ptr&lt;int[]&gt; p = make_unique&lt;int[]&gt;(10);
+</code></pre>
+<p>总结：C++ 智能指针基于 RAII 思想， unique_ptr表示独占所有权，无额外开销； shared_ptr通过引用计数实现共享，线程安全但代价更高； weak_ptr用于打破循环引用；</p>
+<p>优先使用 make_shared&#x2F; make_unique， 能用 unique_ptr就不用 shared_ptr。</p>
+<img src="/2026/05/10/blog3-cpp3/shared_ptr_structure.png" class="" title="shared_ptr内存结构图">
+
+
+
 
     </div>
 
@@ -986,7 +1295,7 @@ int result = func_ptr(5); // result = 6
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E5%88%92%E5%88%86"><span class="nav-number">1.2.</span> <span class="nav-text">内存区域划分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E5%86%85%E5%AD%98%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C%EF%BC%9Anew-delete"><span class="nav-number">1.3.</span> <span class="nav-text">堆内存核心操作：new &#x2F;delete</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E8%AF%AD%E8%A8%80%E9%A3%8E%E6%A0%BC%EF%BC%9Amalloc-free"><span class="nav-number">1.4.</span> <span class="nav-text">C 语言风格：malloc &#x2F;free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#new-delete%E5%AF%B9%E6%AF%94-malloc-free"><span class="nav-number">1.5.</span> <span class="nav-text">new&#x2F;delete对比 malloc&#x2F;free</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%BD%E9%97%AE%E4%B8%8E%E9%99%B7%E9%98%B1"><span class="nav-number">1.5.1.</span> <span class="nav-text">追问与陷阱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">1.5.2.</span> <span class="nav-text">补充</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F"><span class="nav-number">1.6.</span> <span class="nav-text">内存泄漏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8E%E6%8C%87%E9%92%88"><span class="nav-number">1.7.</span> <span class="nav-text">野指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E9%87%8A%E6%94%BE%E5%86%85%E5%AD%98"><span class="nav-number">1.8.</span> <span class="nav-text">重复释放内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E6%A6%82%E8%BF%B0"><span class="nav-number">1.9.</span> <span class="nav-text">智能指针概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E5%88%9D%E8%A1%B7%E4%B8%8E%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="nav-number">1.9.1.</span> <span class="nav-text">设计初衷与核心思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unique-ptr%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.9.2.</span> <span class="nav-text">unique_ptr详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shared-ptr%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.9.3.</span> <span class="nav-text">shared_ptr详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#weak-ptr%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8"><span class="nav-number">1.9.4.</span> <span class="nav-text">weak_ptr解决循环引用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B"><span class="nav-number">1.10.</span> <span class="nav-text">内存泄漏检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAII%E6%9C%BA%E5%88%B6%E6%A0%B8%E5%BF%83"><span class="nav-number">1.11.</span> <span class="nav-text">RAII机制核心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E8%80%83%E9%A2%98"><span class="nav-number">1.12.</span> <span class="nav-text">常见考题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#C-%E5%86%85%E5%AD%98%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.12.1.</span> <span class="nav-text">C++内存是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">1.12.1.1.</span> <span class="nav-text">代码示例：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E8%BF%BD%E9%97%AE"><span class="nav-number">1.12.1.2.</span> <span class="nav-text">高频追问</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A%E7%8E%B0%E4%BB%A3-C-%E7%9A%84%E5%86%85%E5%AD%98%E8%A7%82"><span class="nav-number">1.12.1.3.</span> <span class="nav-text">补充：现代 C++ 的内存观</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E3%80%81%E6%8C%87%E9%92%88%E5%A3%B0%E6%98%8E%E5%92%8C%E5%BC%95%E7%94%A8"><span class="nav-number">1.12.2.</span> <span class="nav-text">指针、指针声明和引用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5-1"><span class="nav-number">1.12.2.1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%87%E9%92%88-vs-%E5%BC%95%E7%94%A8"><span class="nav-number">1.12.2.2.</span> <span class="nav-text">指针 vs 引用</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E5%88%92%E5%88%86"><span class="nav-number">1.2.</span> <span class="nav-text">内存区域划分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E5%86%85%E5%AD%98%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C%EF%BC%9Anew-delete"><span class="nav-number">1.3.</span> <span class="nav-text">堆内存核心操作：new &#x2F;delete</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E8%AF%AD%E8%A8%80%E9%A3%8E%E6%A0%BC%EF%BC%9Amalloc-free"><span class="nav-number">1.4.</span> <span class="nav-text">C 语言风格：malloc &#x2F;free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#new-delete%E5%AF%B9%E6%AF%94-malloc-free"><span class="nav-number">1.5.</span> <span class="nav-text">new&#x2F;delete对比 malloc&#x2F;free</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%BD%E9%97%AE%E4%B8%8E%E9%99%B7%E9%98%B1"><span class="nav-number">1.5.1.</span> <span class="nav-text">追问与陷阱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">1.5.2.</span> <span class="nav-text">补充</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F"><span class="nav-number">1.6.</span> <span class="nav-text">内存泄漏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8E%E6%8C%87%E9%92%88"><span class="nav-number">1.7.</span> <span class="nav-text">野指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E9%87%8A%E6%94%BE%E5%86%85%E5%AD%98"><span class="nav-number">1.8.</span> <span class="nav-text">重复释放内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E6%A6%82%E8%BF%B0"><span class="nav-number">1.9.</span> <span class="nav-text">智能指针概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E5%88%9D%E8%A1%B7%E4%B8%8E%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="nav-number">1.9.1.</span> <span class="nav-text">设计初衷与核心思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unique-ptr%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.9.2.</span> <span class="nav-text">unique_ptr详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shared-ptr%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.9.3.</span> <span class="nav-text">shared_ptr详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#weak-ptr%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8"><span class="nav-number">1.9.4.</span> <span class="nav-text">weak_ptr解决循环引用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B"><span class="nav-number">1.10.</span> <span class="nav-text">内存泄漏检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAII%E6%9C%BA%E5%88%B6%E6%A0%B8%E5%BF%83"><span class="nav-number">1.11.</span> <span class="nav-text">RAII机制核心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E8%80%83%E9%A2%98"><span class="nav-number">1.12.</span> <span class="nav-text">常见考题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#C-%E5%86%85%E5%AD%98%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.12.1.</span> <span class="nav-text">C++内存是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">1.12.1.1.</span> <span class="nav-text">代码示例：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E8%BF%BD%E9%97%AE"><span class="nav-number">1.12.1.2.</span> <span class="nav-text">高频追问</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A%E7%8E%B0%E4%BB%A3-C-%E7%9A%84%E5%86%85%E5%AD%98%E8%A7%82"><span class="nav-number">1.12.1.3.</span> <span class="nav-text">补充：现代 C++ 的内存观</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E3%80%81%E6%8C%87%E9%92%88%E5%A3%B0%E6%98%8E%E5%92%8C%E5%BC%95%E7%94%A8"><span class="nav-number">1.12.2.</span> <span class="nav-text">指针、指针声明和引用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5-1"><span class="nav-number">1.12.2.1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%87%E9%92%88-vs-%E5%BC%95%E7%94%A8"><span class="nav-number">1.12.2.2.</span> <span class="nav-text">指针 vs 引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81"><span class="nav-number">1.12.2.3.</span> <span class="nav-text">常见代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E4%BC%A0%E9%80%92%E3%80%81%E5%80%BC%E4%BC%A0%E9%80%92%E3%80%81%E5%BC%95%E7%94%A8%E4%BC%A0%E9%80%92"><span class="nav-number">1.12.3.</span> <span class="nav-text">指针传递、值传递、引用传递</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%80%BC%E4%BC%A0%E9%80%92%EF%BC%88Pass-by-Value%EF%BC%89"><span class="nav-number">1.12.3.1.</span> <span class="nav-text">值传递（Pass by Value）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E4%BC%A0%E9%80%92%EF%BC%88Pass-by-Pointer%EF%BC%89"><span class="nav-number">1.12.3.2.</span> <span class="nav-text">指针传递（Pass by Pointer）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%95%E7%94%A8%E4%BC%A0%E9%80%92%EF%BC%88Pass-by-Reference%EF%BC%89"><span class="nav-number">1.12.3.3.</span> <span class="nav-text">引用传递（Pass by Reference）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94"><span class="nav-number">1.12.3.4.</span> <span class="nav-text">对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%BD%E9%97%AE"><span class="nav-number">1.12.3.5.</span> <span class="nav-text">追问</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RAII-%E6%80%9D%E6%83%B3"><span class="nav-number">1.12.4.</span> <span class="nav-text">RAII 思想</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93%E4%B8%AD%E7%9A%84-RAII"><span class="nav-number">1.12.4.1.</span> <span class="nav-text">C++ 标准库中的 RAII</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90"><span class="nav-number">1.12.5.</span> <span class="nav-text">智能指针深入解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#std-unique-ptr%EF%BC%88%E7%8B%AC%E5%8D%A0%E6%89%80%E6%9C%89%E6%9D%83%EF%BC%89%EF%BC%9A%E4%B8%80%E4%BB%BD%E8%B5%84%E6%BA%90%EF%BC%8C%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E6%8B%A5%E6%9C%89%E8%80%85"><span class="nav-number">1.12.5.1.</span> <span class="nav-text">std::unique_ptr（独占所有权）：一份资源，只有一个拥有者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#std-shared-ptr%EF%BC%88%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%EF%BC%89%EF%BC%9A%E5%A4%9A%E4%B8%AA%E6%8C%87%E9%92%88%E5%85%B1%E4%BA%AB%E5%90%8C%E4%B8%80%E4%BB%BD%E8%B5%84%E6%BA%90"><span class="nav-number">1.12.5.2.</span> <span class="nav-text">std::shared_ptr（引用计数）：多个指针共享同一份资源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#std-weak-ptr%EF%BC%88%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8%EF%BC%89"><span class="nav-number">1.12.5.3.</span> <span class="nav-text">std::weak_ptr（解决循环引用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.12.5.4.</span> <span class="nav-text">智能指针的底层实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%BD%E9%97%AE-1"><span class="nav-number">1.12.5.5.</span> <span class="nav-text">追问</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
