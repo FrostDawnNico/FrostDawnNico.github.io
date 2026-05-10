@@ -28,7 +28,7 @@
 <meta property="og:description" content="面向对象">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-05-07T15:03:33.000Z">
-<meta property="article:modified_time" content="2026-05-10T02:53:03.361Z">
+<meta property="article:modified_time" content="2026-05-10T03:14:18.435Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-05-10 10:53:03" itemprop="dateModified" datetime="2026-05-10T10:53:03+08:00">2026-05-10</time>
+                <time title="Modified: 2026-05-10 11:14:18" itemprop="dateModified" datetime="2026-05-10T11:14:18+08:00">2026-05-10</time>
               </span>
 
           
@@ -1013,6 +1013,19 @@ public:
 </tr>
 </tbody></table>
 <p>补充： CRTP或 std::variant作为避免 vptr 开销的替代方案</p>
+<ol start="5">
+<li>析构函数的调用顺序</li>
+</ol>
+<p>析构函数的调用顺序是“先派生类，后基类”（LIFO，后进先出）。这与构造函数的顺序（先基类，后派生类）正好相反。</p>
+<p>❓为什么必须是这个顺序？</p>
+<p>依赖关系：派生类对象是在基类对象的基础上构建的（“is-a”关系）。派生类的析构函数可能依赖基类提供的资源或状态。如果先销毁基类，派生类析构时访问基类成员将导致未定义行为（访问已释放的内存）。</p>
+<p>资源安全：确保派生类特有的资源（如上例中的 data）在基类资源释放之前被清理，防止悬空引用。</p>
+<p>❗如果基类析构函数不是虚函数，且通过基类指针删除派生类对象：</p>
+<p>结果：仅调用基类析构函数，派生类析构函数不会被调用。</p>
+<p>后果：派生类中的资源（如 new的内存）无法释放，造成内存泄漏。</p>
+<p>结论：凡是可能被继承的基类，其析构函数必须声明为 virtual。</p>
+<p>多重继承：派生类 →第二个基类 →第一个基类（按继承列表逆序）</p>
+<p>现代 C++ 建议：使用 RAII​ 原则管理资源，并确保基类析构函数为 virtual或 protected（禁止直接删除基类指针）</p>
 
     </div>
 
