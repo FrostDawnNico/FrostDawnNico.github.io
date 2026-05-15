@@ -28,7 +28,7 @@
 <meta property="og:description" content="介绍C++11及以后版本引入的lambda表达式、constexpr、decltype等现代化语言特性。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-05-10T17:09:37.000Z">
-<meta property="article:modified_time" content="2026-05-14T12:40:55.476Z">
+<meta property="article:modified_time" content="2026-05-15T16:48:49.358Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="C++11">
 <meta name="twitter:card" content="summary">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-05-14 20:40:55" itemprop="dateModified" datetime="2026-05-14T20:40:55+08:00">2026-05-14</time>
+                <time title="Modified: 2026-05-16 00:48:49" itemprop="dateModified" datetime="2026-05-16T00:48:49+08:00">2026-05-16</time>
               </span>
 
           
@@ -255,6 +255,129 @@ ClassName(ClassName&amp;&amp; other) noexcept;
 // 移动赋值
 ClassName&amp; operator=(ClassName&amp;&amp; other) noexcept;
 </code></pre>
+<p>❓noexcept关键字作用及优点</p>
+<blockquote>
+<p><strong>移动操作标记为 <code>noexcept</code>，是为了让标准库容器在发生重新分配时能够安全地使用移动语义，从而兼顾异常安全与性能。</strong></p>
+</blockquote>
+<p>一、 <code>noexcept</code> 的作用是什么？</p>
+<p><strong>作用：</strong></p>
+<ul>
+<li>向编译器和标准库<strong>承诺</strong>：<br>👉 <em>这个函数不会抛出任何异常</em></li>
+<li>如果真的抛出了异常，程序会直接调用 <code>std::terminate</code></li>
+</ul>
+<p>二、 为什么移动构造 &#x2F; 赋值特别需要 <code>noexcept</code>？</p>
+<p>✅ 关键原因：<strong>标准库容器的异常安全要求</strong></p>
+<p>以 <code>std::vector</code> 为例： 场景：<code>vector</code> 扩容（reallocate）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;ClassName&gt; v;</span><br><span class="line">v.<span class="built_in">push_back</span>(obj);</span><br></pre></td></tr></table></figure>
+
+<p>当容量不足时：</p>
+<ol>
+<li>申请新内存</li>
+<li><strong>把旧元素搬到新内存</strong></li>
+<li>销毁旧元素</li>
+</ol>
+<p>❌ 如果移动构造函数<strong>没有 <code>noexcept</code></strong></p>
+<p>标准库会这样判断：</p>
+<blockquote>
+<p>“如果这个移动中途抛异常，我已经搬了一半，旧对象还在，还能回滚。”</p>
+</blockquote>
+<p>✅ <strong>安全，但代价大</strong></p>
+<p>➡️ <strong>标准库会放弃移动，改用拷贝构造</strong></p>
+<p>结果：</p>
+<ul>
+<li>性能大幅下降</li>
+<li>移动语义形同虚设</li>
+</ul>
+<p>✅ 如果移动构造函数<strong>有 <code>noexcept</code></strong></p>
+<p>标准库判断：</p>
+<blockquote>
+<p>“这个操作不会抛异常，可以放心移动。”</p>
+</blockquote>
+<p>➡️ <strong>直接使用移动构造</strong></p>
+<p>结果：</p>
+<ul>
+<li>O(n) → O(1)</li>
+<li>无额外内存分配</li>
+<li>真正的“零开销抽象”</li>
+</ul>
+<p>三、<code>noexcept</code> 的核心优点总结</p>
+<table>
+<thead>
+<tr>
+<th>优点</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>✅ 启用高效移动</td>
+<td>vector &#x2F; map &#x2F; unordered_map 扩容时使用移动</td>
+</tr>
+<tr>
+<td>✅ 异常安全</td>
+<td>保证强异常安全（strong exception safety）</td>
+</tr>
+<tr>
+<td>✅ 编译器优化</td>
+<td>可省略异常处理代码</td>
+</tr>
+<tr>
+<td>✅ 符合 STL 设计预期</td>
+<td>是“可移动类型”的重要特征</td>
+</tr>
+<tr>
+<td>✅ swap &#x2F; move 算法更安全</td>
+<td><code>std::move_if_noexcept</code></td>
+</tr>
+</tbody></table>
+<p>四、标准库中的典型体现（面试高频）</p>
+<p>1️⃣ <code>std::move_if_noexcept</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">typename</span> std::conditional&lt;</span><br><span class="line">    !std::is_nothrow_move_constructible&lt;T&gt;::value &amp;&amp;</span><br><span class="line">    std::is_copy_constructible&lt;T&gt;::value,</span><br><span class="line">    <span class="type">const</span> T&amp;, T&amp;&amp;</span><br><span class="line">&gt;::<span class="function">type <span class="title">move_if_noexcept</span><span class="params">(T&amp; x)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>👉 <strong>如果移动可能抛异常，就退化为拷贝</strong></p>
+<p>2️⃣ <code>std::vector</code> 的行为规则（必背）</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>vector 扩容行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>移动构造 <code>noexcept</code></td>
+<td>✅ 使用移动</td>
+</tr>
+<tr>
+<td>移动构造可能抛异常</td>
+<td>❌ 使用拷贝</td>
+</tr>
+<tr>
+<td>不可拷贝</td>
+<td>❌ 编译错误或 terminate</td>
+</tr>
+</tbody></table>
+<p>五、什么时候必须写 <code>noexcept</code>？</p>
+<p>✅ <strong>强烈建议的场景</strong></p>
+<ul>
+<li>移动构造函数</li>
+<li>移动赋值运算符</li>
+<li>析构函数（C++11 起默认 <code>noexcept</code>）</li>
+<li><code>swap</code> 函数</li>
+</ul>
+<p>❌ <strong>不建议乱加的场景</strong></p>
+<ul>
+<li>可能失败的操作（如内存分配、IO）</li>
+<li>调用了可能抛异常的函数</li>
+</ul>
+<p>六、标准写法示例（面试可直接写）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyClass</span>(MyClass&amp;&amp; other) <span class="keyword">noexcept</span></span><br><span class="line">        : <span class="built_in">ptr</span>(other.ptr)</span><br><span class="line">    &#123;</span><br><span class="line">        other.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    MyClass&amp; <span class="keyword">operator</span>=(MyClass&amp;&amp; other) <span class="keyword">noexcept</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != &amp;other) &#123;</span><br><span class="line">            <span class="keyword">delete</span> ptr;</span><br><span class="line">            ptr = other.ptr;</span><br><span class="line">            other.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span>* ptr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>七、面试加分回答（高级）</p>
+<blockquote>
+<p>“<code>noexcept</code> 不仅是异常说明，更是接口契约。<br>对移动构造而言，它是性能开关；<br>对标准库而言，它是异常安全的前提。”</p>
+</blockquote>
+<p>八、一句话总结（背这句）</p>
+<blockquote>
+<p><strong>移动构造 &#x2F; 赋值不加 <code>noexcept</code>，等于白写移动语义。</strong></p>
+</blockquote>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>右值引用结合移动构造、移动赋值，实现移动语义，不再深拷贝数据，而是直接转移资源所有权，减少临时对象开销，大幅提升程序运行性能。</p>
 
     </div>
