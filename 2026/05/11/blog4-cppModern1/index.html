@@ -28,7 +28,7 @@
 <meta property="og:description" content="介绍C++11及以后版本引入的lambda表达式、constexpr、decltype等现代化语言特性。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-05-10T17:09:37.000Z">
-<meta property="article:modified_time" content="2026-05-20T06:31:07.639Z">
+<meta property="article:modified_time" content="2026-05-20T06:43:42.892Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="C++11">
 <meta name="twitter:card" content="summary">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-05-20 14:31:07" itemprop="dateModified" datetime="2026-05-20T14:31:07+08:00">2026-05-20</time>
+                <time title="Modified: 2026-05-20 14:43:42" itemprop="dateModified" datetime="2026-05-20T14:43:42+08:00">2026-05-20</time>
               </span>
 
           
@@ -476,6 +476,102 @@ int a = 10;
 decltype(a) b = 20; // b 是 int
 </code></pre>
 <p>❓自动类型推导会带来哪些副作用？</p>
+<ol>
+<li>丢失顶层 const &#x2F; volatile 和引用（<code>auto</code> 的默认行为）</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> ci = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">auto</span> a = ci;      <span class="comment">// a 是 int，const 被丢弃</span></span><br><span class="line"><span class="keyword">auto</span>&amp; b = ci;     <span class="comment">// b 是 const int&amp;</span></span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li>无意中产生拷贝，影响性能</li>
+<li>意外允许修改本应只读的变量</li>
+</ul>
+<p>📌 <strong>面试提示</strong>：<code>auto</code> 永远不会保留顶层 const &#x2F; volatile，除非显式声明。<br>2. 意外的拷贝与性能问题</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;<span class="type">int</span>&gt; v = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> x : v) &#123; ... &#125;   <span class="comment">// 每次拷贝</span></span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li>对大对象或复杂类型造成性能损耗</li>
+<li>修改 <code>x</code> 不影响原容器</li>
+</ul>
+<p>✅ <strong>正确做法</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; x : v) &#123; ... &#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>与初始化列表的奇怪行为</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;;   <span class="comment">// std::initializer_list&lt;int&gt;</span></span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li>推导结果可能不是你想要的容器或数组</li>
+<li>无法进一步推导为 <code>std::vector</code></li>
+</ul>
+<p>📌 C++17 后部分场景有所改进，但仍需警惕。<br>4. 代码可读性下降（“类型消失”）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> result = <span class="built_in">process</span>(data);</span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li>读者必须追踪 <code>process</code> 的返回类型</li>
+<li>对接口变更不敏感，增加维护成本</li>
+</ul>
+<p>📌 建议：<strong>局部变量可用 auto，公共 API 返回值慎用</strong></p>
+<p>补充回顾：❌ 仅仅返回类型不同的同名函数，在 C++ 中不能构成合法的函数重载<br>✅ 但在极少数特定情况下（虚函数 + 返回类型协变），它可以成为运行期多态的一部分。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Base* <span class="title">clone</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">new</span> Base; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Derived* <span class="title">clone</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">new</span> Derived; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>✅ 合法原因：</p>
+<p>返回类型是 <strong>基类指针 &#x2F; 引用 → 派生类指针 &#x2F; 引用</strong></p>
+<p>称为 <strong>协变返回类型（covariant return type）</strong></p>
+<p>仍然属于 <strong>运行期多态</strong></p>
+<p>📌 注意限制：</p>
+<p>仅适用于 <strong>指针或引用</strong></p>
+<p>仅适用于 <strong>虚函数</strong></p>
+<p>普通函数仍然不行</p>
+<ol start="5">
+<li><code>decltype</code> 的“引用陷阱”</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">decltype</span>((x)) y = x;   <span class="comment">// y 是 int&amp;（注意双括号！）</span></span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li><code>decltype(expr)</code> 若表达式是左值，推导为引用</li>
+<li>容易引入悬垂引用</li>
+</ul>
+<p>📌 面试高频：<code>decltype</code> ≠ <code>auto</code><br>6. 数组退化问题</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> arr[<span class="number">3</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span> a = arr;   <span class="comment">// a 是 int*</span></span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li>丢失数组维度信息</li>
+<li>影响 <code>sizeof</code>、<code>range-based for</code> 等行为</li>
+</ul>
+<ol start="7">
+<li>与代理对象（Proxy Object）结合时的坑</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> bit = <span class="built_in">vector</span>&lt;<span class="type">bool</span>&gt;(<span class="number">10</span>)[<span class="number">0</span>]; <span class="comment">// 返回代理对象，不是 bool&amp;</span></span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li><code>auto</code> 延长临时对象生命周期失败</li>
+<li>产生未定义行为或逻辑错误</li>
+</ul>
+<ol start="8">
+<li>影响 API 稳定性</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">get_value</span><span class="params">()</span></span>; <span class="comment">// 返回类型随实现变化</span></span><br></pre></td></tr></table></figure>
+<p>✅ <strong>副作用</strong>：</p>
+<ul>
+<li>下游代码隐式依赖具体类型</li>
+<li>接口微小改动可能引发连锁编译错误</li>
+</ul>
+<p>面试总结一句话 ✅</p>
+<blockquote>
+<p><strong>自动类型推导提升了便利性，但可能牺牲精确性、性能和可读性；使用时必须清楚它“不会保留什么”，而不是只看它“推导了什么”。</strong></p>
+</blockquote>
+<h3 id="范围-for-循环"><a href="#范围-for-循环" class="headerlink" title="范围 for 循环"></a>范围 for 循环</h3><p>范围 for 语法，遍历神器</p>
+<h4 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h4><p>适用于遍历vector、list、map等各种STL容器，以及数组。</p>
+<h4 id="示例代码-2"><a href="#示例代码-2" class="headerlink" title="示例代码"></a>示例代码</h4><pre><code>vector&lt;int&gt; vec = {1,2,3};
+
+// 传统写法
+for(int i=0; i&lt;vec.size(); i++){...}
+
+// C++11 写法
+for(auto x : vec){ // 自动遍历每个元素
+cout &lt;&lt; x &lt;&lt; endl;
+}
+</code></pre>
 
     </div>
 
@@ -556,7 +652,7 @@ decltype(a) b = 20; // b 是 int
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">C++核心特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E4%B8%8E%E5%86%85%E5%AD%98"><span class="nav-number">1.1.</span> <span class="nav-text">性能与内存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">右值引用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A6%E5%80%BC%E4%B8%8E%E5%8F%B3%E5%80%BC"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">左值与右值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A6%E5%80%BC%E5%BC%95%E7%94%A8%E4%B8%8E%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">左值引用与右值引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">代码示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%B7%A6%E5%8F%B3%E5%80%BC"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">判断左右值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.1.5.</span> <span class="nav-text">右值引用的作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E5%87%BD%E6%95%B0%E6%A0%87%E5%87%86%E7%AD%BE%E5%90%8D"><span class="nav-number">1.1.1.6.</span> <span class="nav-text">对应函数标准签名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.1.1.7.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89-Move-Semantics"><span class="nav-number">1.1.2.</span> <span class="nav-text">移动语义 Move Semantics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8-%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89"><span class="nav-number">1.1.3.</span> <span class="nav-text">右值引用&amp;移动语义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%EF%BC%9A%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E6%98%AF%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80%EF%BC%8C%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89%E6%98%AF%E5%8A%9F%E8%83%BD%E7%9B%AE%E6%A0%87%E3%80%82"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">关系：右值引用是语法基础，移动语义是功能目标。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E9%80%BB%E8%BE%91%E9%93%BE"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">完整逻辑链</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88"><span class="nav-number">1.1.4.</span> <span class="nav-text">智能指针</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">示例代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nullptr"><span class="nav-number">1.1.5.</span> <span class="nav-text">nullptr</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#nullptr%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">nullptr类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8ENULL%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">与NULL区别</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="nav-number">1.2.</span> <span class="nav-text">语法糖</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E7%B1%BB%E5%9E%8B%E6%8E%A8%E5%AF%BC%EF%BC%9Aauto-decltype"><span class="nav-number">1.2.1.</span> <span class="nav-text">自动类型推导：auto&#x2F;decltype</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#auto"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">auto</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#decltype"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">decltype</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81-1"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">示例代码</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">C++核心特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E4%B8%8E%E5%86%85%E5%AD%98"><span class="nav-number">1.1.</span> <span class="nav-text">性能与内存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">右值引用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A6%E5%80%BC%E4%B8%8E%E5%8F%B3%E5%80%BC"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">左值与右值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A6%E5%80%BC%E5%BC%95%E7%94%A8%E4%B8%8E%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">左值引用与右值引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">代码示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%B7%A6%E5%8F%B3%E5%80%BC"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">判断左右值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.1.5.</span> <span class="nav-text">右值引用的作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E5%87%BD%E6%95%B0%E6%A0%87%E5%87%86%E7%AD%BE%E5%90%8D"><span class="nav-number">1.1.1.6.</span> <span class="nav-text">对应函数标准签名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.1.1.7.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89-Move-Semantics"><span class="nav-number">1.1.2.</span> <span class="nav-text">移动语义 Move Semantics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8-%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89"><span class="nav-number">1.1.3.</span> <span class="nav-text">右值引用&amp;移动语义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%EF%BC%9A%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E6%98%AF%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80%EF%BC%8C%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89%E6%98%AF%E5%8A%9F%E8%83%BD%E7%9B%AE%E6%A0%87%E3%80%82"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">关系：右值引用是语法基础，移动语义是功能目标。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E9%80%BB%E8%BE%91%E9%93%BE"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">完整逻辑链</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88"><span class="nav-number">1.1.4.</span> <span class="nav-text">智能指针</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">示例代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nullptr"><span class="nav-number">1.1.5.</span> <span class="nav-text">nullptr</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#nullptr%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">nullptr类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8ENULL%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">与NULL区别</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="nav-number">1.2.</span> <span class="nav-text">语法糖</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E7%B1%BB%E5%9E%8B%E6%8E%A8%E5%AF%BC%EF%BC%9Aauto-decltype"><span class="nav-number">1.2.1.</span> <span class="nav-text">自动类型推导：auto&#x2F;decltype</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#auto"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">auto</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#decltype"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">decltype</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81-1"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">示例代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8C%83%E5%9B%B4-for-%E5%BE%AA%E7%8E%AF"><span class="nav-number">1.2.2.</span> <span class="nav-text">范围 for 循环</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81-2"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">示例代码</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
