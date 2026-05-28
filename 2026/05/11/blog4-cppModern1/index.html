@@ -28,7 +28,7 @@
 <meta property="og:description" content="介绍C++11及以后版本引入的lambda表达式、constexpr、decltype等现代化语言特性。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-05-10T17:09:37.000Z">
-<meta property="article:modified_time" content="2026-05-26T11:50:02.167Z">
+<meta property="article:modified_time" content="2026-05-26T12:56:42.204Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="C++11">
 <meta name="twitter:card" content="summary">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-05-26 19:50:02" itemprop="dateModified" datetime="2026-05-26T19:50:02+08:00">2026-05-26</time>
+                <time title="Modified: 2026-05-26 20:56:42" itemprop="dateModified" datetime="2026-05-26T20:56:42+08:00">2026-05-26</time>
               </span>
 
           
@@ -249,7 +249,6 @@ int a = 20;
 <p>实现<strong>移动语义</strong></p>
 <p>直接<strong>转移堆资源 &#x2F; 指针所有权</strong>，<strong>不进行深拷贝</strong></p>
 <p>减少内存拷贝与开辟销毁开销，大幅<strong>提升性能</strong></p>
-<p>总结：右值引用结合移动构造、移动赋值，实现移动语义，不再深拷贝数据，而是直接转移资源所有权，减少临时对象开销，大幅提升程序运行性能。</p>
 <h4 id="对应函数标准签名"><a href="#对应函数标准签名" class="headerlink" title="对应函数标准签名"></a>对应函数标准签名</h4><pre><code>// 移动构造
 ClassName(ClassName&amp;&amp; other) noexcept;
 
@@ -369,29 +368,32 @@ ClassName&amp; operator=(ClassName&amp;&amp; other) noexcept;
 <li>可能失败的操作（如内存分配、IO）</li>
 <li>调用了可能抛异常的函数</li>
 </ul>
-<p>六、标准写法示例（面试可直接写）</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyClass</span>(MyClass&amp;&amp; other) <span class="keyword">noexcept</span></span><br><span class="line">        : <span class="built_in">ptr</span>(other.ptr)</span><br><span class="line">    &#123;</span><br><span class="line">        other.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    MyClass&amp; <span class="keyword">operator</span>=(MyClass&amp;&amp; other) <span class="keyword">noexcept</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != &amp;other) &#123;</span><br><span class="line">            <span class="keyword">delete</span> ptr;</span><br><span class="line">            ptr = other.ptr;</span><br><span class="line">            other.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span>* ptr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>七、面试加分回答（高级）</p>
+<p>六、标准写法示例</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyClass</span>(MyClass&amp;&amp; other) <span class="keyword">noexcept</span> <span class="comment">//移动构造函数</span></span><br><span class="line">        : <span class="built_in">ptr</span>(other.ptr)</span><br><span class="line">    &#123;</span><br><span class="line">        other.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    MyClass&amp; <span class="keyword">operator</span>=(MyClass&amp;&amp; other) <span class="keyword">noexcept</span> &#123; <span class="comment">//移动赋值运算符</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != &amp;other) &#123;</span><br><span class="line">            <span class="keyword">delete</span> ptr;</span><br><span class="line">            ptr = other.ptr;</span><br><span class="line">            other.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span>* ptr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>七、面试加分回答</p>
 <blockquote>
 <p>“<code>noexcept</code> 不仅是异常说明，更是接口契约。<br>对移动构造而言，它是性能开关；<br>对标准库而言，它是异常安全的前提。”</p>
 </blockquote>
-<p>八、一句话总结（背这句）</p>
+<p>八、一句话总结</p>
 <blockquote>
 <p><strong>移动构造 &#x2F; 赋值不加 <code>noexcept</code>，等于白写移动语义。</strong></p>
 </blockquote>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>右值引用结合移动构造、移动赋值，实现移动语义，不再深拷贝数据，而是直接转移资源所有权，减少临时对象开销，大幅提升程序运行性能。</p>
 <h3 id="移动语义-Move-Semantics"><a href="#移动语义-Move-Semantics" class="headerlink" title="移动语义 Move Semantics"></a>移动语义 Move Semantics</h3><p>把临时对象的堆资源 &#x2F; 内存直接转移给新对象，替代昂贵的深拷贝，O (1) 极快。</p>
-<p>移动构造函数</p>
-<pre><code>类名(类名&amp;&amp; 源) noexcept
-</code></pre>
-<p>移动赋值运算符</p>
-<pre><code>类名&amp; operator=(类名&amp;&amp; 源) noexcept
-</code></pre>
-<p><code>std::move</code> 强制把左值转为右值，主动触发移动语义。</p>
+<ol>
+<li><p>移动构造函数</p>
+<p> 类名(类名&amp;&amp; 源) noexcept</p>
+</li>
+<li><p>移动赋值运算符</p>
+<p> 类名&amp; operator&#x3D;(类名&amp;&amp; 源) noexcept</p>
+</li>
+<li><p><code>std::move</code> 强制把左值转为右值，主动触发移动语义。</p>
+</li>
+</ol>
 <h3 id="右值引用-移动语义"><a href="#右值引用-移动语义" class="headerlink" title="右值引用&amp;移动语义"></a>右值引用&amp;移动语义</h3><p>强绑定，缺一不可</p>
 <h4 id="关系：右值引用是语法基础，移动语义是功能目标。"><a href="#关系：右值引用是语法基础，移动语义是功能目标。" class="headerlink" title="关系：右值引用是语法基础，移动语义是功能目标。"></a>关系：右值引用是语法基础，移动语义是功能目标。</h4><ul>
-<li>右值引用是 C++11 新增的类型（T&amp;&amp;），用于识别临时对象；</li>
-<li>移动语义是一种优化思想：挪用临时对象资源，而非拷贝；</li>
+<li>右值引用是 C++11 新增的<strong>类型</strong>（T&amp;&amp;），用于<strong>识别临时对象</strong>；</li>
+<li>移动语义是一种优化<strong>思想</strong>：<strong>挪用临时对象资源，而非拷贝</strong>；</li>
 </ul>
 <p>一句话总结：右值引用是实现移动语义的工具，移动语义是右值引用的核心用途。</p>
 <h4 id="完整逻辑链"><a href="#完整逻辑链" class="headerlink" title="完整逻辑链"></a>完整逻辑链</h4><ol>
