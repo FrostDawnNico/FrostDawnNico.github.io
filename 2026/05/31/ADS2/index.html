@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="STL容器的数据结构和算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ADS2">
+<meta property="og:url" content="https://frostdawnnico.github.io/2026/05/31/ADS2/index.html">
+<meta property="og:site_name" content="FrostDawn&#39;s Blog">
+<meta property="og:description" content="STL容器的数据结构和算法">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-31T05:51:03.000Z">
+<meta property="article:modified_time" content="2026-05-31T05:56:11.390Z">
+<meta property="article:author" content="Nico Zhong">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://frostdawnnico.github.io/2026/05/31/ADS2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ADS2 | FrostDawn's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">FrostDawn's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Nico's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/05/31/ADS2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Nico Zhong">
+      <meta itemprop="description" content="one step per day | each effort counts">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FrostDawn's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ADS2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2026-05-31 13:51:03 / Modified: 13:56:11" itemprop="dateCreated datePublished" datetime="2026-05-31T13:51:03+08:00">2026-05-31</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>STL容器的数据结构和算法</p>
+<span id="more"></span>
+<hr>
+<h1 id="一、STL-容器必考"><a href="#一、STL-容器必考" class="headerlink" title="一、STL 容器必考"></a>一、STL 容器必考</h1><h2 id="1️⃣-vector"><a href="#1️⃣-vector" class="headerlink" title="1️⃣ vector"></a>1️⃣ vector</h2><h3 id="底层结构"><a href="#底层结构" class="headerlink" title="底层结构"></a>底层结构</h3><ul>
+<li><strong>连续内存动态数组</strong></li>
+<li>本质是：<code>T* + size + capacity</code></li>
+</ul>
+<h3 id="关键机制"><a href="#关键机制" class="headerlink" title="关键机制"></a>关键机制</h3><table>
+<thead>
+<tr>
+<th>点</th>
+<th>面试标准答法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>扩容</td>
+<td>2 倍或 1.5 倍</td>
+</tr>
+<tr>
+<td>扩容代价</td>
+<td>O(n)，拷贝 + 释放旧内存</td>
+</tr>
+<tr>
+<td>size vs capacity</td>
+<td>size 是元素个数，capacity 是已分配空间</td>
+</tr>
+<tr>
+<td>push_back</td>
+<td>可能触发 reallocate</td>
+</tr>
+<tr>
+<td>emplace_back</td>
+<td>原地构造，少一次拷贝</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>经典追问</strong></p>
+<blockquote>
+<p>vector 扩容为什么不用 2 倍以上？</p>
+</blockquote>
+<ul>
+<li>避免无法复用旧内存（某些实现用 1.5 倍）</li>
+</ul>
+<hr>
+<h2 id="2️⃣-map-set（红黑树）"><a href="#2️⃣-map-set（红黑树）" class="headerlink" title="2️⃣ map &#x2F; set（红黑树）"></a>2️⃣ map &#x2F; set（红黑树）</h2><h3 id="底层结构-1"><a href="#底层结构-1" class="headerlink" title="底层结构"></a>底层结构</h3><ul>
+<li><strong>红黑树（自平衡二叉搜索树）</strong></li>
+</ul>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>是否有序</td>
+<td>✅ 中序遍历有序</td>
+</tr>
+<tr>
+<td>查找</td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td>是否稳定</td>
+<td>✅ 插入顺序不影响结构</td>
+</tr>
+<tr>
+<td>迭代器失效</td>
+<td>不会因插入&#x2F;删除失效（除当前节点）</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>常考对比</strong></p>
+<blockquote>
+<p>map vs unordered_map（见下）</p>
+</blockquote>
+<hr>
+<h2 id="3️⃣-unordered-map-unordered-set"><a href="#3️⃣-unordered-map-unordered-set" class="headerlink" title="3️⃣ unordered_map &#x2F; unordered_set"></a>3️⃣ unordered_map &#x2F; unordered_set</h2><h3 id="底层结构-2"><a href="#底层结构-2" class="headerlink" title="底层结构"></a>底层结构</h3><ul>
+<li><strong>哈希表（数组 + 链表 &#x2F; 红黑树）</strong></li>
+<li>C++11 起标准</li>
+</ul>
+<h3 id="核心点"><a href="#核心点" class="headerlink" title="核心点"></a>核心点</h3><table>
+<thead>
+<tr>
+<th>点</th>
+<th>答案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>平均复杂度</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>最坏</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>冲突解决</td>
+<td>链地址法</td>
+</tr>
+<tr>
+<td>bucket</td>
+<td>哈希桶</td>
+</tr>
+<tr>
+<td>rehash</td>
+<td>负载因子 &gt; max_load_factor</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>面试杀手题</strong></p>
+<blockquote>
+<p>unordered_map 线程安全吗？</p>
+</blockquote>
+<ul>
+<li>❌ 不安全，需加锁或用 concurrent_hash_map</li>
+</ul>
+<hr>
+<h2 id="4️⃣-list-forward-list"><a href="#4️⃣-list-forward-list" class="headerlink" title="4️⃣ list &#x2F; forward_list"></a>4️⃣ list &#x2F; forward_list</h2><h3 id="底层"><a href="#底层" class="headerlink" title="底层"></a>底层</h3><ul>
+<li><strong>双向链表 &#x2F; 单向链表</strong></li>
+</ul>
+<h3 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h3><table>
+<thead>
+<tr>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>任意位置 O(1) 插入删除</td>
+<td>不支持随机访问</td>
+</tr>
+<tr>
+<td>迭代器不失效</td>
+<td>cache 不友好</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>常问</strong></p>
+<blockquote>
+<p>list 的 sort 是什么排序？</p>
+</blockquote>
+<ul>
+<li><strong>归并排序</strong></li>
+</ul>
+<hr>
+<h2 id="5️⃣-deque（双端队列）"><a href="#5️⃣-deque（双端队列）" class="headerlink" title="5️⃣ deque（双端队列）"></a>5️⃣ deque（双端队列）</h2><h3 id="底层结构-3"><a href="#底层结构-3" class="headerlink" title="底层结构"></a>底层结构</h3><ul>
+<li><strong>分段连续内存 + 中央映射数组</strong></li>
+</ul>
+<h3 id="特点-2"><a href="#特点-2" class="headerlink" title="特点"></a>特点</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>头尾插入</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>随机访问</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>扩容</td>
+<td>不整体拷贝</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>隐藏考点</strong></p>
+<blockquote>
+<p>stack &#x2F; queue 默认容器是？</p>
+</blockquote>
+<ul>
+<li><code>deque</code></li>
+</ul>
+<hr>
+<h2 id="6️⃣-priority-queue（堆）"><a href="#6️⃣-priority-queue（堆）" class="headerlink" title="6️⃣ priority_queue（堆）"></a>6️⃣ priority_queue（堆）</h2><h3 id="底层结构-4"><a href="#底层结构-4" class="headerlink" title="底层结构"></a>底层结构</h3><ul>
+<li><strong>vector + 堆算法（make_heap）</strong></li>
+</ul>
+<h3 id="特点-3"><a href="#特点-3" class="headerlink" title="特点"></a>特点</h3><table>
+<thead>
+<tr>
+<th>点</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>默认</td>
+<td>大顶堆</td>
+</tr>
+<tr>
+<td>小顶堆</td>
+<td><code>greater&lt;T&gt;</code></td>
+</tr>
+<tr>
+<td>插入</td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td>Top</td>
+<td>O(1)</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>常考</strong></p>
+<blockquote>
+<p>如何找第 K 大元素？</p>
+</blockquote>
+<ul>
+<li>priority_queue（最小堆）</li>
+</ul>
+<hr>
+<h1 id="二、容器对比速查表（面试神器）"><a href="#二、容器对比速查表（面试神器）" class="headerlink" title="二、容器对比速查表（面试神器）"></a>二、容器对比速查表（面试神器）</h1><table>
+<thead>
+<tr>
+<th>容器</th>
+<th>底层</th>
+<th>是否有序</th>
+<th>查找</th>
+<th>插入</th>
+<th>稳定</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vector</td>
+<td>数组</td>
+<td>❌</td>
+<td>O(n)</td>
+<td>O(1)~O(n)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>list</td>
+<td>链表</td>
+<td>❌</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>map</td>
+<td>红黑树</td>
+<td>✅</td>
+<td>O(log n)</td>
+<td>O(log n)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>unordered_map</td>
+<td>哈希</td>
+<td>❌</td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>priority_queue</td>
+<td>堆</td>
+<td>❌</td>
+<td>O(1) top</td>
+<td>O(log n)</td>
+<td>❌</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="三、STL-算法常考（）"><a href="#三、STL-算法常考（）" class="headerlink" title="三、STL 算法常考（）"></a>三、STL 算法常考（<algorithm>）</h1><h2 id="1️⃣-sort（必考）"><a href="#1️⃣-sort（必考）" class="headerlink" title="1️⃣ sort（必考）"></a>1️⃣ sort（必考）</h2><h3 id="底层-1"><a href="#底层-1" class="headerlink" title="底层"></a>底层</h3><ul>
+<li><strong>Introsort</strong><ul>
+<li>QuickSort + HeapSort + InsertionSort</li>
+</ul>
+</li>
+</ul>
+<h3 id="特点-4"><a href="#特点-4" class="headerlink" title="特点"></a>特点</h3><table>
+<thead>
+<tr>
+<th>点</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>平均</td>
+<td>O(n log n)</td>
+</tr>
+<tr>
+<td>最坏</td>
+<td>O(n log n)</td>
+</tr>
+<tr>
+<td>是否稳定</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>stable_sort</td>
+<td>✅（归并）</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>常问</strong></p>
+<blockquote>
+<p>sort 为什么不用归并？</p>
+</blockquote>
+<ul>
+<li>归并要额外 O(n) 空间</li>
+</ul>
+<hr>
+<h2 id="2️⃣-find-count-binary-search"><a href="#2️⃣-find-count-binary-search" class="headerlink" title="2️⃣ find &#x2F; count &#x2F; binary_search"></a>2️⃣ find &#x2F; count &#x2F; binary_search</h2><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>前提</th>
+<th>复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>find</td>
+<td>无序</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>binary_search</td>
+<td>有序</td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td>lower_bound</td>
+<td>有序</td>
+<td>O(log n)</td>
+</tr>
+</tbody></table>
+<p>✅ <strong>必会</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">lower_bound</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), x); <span class="comment">// ≥ x</span></span><br><span class="line"><span class="built_in">upper_bound</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), x); <span class="comment">// &gt; x</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3️⃣-erase-remove-idiom（经典坑）"><a href="#3️⃣-erase-remove-idiom（经典坑）" class="headerlink" title="3️⃣ erase-remove idiom（经典坑）"></a>3️⃣ erase-remove idiom（经典坑）</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v.<span class="built_in">erase</span>(<span class="built_in">remove</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), <span class="number">3</span>), v.<span class="built_in">end</span>());</span><br></pre></td></tr></table></figure>
+
+<p>✅ 面试官想听：</p>
+<blockquote>
+<p>remove 并不真的删除，只是移动元素</p>
+</blockquote>
+<hr>
+<h2 id="4️⃣-copy-transform-for-each"><a href="#4️⃣-copy-transform-for-each" class="headerlink" title="4️⃣ copy &#x2F; transform &#x2F; for_each"></a>4️⃣ copy &#x2F; transform &#x2F; for_each</h2><p>常考 <strong>lambda + STL</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">transform</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), v.<span class="built_in">begin</span>(),</span><br><span class="line">          <span class="type">int</span> x&#123; <span class="keyword">return</span> x * <span class="number">2</span>; &#125;);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="四、迭代器失效（高频致命题）"><a href="#四、迭代器失效（高频致命题）" class="headerlink" title="四、迭代器失效（高频致命题）"></a>四、迭代器失效（高频致命题）</h1><table>
+<thead>
+<tr>
+<th>容器</th>
+<th>插入</th>
+<th>删除</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vector</td>
+<td>可能全部失效</td>
+<td>后面失效</td>
+</tr>
+<tr>
+<td>deque</td>
+<td>首尾不失效</td>
+<td>中间全失效</td>
+</tr>
+<tr>
+<td>list</td>
+<td>永不失效</td>
+<td>仅当前失效</td>
+</tr>
+<tr>
+<td>map</td>
+<td>永不失效</td>
+<td>仅当前失效</td>
+</tr>
+</tbody></table>
+<p>✅ 一句话总结：</p>
+<blockquote>
+<p><strong>连续内存容器最危险</strong></p>
+</blockquote>
+<hr>
+<h1 id="五、面试官最爱追问-TOP-5"><a href="#五、面试官最爱追问-TOP-5" class="headerlink" title="五、面试官最爱追问 TOP 5"></a>五、面试官最爱追问 TOP 5</h1><ol>
+<li><p><strong>map 和 unordered_map 选哪个？</strong></p>
+<ul>
+<li>要顺序 → map</li>
+<li>要性能 → unordered_map</li>
+</ul>
+</li>
+<li><p><strong>vector 能用 memcpy 拷贝吗？</strong></p>
+<ul>
+<li>❌ 非 POD 会崩</li>
+</ul>
+</li>
+<li><p><strong>emplace 比 push 好在哪？</strong></p>
+<ul>
+<li>减少一次构造 + 拷贝</li>
+</ul>
+</li>
+<li><p><strong>STL 线程安全吗？</strong></p>
+<ul>
+<li>读安全，写不安全</li>
+</ul>
+</li>
+<li><p><strong>为什么少用 list？</strong></p>
+<ul>
+<li>cache miss 严重</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h1 id="六、30-秒面试速答模板"><a href="#六、30-秒面试速答模板" class="headerlink" title="六、30 秒面试速答模板"></a>六、30 秒面试速答模板</h1><blockquote>
+<p>STL 容器里我最熟的是 vector、map 和 unordered_map。<br>vector 是连续内存，扩容成本高；map 用红黑树保证有序；unordered_map 用哈希表追求 O(1)。<br>sort 用的是 introsort，优先用快排，最坏情况退化成堆排。</p>
+</blockquote>
+<hr>
+<p>如果你愿意，我可以：</p>
+<ul>
+<li>✅ 给你 <strong>STL 源码级底层图</strong></li>
+<li>✅ 出 <strong>10 道 STL 高频笔试题</strong></li>
+<li>✅ 模拟 <strong>面试官连环追问</strong></li>
+</ul>
+<p>你可以直接说：<br>👉「给我 STL 面试连环问」</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/05/31/ADS1/" rel="prev" title="算法与数据结构">
+      <i class="fa fa-chevron-left"></i> 算法与数据结构
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81STL-%E5%AE%B9%E5%99%A8%E5%BF%85%E8%80%83"><span class="nav-number">1.</span> <span class="nav-text">一、STL 容器必考</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-vector"><span class="nav-number">1.1.</span> <span class="nav-text">1️⃣ vector</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">底层结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E6%9C%BA%E5%88%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">关键机制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-map-set%EF%BC%88%E7%BA%A2%E9%BB%91%E6%A0%91%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">2️⃣ map &#x2F; set（红黑树）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">底层结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">1.2.2.</span> <span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-unordered-map-unordered-set"><span class="nav-number">1.3.</span> <span class="nav-text">3️⃣ unordered_map &#x2F; unordered_set</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">底层结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%82%B9"><span class="nav-number">1.3.2.</span> <span class="nav-text">核心点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-list-forward-list"><span class="nav-number">1.4.</span> <span class="nav-text">4️⃣ list &#x2F; forward_list</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82"><span class="nav-number">1.4.1.</span> <span class="nav-text">底层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-1"><span class="nav-number">1.4.2.</span> <span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5%EF%B8%8F%E2%83%A3-deque%EF%BC%88%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">5️⃣ deque（双端队列）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84-3"><span class="nav-number">1.5.1.</span> <span class="nav-text">底层结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-2"><span class="nav-number">1.5.2.</span> <span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6%EF%B8%8F%E2%83%A3-priority-queue%EF%BC%88%E5%A0%86%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">6️⃣ priority_queue（堆）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84-4"><span class="nav-number">1.6.1.</span> <span class="nav-text">底层结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-3"><span class="nav-number">1.6.2.</span> <span class="nav-text">特点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%AE%B9%E5%99%A8%E5%AF%B9%E6%AF%94%E9%80%9F%E6%9F%A5%E8%A1%A8%EF%BC%88%E9%9D%A2%E8%AF%95%E7%A5%9E%E5%99%A8%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">二、容器对比速查表（面试神器）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81STL-%E7%AE%97%E6%B3%95%E5%B8%B8%E8%80%83%EF%BC%88%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">三、STL 算法常考（）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-sort%EF%BC%88%E5%BF%85%E8%80%83%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">1️⃣ sort（必考）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82-1"><span class="nav-number">3.1.1.</span> <span class="nav-text">底层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-4"><span class="nav-number">3.1.2.</span> <span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-find-count-binary-search"><span class="nav-number">3.2.</span> <span class="nav-text">2️⃣ find &#x2F; count &#x2F; binary_search</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-erase-remove-idiom%EF%BC%88%E7%BB%8F%E5%85%B8%E5%9D%91%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">3️⃣ erase-remove idiom（经典坑）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-copy-transform-for-each"><span class="nav-number">3.4.</span> <span class="nav-text">4️⃣ copy &#x2F; transform &#x2F; for_each</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%A4%B1%E6%95%88%EF%BC%88%E9%AB%98%E9%A2%91%E8%87%B4%E5%91%BD%E9%A2%98%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">四、迭代器失效（高频致命题）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E9%9D%A2%E8%AF%95%E5%AE%98%E6%9C%80%E7%88%B1%E8%BF%BD%E9%97%AE-TOP-5"><span class="nav-number">5.</span> <span class="nav-text">五、面试官最爱追问 TOP 5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD%E3%80%8130-%E7%A7%92%E9%9D%A2%E8%AF%95%E9%80%9F%E7%AD%94%E6%A8%A1%E6%9D%BF"><span class="nav-number">6.</span> <span class="nav-text">六、30 秒面试速答模板</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Nico Zhong</p>
+  <div class="site-description" itemprop="description">one step per day | each effort counts</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Nico Zhong</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
