@@ -28,7 +28,7 @@
 <meta property="og:description" content="复习排序算法的时间复杂度、红黑树等经典数据结构的原理等。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-05-31T03:23:36.000Z">
-<meta property="article:modified_time" content="2026-05-31T03:29:48.559Z">
+<meta property="article:modified_time" content="2026-05-31T05:07:29.862Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="数据结构">
 <meta name="twitter:card" content="summary">
@@ -176,7 +176,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-05-31 11:23:36 / Modified: 11:29:48" itemprop="dateCreated datePublished" datetime="2026-05-31T11:23:36+08:00">2026-05-31</time>
+              <time title="Created: 2026-05-31 11:23:36 / Modified: 13:07:29" itemprop="dateCreated datePublished" datetime="2026-05-31T11:23:36+08:00">2026-05-31</time>
             </span>
 
           
@@ -192,7 +192,13 @@
       
         <p>复习排序算法的时间复杂度、红黑树等经典数据结构的原理等。</p>
 <span id="more"></span>
-<h1 id="复杂度速查表"><a href="#复杂度速查表" class="headerlink" title="复杂度速查表"></a>复杂度速查表</h1><h2 id="涵盖了STL容器、排序算法以及高频面试考点。"><a href="#涵盖了STL容器、排序算法以及高频面试考点。" class="headerlink" title="涵盖了STL容器、排序算法以及高频面试考点。"></a>涵盖了<strong>STL容器</strong>、<strong>排序算法</strong>以及<strong>高频面试考点</strong>。</h2><h3 id="🧩-第一部分：C-STL-容器复杂度速查表"><a href="#🧩-第一部分：C-STL-容器复杂度速查表" class="headerlink" title="🧩 第一部分：C++ STL 容器复杂度速查表"></a>🧩 第一部分：C++ STL 容器复杂度速查表</h3><p>底层实现决定了上层建筑，记住它们的最好方法就是结合它们的<strong>底层数据结构</strong>来理解。</p>
+<h1 id="数据结构-算法"><a href="#数据结构-算法" class="headerlink" title="数据结构&amp;算法"></a>数据结构&amp;算法</h1><h2 id="数据结构–数据的存储与组织"><a href="#数据结构–数据的存储与组织" class="headerlink" title="数据结构–数据的存储与组织"></a>数据结构–数据的存储与组织</h2><h3 id="数组（Array）——-基础存储"><a href="#数组（Array）——-基础存储" class="headerlink" title="数组（Array）—— 基础存储"></a>数组（Array）—— 基础存储</h3><p>内存连续，支持通过下标进行 O(1) 的随机访问。</p>
+<h3 id="链表（Linked-List）——-灵活存储"><a href="#链表（Linked-List）——-灵活存储" class="headerlink" title="链表（Linked List）—— 灵活存储"></a>链表（Linked List）—— 灵活存储</h3><p>内存离散，通过指针将节点串联。彻底解决了数组插入删除慢、大小受限的问题，实现了动态的内存分配。</p>
+<h3 id="栈与队列（Stack-Queue）——-逻辑约束"><a href="#栈与队列（Stack-Queue）——-逻辑约束" class="headerlink" title="栈与队列（Stack &amp; Queue）—— 逻辑约束"></a>栈与队列（Stack &amp; Queue）—— 逻辑约束</h3><p>它们通常基于数组或链表实现，但在操作上施加了严格的规则。</p>
+<h3 id="树（Tree）——-层次关系"><a href="#树（Tree）——-层次关系" class="headerlink" title="树（Tree）—— 层次关系"></a>树（Tree）—— 层次关系</h3><p>从线性结构跨越到非线性结构，用于表达“一对多”的层次关系。</p>
+<h3 id="哈希表（Hash-Table）——-高效检索"><a href="#哈希表（Hash-Table）——-高效检索" class="headerlink" title="哈希表（Hash Table）—— 高效检索"></a>哈希表（Hash Table）—— 高效检索</h3><p>数据结构的集大成者。底层通常由“数组 + 链表&#x2F;红黑树”构成。</p>
+<h2 id="算法–问题的求解策略"><a href="#算法–问题的求解策略" class="headerlink" title="算法–问题的求解策略"></a>算法–问题的求解策略</h2><h3 id="枚举（暴力法）——-思维起点"><a href="#枚举（暴力法）——-思维起点" class="headerlink" title="枚举（暴力法）—— 思维起点"></a>枚举（暴力法）—— 思维起点</h3><p>列举所有可能的情况，逐一验证直到找到答案。</p>
+<h3 id="递归（Recursion）——-化繁为简"><a href="#递归（Recursion）——-化繁为简" class="headerlink" title="递归（Recursion）—— 化繁为简"></a>递归（Recursion）—— 化繁为简</h3><h1 id="复杂度速查表"><a href="#复杂度速查表" class="headerlink" title="复杂度速查表"></a>复杂度速查表</h1><h2 id="涵盖了STL容器、排序算法以及高频面试考点。"><a href="#涵盖了STL容器、排序算法以及高频面试考点。" class="headerlink" title="涵盖了STL容器、排序算法以及高频面试考点。"></a>涵盖了<strong>STL容器</strong>、<strong>排序算法</strong>以及<strong>高频面试考点</strong>。</h2><h3 id="🧩-第一部分：C-STL-容器复杂度速查表"><a href="#🧩-第一部分：C-STL-容器复杂度速查表" class="headerlink" title="🧩 第一部分：C++ STL 容器复杂度速查表"></a>🧩 第一部分：C++ STL 容器复杂度速查表</h3><p>底层实现决定了上层建筑，记住它们的最好方法就是结合它们的<strong>底层数据结构</strong>来理解。</p>
 <h4 id="1-序列式容器-Sequence-Containers"><a href="#1-序列式容器-Sequence-Containers" class="headerlink" title="1. 序列式容器 (Sequence Containers)"></a>1. 序列式容器 (Sequence Containers)</h4><table>
 <thead>
 <tr>
@@ -303,7 +309,7 @@
 </tr>
 </tbody></table>
 <p><em>(注：map的key唯一，multimap允许重复key)</em></p>
-<h4 id="3-无序关联容器-Unordered-Containers-——-面试高频雷区！"><a href="#3-无序关联容器-Unordered-Containers-——-面试高频雷区！" class="headerlink" title="3. 无序关联容器 (Unordered Containers) —— 面试高频雷区！"></a>3. 无序关联容器 (Unordered Containers) —— <strong>面试高频雷区！</strong></h4><table>
+<h4 id="3-无序关联容器-Unordered-Containers-——-高频雷区"><a href="#3-无序关联容器-Unordered-Containers-——-高频雷区" class="headerlink" title="3. 无序关联容器 (Unordered Containers) —— 高频雷区"></a>3. 无序关联容器 (Unordered Containers) —— <strong>高频雷区</strong></h4><table>
 <thead>
 <tr>
 <th align="left">容器</th>
@@ -440,12 +446,12 @@
 <li><strong>破局</strong>：如果事先知道大概要存多少数据，务必使用 <code>reserve(n)</code> 预先分配内存，这能把后续插入统统拉回 O(1)！</li>
 </ul>
 <h4 id="2-递归的隐藏成本：空间复杂度"><a href="#2-递归的隐藏成本：空间复杂度" class="headerlink" title="2. 递归的隐藏成本：空间复杂度"></a>2. 递归的隐藏成本：空间复杂度</h4><ul>
-<li>很多同学算复杂度只看时间不看空间。比如经典的斐波那契数列递归求法：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">fib</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123; <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span> n; <span class="keyword">return</span> <span class="built_in">fib</span>(n<span class="number">-1</span>) + <span class="built_in">fib</span>(n<span class="number">-2</span>); &#125;</span><br></pre></td></tr></table></figure></li>
+<li>只看时间不看空间。比如经典的斐波那契数列递归求法：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">fib</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123; <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span> n; <span class="keyword">return</span> <span class="built_in">fib</span>(n<span class="number">-1</span>) + <span class="built_in">fib</span>(n<span class="number">-2</span>); &#125;</span><br></pre></td></tr></table></figure></li>
 <li><strong>时间复杂度</strong>：惊人的 <strong>O(2ⁿ)</strong> （呈指数爆炸）。</li>
 <li><strong>空间复杂度</strong>：<strong>O(n)</strong> （由于系统调用栈的深度，最深的递归分支会一直压栈直到基线条件）。</li>
 </ul>
 <h4 id="3-unordered-map-的哈希冲突"><a href="#3-unordered-map-的哈希冲突" class="headerlink" title="3. unordered_map 的哈希冲突"></a>3. <code>unordered_map</code> 的哈希冲突</h4><ul>
-<li>虽然平均是 O(1)，但如果你的哈希函数写得太烂（比如把所有元素都映射到同一个桶里），哈希表就会退化成链表，查找复杂度瞬间飙升至 <strong>O(n)</strong>。这也是为什么面试有时会让手写一个简单的哈希表。</li>
+<li>虽然平均是 O(1)，但如果你的哈希函数写得太烂（比如把所有元素都映射到同一个桶里），哈希表就会退化成链表，查找复杂度瞬间飙升至 <strong>O(n)</strong>。</li>
 </ul>
 <h4 id="4-遍历中修改容器（迭代器失效）"><a href="#4-遍历中修改容器（迭代器失效）" class="headerlink" title="4. 遍历中修改容器（迭代器失效）"></a>4. 遍历中修改容器（迭代器失效）</h4><ul>
 <li><strong><code>vector</code> 插入&#x2F;删除</strong>：会导致元素移动，<strong>指向插入&#x2F;删除点及之后的迭代器全部失效</strong>。</li>
@@ -453,8 +459,405 @@
 <li><strong><code>unordered_map</code> 插入</strong>：可能会导致全局重哈希（Rehash），<strong>此时所有迭代器全部失效</strong>。</li>
 </ul>
 <hr>
-<p>💡 <strong>面试实战小贴士</strong>：<br>当你在面试中准备写代码时，养成好习惯：<strong>一边写一边口述复杂度</strong>。<br>比如：“这里我选用 <code>unordered_map</code> 来存访过的元素，因为平均查找是 O(1)，整体算法时间复杂度可以控制在 O(n)，空间复杂度也是 O(n)。”<br>这句话一出口，面试官立刻就知道你是个老手了。</p>
+<p>💡 <strong>面试实战</strong>：<br>当在面试中准备写代码时，可以：<strong>一边写一边口述复杂度</strong>。<br>比如：“这里我选用 <code>unordered_map</code> 来存访过的元素，因为平均查找是 O(1)，整体算法时间复杂度可以控制在 O(n)，空间复杂度也是 O(n)。”</p>
+<hr>
+<h1 id="⏱️-C-面试-·-复杂度速记脑图"><a href="#⏱️-C-面试-·-复杂度速记脑图" class="headerlink" title="⏱️ C++ 面试 · 复杂度速记脑图"></a>⏱️ C++ 面试 · 复杂度速记脑图</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line">算法复杂度速查</span><br><span class="line">├── 一、数据结构复杂度（必背）</span><br><span class="line">│   ├── 数组 / vector</span><br><span class="line">│   │   ├── 访问：O(1)</span><br><span class="line">│   │   ├── 插入 / 删除：O(n)</span><br><span class="line">│   │   └── 扩容：O(n)</span><br><span class="line">│   ├── 链表 list</span><br><span class="line">│   │   ├── 访问：O(n)</span><br><span class="line">│   │   ├── 插入 / 删除：O(1)</span><br><span class="line">│   │   └── 查找：O(n)</span><br><span class="line">│   ├── 栈 / 队列</span><br><span class="line">│   │   ├── 入 / 出：O(1)</span><br><span class="line">│   │   └── 访问：O(n)</span><br><span class="line">│   ├── map / set</span><br><span class="line">│   │   ├── 查找 / 插入 / 删除：O(log n)</span><br><span class="line">│   │   └── 底层：红黑树</span><br><span class="line">│   ├── unordered_map / set</span><br><span class="line">│   │   ├── 平均：O(1)</span><br><span class="line">│   │   ├── 最坏：O(n)</span><br><span class="line">│   │   └── 冲突严重时退化</span><br><span class="line">│   ├── priority_queue</span><br><span class="line">│   │   ├── 插入 / 删除：O(log n)</span><br><span class="line">│   │   └── 取 top：O(1)</span><br><span class="line">│   └── 堆 Heap</span><br><span class="line">│       ├── 建堆：O(n)</span><br><span class="line">│       └── 调整：O(log n)</span><br><span class="line">│</span><br><span class="line">├── 二、树结构复杂度</span><br><span class="line">│   ├── 二叉树遍历</span><br><span class="line">│   │   ├── 时间：O(n)</span><br><span class="line">│   │   └── 空间：O(h)</span><br><span class="line">│   ├── BST</span><br><span class="line">│   │   ├── 查找 / 插入 / 删除：O(h)</span><br><span class="line">│   │   └── 平衡时 O(log n)</span><br><span class="line">│   ├── 红黑树</span><br><span class="line">│   │   └── 所有操作：O(log n)</span><br><span class="line">│   └── Trie</span><br><span class="line">│       ├── 插入 / 查找：O(L)</span><br><span class="line">│       └── L = 单词长度</span><br><span class="line">│</span><br><span class="line">├── 三、图复杂度</span><br><span class="line">│   ├── DFS / BFS</span><br><span class="line">│   │   ├── 时间：O(V + E)</span><br><span class="line">│   │   └── 空间：O(V)</span><br><span class="line">│   ├── Dijkstra</span><br><span class="line">│   │   ├── 普通：O(V²)</span><br><span class="line">│   │   └── 堆优化：O(E log V)</span><br><span class="line">│   └── 拓扑排序</span><br><span class="line">│       └── O(V + E)</span><br><span class="line">│</span><br><span class="line">├── 四、排序算法复杂度（面试高频）</span><br><span class="line">│   ├── 冒泡 / 选择 / 插入</span><br><span class="line">│   │   └── O(n²)</span><br><span class="line">│   ├── 快排 Quick Sort</span><br><span class="line">│   │   ├── 平均：O(n log n)</span><br><span class="line">│   │   └── 最坏：O(n²)</span><br><span class="line">│   ├── 归并 Merge Sort</span><br><span class="line">│   │   └── O(n log n)</span><br><span class="line">│   ├── 堆排序 Heap Sort</span><br><span class="line">│   │   └── O(n log n)</span><br><span class="line">│   ├── 计数 / 桶 / 基数</span><br><span class="line">│   │   └── O(n + k)</span><br><span class="line">│   └── STL sort</span><br><span class="line">│       ├── introsort（快排 + 堆排 + 插排）</span><br><span class="line">│       └── O(n log n)</span><br><span class="line">│</span><br><span class="line">├── 五、查找算法</span><br><span class="line">│   ├── 顺序查找：O(n)</span><br><span class="line">│   ├── 二分查找：O(log n)</span><br><span class="line">│   └── 哈希查找：O(1) 平均</span><br><span class="line">│</span><br><span class="line">├── 六、空间复杂度常考点</span><br><span class="line">│   ├── 递归：O(递归深度)</span><br><span class="line">│   ├── DP 一维：O(n)</span><br><span class="line">│   ├── DP 二维：O(n²)</span><br><span class="line">│   └── 原地算法：O(1)</span><br><span class="line">│</span><br><span class="line">└── 七、面试速记口诀</span><br><span class="line">    ├── 数组访问快，插入慢</span><br><span class="line">    ├── 链表插入快，访问慢</span><br><span class="line">    ├── map 稳定 log n</span><br><span class="line">    ├── hash 快但不稳</span><br><span class="line">    ├── 排序记住 n log n</span><br><span class="line">    ├── 递归看深度</span><br><span class="line">    └── 空间别忘算栈</span><br></pre></td></tr></table></figure>
 
+<hr>
+<h2 id="✅-口述“万能句式”"><a href="#✅-口述“万能句式”" class="headerlink" title="✅ 口述“万能句式”"></a>✅ 口述“万能句式”</h2><blockquote>
+<p>“<strong>时间复杂度是 O(n log n)，空间复杂度是 O(1)，属于原地算法。</strong>”<br>“<strong>最坏情况下退化成 O(n²)，但平均是 O(n log n)。</strong>”<br>“<strong>这里用了哈希表，把时间从 O(n²) 降到 O(n)。</strong>”</p>
+</blockquote>
+<hr>
+<h2 id="✅-10-秒速记表（考前必扫）"><a href="#✅-10-秒速记表（考前必扫）" class="headerlink" title="✅ 10 秒速记表（考前必扫）"></a>✅ 10 秒速记表（考前必扫）</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>二分查找</td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td>排序</td>
+<td>O(n log n)</td>
+</tr>
+<tr>
+<td>DFS &#x2F; BFS</td>
+<td>O(V + E)</td>
+</tr>
+<tr>
+<td>哈希查找</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>递归</td>
+<td>O(深度)</td>
+</tr>
+<tr>
+<td>全排列</td>
+<td>O(n!)</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="🎯-C-面试-·-复杂度追问清单"><a href="#🎯-C-面试-·-复杂度追问清单" class="headerlink" title="🎯 C++ 面试 · 复杂度追问清单"></a>🎯 C++ 面试 · 复杂度追问清单</h1><hr>
+<h2 id="一、数组-vector（最常被追问）"><a href="#一、数组-vector（最常被追问）" class="headerlink" title="一、数组 &amp; vector（最常被追问）"></a>一、数组 &amp; vector（最常被追问）</h2><h3 id="❓-Q1：push-back-是-O-1-吗？"><a href="#❓-Q1：push-back-是-O-1-吗？" class="headerlink" title="❓ Q1：push_back() 是 O(1) 吗？"></a>❓ Q1：<code>push_back()</code> 是 O(1) 吗？</h3><p>✅ <strong>标准答法：</strong></p>
+<blockquote>
+<p>平均 O(1)，<strong>均摊 O(1)</strong><br>发生扩容时是 O(n)，但均摊下来仍是 O(1)</p>
+</blockquote>
+<p>📌 <strong>加分点：</strong></p>
+<ul>
+<li>扩容通常是 ×2</li>
+<li>扩容会导致<strong>迭代器全部失效</strong></li>
+</ul>
+<hr>
+<h3 id="❓-Q2：vector-插入中间是-O-n-为什么？"><a href="#❓-Q2：vector-插入中间是-O-n-为什么？" class="headerlink" title="❓ Q2：vector 插入中间是 O(n) 为什么？"></a>❓ Q2：<code>vector</code> 插入中间是 O(n) 为什么？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p>需要整体移动元素</p>
+</blockquote>
+<p>📌 <strong>追问延伸：</strong></p>
+<ul>
+<li><code>list</code> 插入是 O(1)</li>
+<li>但 <code>list</code> 不能随机访问</li>
+</ul>
+<hr>
+<h2 id="二、哈希表（unordered-map-set）"><a href="#二、哈希表（unordered-map-set）" class="headerlink" title="二、哈希表（unordered_map &#x2F; set）"></a>二、哈希表（unordered_map &#x2F; set）</h2><h3 id="❓-Q3：unordered-map-查找一定是-O-1-吗？"><a href="#❓-Q3：unordered-map-查找一定是-O-1-吗？" class="headerlink" title="❓ Q3：unordered_map 查找一定是 O(1) 吗？"></a>❓ Q3：<code>unordered_map</code> 查找一定是 O(1) 吗？</h3><p>✅ <strong>标准答法：</strong></p>
+<blockquote>
+<p><strong>平均 O(1)，最坏 O(n)</strong></p>
+</blockquote>
+<p>📌 <strong>必补一句：</strong></p>
+<blockquote>
+<p>当所有 key 都哈希冲突时，退化为链表（C++11 后是桶）</p>
+</blockquote>
+<hr>
+<h3 id="❓-Q4：为什么-map-不用哈希表？"><a href="#❓-Q4：为什么-map-不用哈希表？" class="headerlink" title="❓ Q4：为什么 map 不用哈希表？"></a>❓ Q4：为什么 <code>map</code> 不用哈希表？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p><code>map</code> 需要<strong>有序遍历</strong>，哈希表无序<br>红黑树稳定 O(log n)，适合范围查询</p>
+</blockquote>
+<hr>
+<h3 id="❓-Q5：unordered-map-和-unordered-set-区别？"><a href="#❓-Q5：unordered-map-和-unordered-set-区别？" class="headerlink" title="❓ Q5：unordered_map 和 unordered_set 区别？"></a>❓ Q5：<code>unordered_map</code> 和 <code>unordered_set</code> 区别？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p>只存 key vs 存 key-value<br>复杂度完全一致</p>
+</blockquote>
+<hr>
+<h2 id="三、排序-STL-sort"><a href="#三、排序-STL-sort" class="headerlink" title="三、排序 &amp; STL sort"></a>三、排序 &amp; STL sort</h2><h3 id="❓-Q6：std-sort-是快排吗？"><a href="#❓-Q6：std-sort-是快排吗？" class="headerlink" title="❓ Q6：std::sort 是快排吗？"></a>❓ Q6：<code>std::sort</code> 是快排吗？</h3><p>✅ <strong>标准答法：</strong></p>
+<blockquote>
+<p><strong>Introsort（内省排序）</strong></p>
+</blockquote>
+<ul>
+<li>快排</li>
+<li>深度过深转堆排</li>
+<li>小规模转插排</li>
+</ul>
+<p>📌 <strong>复杂度：</strong></p>
+<blockquote>
+<p>O(n log n)，最坏也是 O(n log n)</p>
+</blockquote>
+<hr>
+<h3 id="❓-Q7：为什么快排最坏-O-n²-？"><a href="#❓-Q7：为什么快排最坏-O-n²-？" class="headerlink" title="❓ Q7：为什么快排最坏 O(n²)？"></a>❓ Q7：为什么快排最坏 O(n²)？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p>每次选到最小 &#x2F; 最大元素<br>常见于已排序数组</p>
+</blockquote>
+<hr>
+<h2 id="四、递归-栈空间"><a href="#四、递归-栈空间" class="headerlink" title="四、递归 &amp; 栈空间"></a>四、递归 &amp; 栈空间</h2><h3 id="❓-Q8：递归-Fibonacci-的时间复杂度？"><a href="#❓-Q8：递归-Fibonacci-的时间复杂度？" class="headerlink" title="❓ Q8：递归 Fibonacci 的时间复杂度？"></a>❓ Q8：递归 Fibonacci 的时间复杂度？</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">f</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span> n;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">f</span>(n<span class="number">-1</span>) + <span class="built_in">f</span>(n<span class="number">-2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>✅ <strong>答：</strong></p>
+<blockquote>
+<p><strong>O(2ⁿ)</strong>（指数级）</p>
+</blockquote>
+<p>📌 <strong>追问：</strong></p>
+<ul>
+<li>如何优化？<ul>
+<li>记忆化 → O(n)</li>
+<li>迭代 → O(n)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="❓-Q9：递归的空间复杂度怎么算？"><a href="#❓-Q9：递归的空间复杂度怎么算？" class="headerlink" title="❓ Q9：递归的空间复杂度怎么算？"></a>❓ Q9：递归的空间复杂度怎么算？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p><strong>等于递归深度</strong></p>
+</blockquote>
+<ul>
+<li>二叉树递归：O(h)</li>
+<li>链表递归：O(n)</li>
+</ul>
+<hr>
+<h2 id="五、树-图"><a href="#五、树-图" class="headerlink" title="五、树 &amp; 图"></a>五、树 &amp; 图</h2><h3 id="❓-Q10：BST-查找为什么是-O-log-n-？"><a href="#❓-Q10：BST-查找为什么是-O-log-n-？" class="headerlink" title="❓ Q10：BST 查找为什么是 O(log n)？"></a>❓ Q10：BST 查找为什么是 O(log n)？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p>前提是<strong>平衡</strong></p>
+</blockquote>
+<ul>
+<li>最坏（退化成链表）：O(n)</li>
+</ul>
+<hr>
+<h3 id="❓-Q11：红黑树比-AVL-快在哪？"><a href="#❓-Q11：红黑树比-AVL-快在哪？" class="headerlink" title="❓ Q11：红黑树比 AVL 快在哪？"></a>❓ Q11：红黑树比 AVL 快在哪？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p>旋转更少，插入更快<br>查询略慢，综合性能更好</p>
+</blockquote>
+<hr>
+<h3 id="❓-Q12：图的-DFS-BFS-复杂度？"><a href="#❓-Q12：图的-DFS-BFS-复杂度？" class="headerlink" title="❓ Q12：图的 DFS &#x2F; BFS 复杂度？"></a>❓ Q12：图的 DFS &#x2F; BFS 复杂度？</h3><p>✅ <strong>答：</strong></p>
+<blockquote>
+<p><strong>O(V + E)</strong><br>V：顶点数，E：边数</p>
+</blockquote>
+<hr>
+<h2 id="六、堆-priority-queue"><a href="#六、堆-priority-queue" class="headerlink" title="六、堆 &amp; priority_queue"></a>六、堆 &amp; priority_queue</h2><h3 id="❓-Q13：建堆为什么是-O-n-不是-O-n-log-n-？"><a href="#❓-Q13：建堆为什么是-O-n-不是-O-n-log-n-？" class="headerlink" title="❓ Q13：建堆为什么是 O(n) 不是 O(n log n)？"></a>❓ Q13：建堆为什么是 O(n) 不是 O(n log n)？</h3><p>✅ <strong>关键点：</strong></p>
+<blockquote>
+<p>大多数节点在底层，调整成本低<br>数学推导结果是 O(n)</p>
+</blockquote>
+<p>📌 <strong>必会：</strong></p>
+<ul>
+<li>插入 &#x2F; 删除：O(log n)</li>
+<li>取堆顶：O(1)</li>
+</ul>
+<hr>
+<h2 id="七、经典陷阱题（高频）"><a href="#七、经典陷阱题（高频）" class="headerlink" title="七、经典陷阱题（高频）"></a>七、经典陷阱题（高频）</h2><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>正确回答</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vector::size()</code></td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td><code>list::size()</code>（老标准）</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td><code>map::find()</code></td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td><code>unordered_map::rehash()</code></td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>递归 vs 迭代</td>
+<td>递归多了栈空间</td>
+</tr>
+<tr>
+<td>原地算法</td>
+<td>空间 O(1)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="八、面试“保命话术”（直接用）"><a href="#八、面试“保命话术”（直接用）" class="headerlink" title="八、面试“保命话术”（直接用）"></a>八、面试“保命话术”（直接用）</h2><p>✅ <strong>被问复杂度来源：</strong></p>
+<blockquote>
+<p>“这个复杂度来源于 XXX 操作，每一步……”</p>
+</blockquote>
+<p>✅ <strong>不确定时：</strong></p>
+<blockquote>
+<p>“平均情况下是 O(n log n)，最坏可能退化到 O(n²)。”</p>
+</blockquote>
+<p>✅ <strong>对比型问题：</strong></p>
+<blockquote>
+<p>“如果用哈希表，可以把时间从 O(n²) 降到 O(n)，但牺牲了空间。”</p>
+</blockquote>
+<hr>
+<h2 id="九、练习方式"><a href="#九、练习方式" class="headerlink" title="九、练习方式"></a>九、练习方式</h2><p>✅ <strong>对着代码说复杂度</strong><br>✅ <strong>每道题必须说：</strong></p>
+<ul>
+<li>时间复杂度</li>
+<li>空间复杂度</li>
+<li>是否可优化</li>
+</ul>
+<hr>
+<h1 id="常见数据结构"><a href="#常见数据结构" class="headerlink" title="常见数据结构"></a>常见数据结构</h1><p>数据结构通常围绕**“底层实现 + STL 封装 + 算法应用”**展开。</p>
+<hr>
+<h2 id="一、超高频"><a href="#一、超高频" class="headerlink" title="一、超高频"></a>一、超高频</h2><h3 id="1️⃣-数组（Array）"><a href="#1️⃣-数组（Array）" class="headerlink" title="1️⃣ 数组（Array）"></a>1️⃣ 数组（Array）</h3><p><strong>考点：</strong></p>
+<ul>
+<li>内存连续、随机访问 O(1)</li>
+<li>越界问题、<code>vector</code> 扩容机制</li>
+<li>二维数组在内存中的存储方式</li>
+</ul>
+<p><strong>常考题：</strong></p>
+<ul>
+<li>数组中出现次数超过一半的数字</li>
+<li>两数之和 &#x2F; 三数之和</li>
+<li>滑动窗口最大值</li>
+</ul>
+<hr>
+<h3 id="2️⃣-链表（Linked-List）"><a href="#2️⃣-链表（Linked-List）" class="headerlink" title="2️⃣ 链表（Linked List）"></a>2️⃣ 链表（Linked List）</h3><p><strong>重点：</strong></p>
+<ul>
+<li>单向 &#x2F; 双向 &#x2F; 循环链表</li>
+<li>指针操作（容易出 bug）</li>
+</ul>
+<p><strong>高频题：</strong></p>
+<ul>
+<li>反转链表</li>
+<li>判断是否有环（快慢指针）</li>
+<li>合并两个有序链表</li>
+<li>删除倒数第 K 个节点</li>
+</ul>
+<p>✅ <strong>必会手写</strong></p>
+<hr>
+<h3 id="3️⃣-栈（Stack）"><a href="#3️⃣-栈（Stack）" class="headerlink" title="3️⃣ 栈（Stack）"></a>3️⃣ 栈（Stack）</h3><p><strong>考点：</strong></p>
+<ul>
+<li>LIFO</li>
+<li>STL：<code>stack&lt;T&gt;</code></li>
+<li>单调栈思想</li>
+</ul>
+<p><strong>常考题：</strong></p>
+<ul>
+<li>有效的括号</li>
+<li>最小栈（O(1) 取最小值）</li>
+<li>柱状图中最大的矩形</li>
+</ul>
+<hr>
+<h3 id="4️⃣-队列（Queue）"><a href="#4️⃣-队列（Queue）" class="headerlink" title="4️⃣ 队列（Queue）"></a>4️⃣ 队列（Queue）</h3><p><strong>考点：</strong></p>
+<ul>
+<li>FIFO</li>
+<li>双端队列 <code>deque</code></li>
+<li>循环队列</li>
+</ul>
+<p><strong>常考题：</strong></p>
+<ul>
+<li>用栈实现队列</li>
+<li>滑动窗口最大值（单调队列）</li>
+</ul>
+<hr>
+<h2 id="二、高频（STL-底层原理）"><a href="#二、高频（STL-底层原理）" class="headerlink" title="二、高频（STL + 底层原理）"></a>二、高频（STL + 底层原理）</h2><h3 id="5️⃣-哈希表（Hash-Table）"><a href="#5️⃣-哈希表（Hash-Table）" class="headerlink" title="5️⃣ 哈希表（Hash Table）"></a>5️⃣ 哈希表（Hash Table）</h3><p><strong>重点：</strong></p>
+<ul>
+<li>哈希函数、冲突解决（拉链法 &#x2F; 开放寻址）</li>
+<li>STL：<code>unordered_map</code> vs <code>map</code></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>容器</th>
+<th>底层</th>
+<th>是否有序</th>
+<th>查找复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>map</td>
+<td>红黑树</td>
+<td>✅</td>
+<td>O(log n)</td>
+</tr>
+<tr>
+<td>unordered_map</td>
+<td>哈希表</td>
+<td>❌</td>
+<td>O(1) 平均</td>
+</tr>
+</tbody></table>
+<p><strong>常考题：</strong></p>
+<ul>
+<li>LRU 缓存</li>
+<li>两数之和</li>
+<li>字符串中第一个只出现一次的字符</li>
+</ul>
+<hr>
+<h3 id="6️⃣-二叉树（Binary-Tree）"><a href="#6️⃣-二叉树（Binary-Tree）" class="headerlink" title="6️⃣ 二叉树（Binary Tree）"></a>6️⃣ 二叉树（Binary Tree）</h3><p><strong>必会遍历：</strong></p>
+<ul>
+<li>前 &#x2F; 中 &#x2F; 后序（递归 + 非递归）</li>
+<li>层序遍历（队列）</li>
+</ul>
+<p><strong>高频题：</strong></p>
+<ul>
+<li>二叉树的最大深度</li>
+<li>对称二叉树</li>
+<li>二叉树的镜像</li>
+<li>最近公共祖先（LCA）</li>
+</ul>
+<hr>
+<h3 id="7️⃣-堆（Heap-Priority-Queue）"><a href="#7️⃣-堆（Heap-Priority-Queue）" class="headerlink" title="7️⃣ 堆（Heap &#x2F; Priority Queue）"></a>7️⃣ 堆（Heap &#x2F; Priority Queue）</h3><p><strong>重点：</strong></p>
+<ul>
+<li>大顶堆 &#x2F; 小顶堆</li>
+<li>STL：<code>priority_queue</code></li>
+</ul>
+<p><strong>常考题：</strong></p>
+<ul>
+<li>Top K 问题</li>
+<li>数据流的中位数</li>
+<li>合并 K 个有序链表</li>
+</ul>
+<hr>
+<h2 id="三、进阶"><a href="#三、进阶" class="headerlink" title="三、进阶"></a>三、进阶</h2><h3 id="8️⃣-红黑树（Red-Black-Tree）"><a href="#8️⃣-红黑树（Red-Black-Tree）" class="headerlink" title="8️⃣ 红黑树（Red-Black Tree）"></a>8️⃣ 红黑树（Red-Black Tree）</h3><p><strong>面试常问：</strong></p>
+<ul>
+<li>为什么 map 用红黑树而不是 AVL？</li>
+<li>红黑树的性质</li>
+<li>插入后的平衡调整（不要求手写）</li>
+</ul>
+<p>✅ <strong>理解即可，很少让写</strong></p>
+<hr>
+<h3 id="9️⃣-图（Graph）"><a href="#9️⃣-图（Graph）" class="headerlink" title="9️⃣ 图（Graph）"></a>9️⃣ 图（Graph）</h3><p><strong>重点：</strong></p>
+<ul>
+<li>邻接表 &#x2F; 邻接矩阵</li>
+<li>DFS &#x2F; BFS</li>
+<li>拓扑排序</li>
+</ul>
+<p><strong>常考题：</strong></p>
+<ul>
+<li>课程表（拓扑排序）</li>
+<li>岛屿数量（DFS&#x2F;BFS）</li>
+</ul>
+<hr>
+<h3 id="🔟-Trie（前缀树）"><a href="#🔟-Trie（前缀树）" class="headerlink" title="🔟 Trie（前缀树）"></a>🔟 Trie（前缀树）</h3><p><strong>考点：</strong></p>
+<ul>
+<li>字符串检索</li>
+<li>自动补全</li>
+</ul>
+<p><strong>常考题：</strong></p>
+<ul>
+<li>实现 Trie</li>
+<li>单词搜索 II</li>
+</ul>
+<hr>
+<h2 id="四、C-面试特别爱问的-STL-容器"><a href="#四、C-面试特别爱问的-STL-容器" class="headerlink" title="四、C++ 面试特别爱问的 STL 容器"></a>四、C++ 面试特别爱问的 STL 容器</h2><table>
+<thead>
+<tr>
+<th>容器</th>
+<th>底层</th>
+<th>面试重点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vector</td>
+<td>动态数组</td>
+<td>扩容、迭代器失效</td>
+</tr>
+<tr>
+<td>list</td>
+<td>双向链表</td>
+<td>插入删除</td>
+</tr>
+<tr>
+<td>deque</td>
+<td>分段数组</td>
+<td>双端队列</td>
+</tr>
+<tr>
+<td>set &#x2F; map</td>
+<td>红黑树</td>
+<td>有序性</td>
+</tr>
+<tr>
+<td>unordered_set</td>
+<td>哈希表</td>
+<td>冲突处理</td>
+</tr>
+</tbody></table>
+<h3 id="准备建议（实战向）"><a href="#准备建议（实战向）" class="headerlink" title="准备建议（实战向）"></a>准备建议（实战向）</h3><p>✅ <strong>必须能手写：</strong></p>
+<ul>
+<li>链表反转</li>
+<li>二叉树遍历</li>
+<li>栈 &#x2F; 队列实现</li>
+<li>LRU Cache</li>
+</ul>
+<p>✅ <strong>理解但不一定写：</strong></p>
+<ul>
+<li>红黑树</li>
+<li>哈希冲突解决</li>
+<li>堆调整</li>
+</ul>
+<hr>
+<h1 id="数据结构速记脑图"><a href="#数据结构速记脑图" class="headerlink" title="数据结构速记脑图"></a>数据结构速记脑图</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line">C++ 面试数据结构</span><br><span class="line">├── 一、基础必会（手写级）</span><br><span class="line">│   ├── 数组 Array</span><br><span class="line">│   │   ├── 连续内存 / 随机访问 O(1)</span><br><span class="line">│   │   ├── vector 扩容（2 倍 / 1.5 倍）</span><br><span class="line">│   │   └── 迭代器失效 ⚠️</span><br><span class="line">│   ├── 链表 Linked List</span><br><span class="line">│   │   ├── 单 / 双 / 循环</span><br><span class="line">│   │   ├── 指针操作（next / prev）</span><br><span class="line">│   │   └── 反转 / 环检测 / 删除</span><br><span class="line">│   ├── 栈 Stack</span><br><span class="line">│   │   ├── LIFO</span><br><span class="line">│   │   ├── 单调栈</span><br><span class="line">│   │   └── 括号匹配</span><br><span class="line">│   └── 队列 Queue</span><br><span class="line">│       ├── FIFO</span><br><span class="line">│       ├── deque（双端队列）</span><br><span class="line">│       └── 单调队列（滑动窗口）</span><br><span class="line">│</span><br><span class="line">├── 二、STL 容器（原理级）</span><br><span class="line">│   ├── vector</span><br><span class="line">│   │   ├── 动态数组</span><br><span class="line">│   │   ├── push_back / emplace_back</span><br><span class="line">│   │   └── 扩容代价 ⚠️</span><br><span class="line">│   ├── list</span><br><span class="line">│   │   ├── 双向链表</span><br><span class="line">│   │   └── 插入删除 O(1)</span><br><span class="line">│   ├── map / set</span><br><span class="line">│   │   ├── 红黑树</span><br><span class="line">│   │   ├── 有序</span><br><span class="line">│   │   └── O(log n)</span><br><span class="line">│   ├── unordered_map / set</span><br><span class="line">│   │   ├── 哈希表</span><br><span class="line">│   │   ├── 冲突：拉链法</span><br><span class="line">│   │   └── O(1) 平均</span><br><span class="line">│   └── priority_queue</span><br><span class="line">│       ├── 大顶堆 / 小顶堆</span><br><span class="line">│       └── TopK</span><br><span class="line">│</span><br><span class="line">├── 三、树结构（高频）</span><br><span class="line">│   ├── 二叉树</span><br><span class="line">│   │   ├── 遍历（前 / 中 / 后 / 层序）</span><br><span class="line">│   │   ├── 递归 + 非递归</span><br><span class="line">│   │   └── 深度 / 路径</span><br><span class="line">│   ├── 二叉搜索树 BST</span><br><span class="line">│   │   ├── 左 &lt; 根 &lt; 右</span><br><span class="line">│   │   └── 中序有序</span><br><span class="line">│   ├── 平衡树</span><br><span class="line">│   │   ├── AVL（严格平衡）</span><br><span class="line">│   │   └── 红黑树（map 底层）</span><br><span class="line">│   └── 堆 Heap</span><br><span class="line">│       ├── 完全二叉树</span><br><span class="line">│       └── 上浮 / 下沉</span><br><span class="line">│</span><br><span class="line">├── 四、图 Graph</span><br><span class="line">│   ├── 存储</span><br><span class="line">│   │   ├── 邻接表（常用）</span><br><span class="line">│   │   └── 邻接矩阵</span><br><span class="line">│   ├── 遍历</span><br><span class="line">│   │   ├── DFS（栈 / 递归）</span><br><span class="line">│   │   └── BFS（队列）</span><br><span class="line">│   └── 经典应用</span><br><span class="line">│       ├── 拓扑排序</span><br><span class="line">│       └── 最短路径（Dijkstra）</span><br><span class="line">│</span><br><span class="line">├── 五、高级结构（加分项）</span><br><span class="line">│   ├── Trie（前缀树）</span><br><span class="line">│   │   ├── 字符串检索</span><br><span class="line">│   │   └── 空间换时间</span><br><span class="line">│   ├── 并查集 Union-Find</span><br><span class="line">│   │   ├── 路径压缩</span><br><span class="line">│   │   └── 连通性问题</span><br><span class="line">│   ├── 跳表 Skip List</span><br><span class="line">│   │   ├── Redis 有序集合</span><br><span class="line">│   │   └── 替代红黑树</span><br><span class="line">│   └── LRU Cache</span><br><span class="line">│       ├── hash + 双向链表</span><br><span class="line">│       └── O(1)</span><br><span class="line">│</span><br><span class="line">└── 六、面试速记口诀</span><br><span class="line">├── 数组看边界</span><br><span class="line">├── 链表看指针</span><br><span class="line">├── 栈看单调</span><br><span class="line">├── 队列看双端</span><br><span class="line">├── map 看红黑树</span><br><span class="line">├── hash 看冲突</span><br><span class="line">└── 树看遍历</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -534,7 +937,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-number">1.</span> <span class="nav-text">复杂度速查表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%B5%E7%9B%96%E4%BA%86STL%E5%AE%B9%E5%99%A8%E3%80%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E4%BB%A5%E5%8F%8A%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E8%80%83%E7%82%B9%E3%80%82"><span class="nav-number">1.1.</span> <span class="nav-text">涵盖了STL容器、排序算法以及高频面试考点。</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%A9-%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%EF%BC%9AC-STL-%E5%AE%B9%E5%99%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">🧩 第一部分：C++ STL 容器复杂度速查表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%BA%8F%E5%88%97%E5%BC%8F%E5%AE%B9%E5%99%A8-Sequence-Containers"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">1. 序列式容器 (Sequence Containers)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%85%B3%E8%81%94%E5%BC%8F%E5%AE%B9%E5%99%A8-Associative-Containers"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">2. 关联式容器 (Associative Containers)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%97%A0%E5%BA%8F%E5%85%B3%E8%81%94%E5%AE%B9%E5%99%A8-Unordered-Containers-%E2%80%94%E2%80%94-%E9%9D%A2%E8%AF%95%E9%AB%98%E9%A2%91%E9%9B%B7%E5%8C%BA%EF%BC%81"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">3. 无序关联容器 (Unordered Containers) —— 面试高频雷区！</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%AE%B9%E5%99%A8%E9%80%82%E9%85%8D%E5%99%A8-Container-Adapters"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">4. 容器适配器 (Container Adapters)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%84-%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E7%BB%8F%E5%85%B8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%A4%8D%E6%9D%82%E5%BA%A6%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-number">1.1.2.</span> <span class="nav-text">🔄 第二部分：经典排序算法复杂度速查表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%A0-%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E9%9D%A2%E8%AF%95%E5%BF%85%E8%80%83%E2%80%9C%E6%BD%9C%E8%A7%84%E5%88%99%E2%80%9D%E4%B8%8E%E6%98%93%E9%94%99%E7%82%B9"><span class="nav-number">1.1.3.</span> <span class="nav-text">🧠 第三部分：面试必考“潜规则”与易错点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-vector-%E7%9A%84%E2%80%9C%E6%89%A9%E5%AE%B9%E2%80%9D%E9%99%B7%E9%98%B1"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">1. vector 的“扩容”陷阱</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E9%80%92%E5%BD%92%E7%9A%84%E9%9A%90%E8%97%8F%E6%88%90%E6%9C%AC%EF%BC%9A%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">2. 递归的隐藏成本：空间复杂度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-unordered-map-%E7%9A%84%E5%93%88%E5%B8%8C%E5%86%B2%E7%AA%81"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">3. unordered_map 的哈希冲突</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%81%8D%E5%8E%86%E4%B8%AD%E4%BF%AE%E6%94%B9%E5%AE%B9%E5%99%A8%EF%BC%88%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%A4%B1%E6%95%88%EF%BC%89"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">4. 遍历中修改容器（迭代器失效）</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">数据结构&amp;算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%93%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E7%BB%84%E7%BB%87"><span class="nav-number">1.1.</span> <span class="nav-text">数据结构–数据的存储与组织</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%EF%BC%88Array%EF%BC%89%E2%80%94%E2%80%94-%E5%9F%BA%E7%A1%80%E5%AD%98%E5%82%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">数组（Array）—— 基础存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%93%BE%E8%A1%A8%EF%BC%88Linked-List%EF%BC%89%E2%80%94%E2%80%94-%E7%81%B5%E6%B4%BB%E5%AD%98%E5%82%A8"><span class="nav-number">1.1.2.</span> <span class="nav-text">链表（Linked List）—— 灵活存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%88%E4%B8%8E%E9%98%9F%E5%88%97%EF%BC%88Stack-Queue%EF%BC%89%E2%80%94%E2%80%94-%E9%80%BB%E8%BE%91%E7%BA%A6%E6%9D%9F"><span class="nav-number">1.1.3.</span> <span class="nav-text">栈与队列（Stack &amp; Queue）—— 逻辑约束</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%91%EF%BC%88Tree%EF%BC%89%E2%80%94%E2%80%94-%E5%B1%82%E6%AC%A1%E5%85%B3%E7%B3%BB"><span class="nav-number">1.1.4.</span> <span class="nav-text">树（Tree）—— 层次关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%A1%A8%EF%BC%88Hash-Table%EF%BC%89%E2%80%94%E2%80%94-%E9%AB%98%E6%95%88%E6%A3%80%E7%B4%A2"><span class="nav-number">1.1.5.</span> <span class="nav-text">哈希表（Hash Table）—— 高效检索</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E2%80%93%E9%97%AE%E9%A2%98%E7%9A%84%E6%B1%82%E8%A7%A3%E7%AD%96%E7%95%A5"><span class="nav-number">1.2.</span> <span class="nav-text">算法–问题的求解策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE%EF%BC%88%E6%9A%B4%E5%8A%9B%E6%B3%95%EF%BC%89%E2%80%94%E2%80%94-%E6%80%9D%E7%BB%B4%E8%B5%B7%E7%82%B9"><span class="nav-number">1.2.1.</span> <span class="nav-text">枚举（暴力法）—— 思维起点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%92%E5%BD%92%EF%BC%88Recursion%EF%BC%89%E2%80%94%E2%80%94-%E5%8C%96%E7%B9%81%E4%B8%BA%E7%AE%80"><span class="nav-number">1.2.2.</span> <span class="nav-text">递归（Recursion）—— 化繁为简</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-number">2.</span> <span class="nav-text">复杂度速查表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%B5%E7%9B%96%E4%BA%86STL%E5%AE%B9%E5%99%A8%E3%80%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E4%BB%A5%E5%8F%8A%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E8%80%83%E7%82%B9%E3%80%82"><span class="nav-number">2.1.</span> <span class="nav-text">涵盖了STL容器、排序算法以及高频面试考点。</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%A9-%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%EF%BC%9AC-STL-%E5%AE%B9%E5%99%A8%E5%A4%8D%E6%9D%82%E5%BA%A6%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-number">2.1.1.</span> <span class="nav-text">🧩 第一部分：C++ STL 容器复杂度速查表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%BA%8F%E5%88%97%E5%BC%8F%E5%AE%B9%E5%99%A8-Sequence-Containers"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">1. 序列式容器 (Sequence Containers)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%85%B3%E8%81%94%E5%BC%8F%E5%AE%B9%E5%99%A8-Associative-Containers"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">2. 关联式容器 (Associative Containers)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%97%A0%E5%BA%8F%E5%85%B3%E8%81%94%E5%AE%B9%E5%99%A8-Unordered-Containers-%E2%80%94%E2%80%94-%E9%AB%98%E9%A2%91%E9%9B%B7%E5%8C%BA"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">3. 无序关联容器 (Unordered Containers) —— 高频雷区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%AE%B9%E5%99%A8%E9%80%82%E9%85%8D%E5%99%A8-Container-Adapters"><span class="nav-number">2.1.1.4.</span> <span class="nav-text">4. 容器适配器 (Container Adapters)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%84-%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E7%BB%8F%E5%85%B8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%A4%8D%E6%9D%82%E5%BA%A6%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-number">2.1.2.</span> <span class="nav-text">🔄 第二部分：经典排序算法复杂度速查表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%A0-%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E9%9D%A2%E8%AF%95%E5%BF%85%E8%80%83%E2%80%9C%E6%BD%9C%E8%A7%84%E5%88%99%E2%80%9D%E4%B8%8E%E6%98%93%E9%94%99%E7%82%B9"><span class="nav-number">2.1.3.</span> <span class="nav-text">🧠 第三部分：面试必考“潜规则”与易错点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-vector-%E7%9A%84%E2%80%9C%E6%89%A9%E5%AE%B9%E2%80%9D%E9%99%B7%E9%98%B1"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">1. vector 的“扩容”陷阱</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E9%80%92%E5%BD%92%E7%9A%84%E9%9A%90%E8%97%8F%E6%88%90%E6%9C%AC%EF%BC%9A%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">2.1.3.2.</span> <span class="nav-text">2. 递归的隐藏成本：空间复杂度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-unordered-map-%E7%9A%84%E5%93%88%E5%B8%8C%E5%86%B2%E7%AA%81"><span class="nav-number">2.1.3.3.</span> <span class="nav-text">3. unordered_map 的哈希冲突</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%81%8D%E5%8E%86%E4%B8%AD%E4%BF%AE%E6%94%B9%E5%AE%B9%E5%99%A8%EF%BC%88%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%A4%B1%E6%95%88%EF%BC%89"><span class="nav-number">2.1.3.4.</span> <span class="nav-text">4. 遍历中修改容器（迭代器失效）</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E2%8F%B1%EF%B8%8F-C-%E9%9D%A2%E8%AF%95-%C2%B7-%E5%A4%8D%E6%9D%82%E5%BA%A6%E9%80%9F%E8%AE%B0%E8%84%91%E5%9B%BE"><span class="nav-number">3.</span> <span class="nav-text">⏱️ C++ 面试 · 复杂度速记脑图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-%E5%8F%A3%E8%BF%B0%E2%80%9C%E4%B8%87%E8%83%BD%E5%8F%A5%E5%BC%8F%E2%80%9D"><span class="nav-number">3.1.</span> <span class="nav-text">✅ 口述“万能句式”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-10-%E7%A7%92%E9%80%9F%E8%AE%B0%E8%A1%A8%EF%BC%88%E8%80%83%E5%89%8D%E5%BF%85%E6%89%AB%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">✅ 10 秒速记表（考前必扫）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%F0%9F%8E%AF-C-%E9%9D%A2%E8%AF%95-%C2%B7-%E5%A4%8D%E6%9D%82%E5%BA%A6%E8%BF%BD%E9%97%AE%E6%B8%85%E5%8D%95"><span class="nav-number">4.</span> <span class="nav-text">🎯 C++ 面试 · 复杂度追问清单</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%95%B0%E7%BB%84-vector%EF%BC%88%E6%9C%80%E5%B8%B8%E8%A2%AB%E8%BF%BD%E9%97%AE%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">一、数组 &amp; vector（最常被追问）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q1%EF%BC%9Apush-back-%E6%98%AF-O-1-%E5%90%97%EF%BC%9F"><span class="nav-number">4.1.1.</span> <span class="nav-text">❓ Q1：push_back() 是 O(1) 吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q2%EF%BC%9Avector-%E6%8F%92%E5%85%A5%E4%B8%AD%E9%97%B4%E6%98%AF-O-n-%E4%B8%BA%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">4.1.2.</span> <span class="nav-text">❓ Q2：vector 插入中间是 O(n) 为什么？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%EF%BC%88unordered-map-set%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">二、哈希表（unordered_map &#x2F; set）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q3%EF%BC%9Aunordered-map-%E6%9F%A5%E6%89%BE%E4%B8%80%E5%AE%9A%E6%98%AF-O-1-%E5%90%97%EF%BC%9F"><span class="nav-number">4.2.1.</span> <span class="nav-text">❓ Q3：unordered_map 查找一定是 O(1) 吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q4%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88-map-%E4%B8%8D%E7%94%A8%E5%93%88%E5%B8%8C%E8%A1%A8%EF%BC%9F"><span class="nav-number">4.2.2.</span> <span class="nav-text">❓ Q4：为什么 map 不用哈希表？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q5%EF%BC%9Aunordered-map-%E5%92%8C-unordered-set-%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">4.2.3.</span> <span class="nav-text">❓ Q5：unordered_map 和 unordered_set 区别？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%8E%92%E5%BA%8F-STL-sort"><span class="nav-number">4.3.</span> <span class="nav-text">三、排序 &amp; STL sort</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q6%EF%BC%9Astd-sort-%E6%98%AF%E5%BF%AB%E6%8E%92%E5%90%97%EF%BC%9F"><span class="nav-number">4.3.1.</span> <span class="nav-text">❓ Q6：std::sort 是快排吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q7%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%AB%E6%8E%92%E6%9C%80%E5%9D%8F-O-n%C2%B2-%EF%BC%9F"><span class="nav-number">4.3.2.</span> <span class="nav-text">❓ Q7：为什么快排最坏 O(n²)？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E9%80%92%E5%BD%92-%E6%A0%88%E7%A9%BA%E9%97%B4"><span class="nav-number">4.4.</span> <span class="nav-text">四、递归 &amp; 栈空间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q8%EF%BC%9A%E9%80%92%E5%BD%92-Fibonacci-%E7%9A%84%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%EF%BC%9F"><span class="nav-number">4.4.1.</span> <span class="nav-text">❓ Q8：递归 Fibonacci 的时间复杂度？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q9%EF%BC%9A%E9%80%92%E5%BD%92%E7%9A%84%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E6%80%8E%E4%B9%88%E7%AE%97%EF%BC%9F"><span class="nav-number">4.4.2.</span> <span class="nav-text">❓ Q9：递归的空间复杂度怎么算？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%A0%91-%E5%9B%BE"><span class="nav-number">4.5.</span> <span class="nav-text">五、树 &amp; 图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q10%EF%BC%9ABST-%E6%9F%A5%E6%89%BE%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-O-log-n-%EF%BC%9F"><span class="nav-number">4.5.1.</span> <span class="nav-text">❓ Q10：BST 查找为什么是 O(log n)？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q11%EF%BC%9A%E7%BA%A2%E9%BB%91%E6%A0%91%E6%AF%94-AVL-%E5%BF%AB%E5%9C%A8%E5%93%AA%EF%BC%9F"><span class="nav-number">4.5.2.</span> <span class="nav-text">❓ Q11：红黑树比 AVL 快在哪？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q12%EF%BC%9A%E5%9B%BE%E7%9A%84-DFS-BFS-%E5%A4%8D%E6%9D%82%E5%BA%A6%EF%BC%9F"><span class="nav-number">4.5.3.</span> <span class="nav-text">❓ Q12：图的 DFS &#x2F; BFS 复杂度？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%A0%86-priority-queue"><span class="nav-number">4.6.</span> <span class="nav-text">六、堆 &amp; priority_queue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%93-Q13%EF%BC%9A%E5%BB%BA%E5%A0%86%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-O-n-%E4%B8%8D%E6%98%AF-O-n-log-n-%EF%BC%9F"><span class="nav-number">4.6.1.</span> <span class="nav-text">❓ Q13：建堆为什么是 O(n) 不是 O(n log n)？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%BB%8F%E5%85%B8%E9%99%B7%E9%98%B1%E9%A2%98%EF%BC%88%E9%AB%98%E9%A2%91%EF%BC%89"><span class="nav-number">4.7.</span> <span class="nav-text">七、经典陷阱题（高频）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E9%9D%A2%E8%AF%95%E2%80%9C%E4%BF%9D%E5%91%BD%E8%AF%9D%E6%9C%AF%E2%80%9D%EF%BC%88%E7%9B%B4%E6%8E%A5%E7%94%A8%EF%BC%89"><span class="nav-number">4.8.</span> <span class="nav-text">八、面试“保命话术”（直接用）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E7%BB%83%E4%B9%A0%E6%96%B9%E5%BC%8F"><span class="nav-number">4.9.</span> <span class="nav-text">九、练习方式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">常见数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%B6%85%E9%AB%98%E9%A2%91"><span class="nav-number">5.1.</span> <span class="nav-text">一、超高频</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E6%95%B0%E7%BB%84%EF%BC%88Array%EF%BC%89"><span class="nav-number">5.1.1.</span> <span class="nav-text">1️⃣ 数组（Array）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E9%93%BE%E8%A1%A8%EF%BC%88Linked-List%EF%BC%89"><span class="nav-number">5.1.2.</span> <span class="nav-text">2️⃣ 链表（Linked List）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E6%A0%88%EF%BC%88Stack%EF%BC%89"><span class="nav-number">5.1.3.</span> <span class="nav-text">3️⃣ 栈（Stack）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-%E9%98%9F%E5%88%97%EF%BC%88Queue%EF%BC%89"><span class="nav-number">5.1.4.</span> <span class="nav-text">4️⃣ 队列（Queue）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%AB%98%E9%A2%91%EF%BC%88STL-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">二、高频（STL + 底层原理）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5%EF%B8%8F%E2%83%A3-%E5%93%88%E5%B8%8C%E8%A1%A8%EF%BC%88Hash-Table%EF%BC%89"><span class="nav-number">5.2.1.</span> <span class="nav-text">5️⃣ 哈希表（Hash Table）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%EF%B8%8F%E2%83%A3-%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%88Binary-Tree%EF%BC%89"><span class="nav-number">5.2.2.</span> <span class="nav-text">6️⃣ 二叉树（Binary Tree）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7%EF%B8%8F%E2%83%A3-%E5%A0%86%EF%BC%88Heap-Priority-Queue%EF%BC%89"><span class="nav-number">5.2.3.</span> <span class="nav-text">7️⃣ 堆（Heap &#x2F; Priority Queue）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%BF%9B%E9%98%B6"><span class="nav-number">5.3.</span> <span class="nav-text">三、进阶</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8%EF%B8%8F%E2%83%A3-%E7%BA%A2%E9%BB%91%E6%A0%91%EF%BC%88Red-Black-Tree%EF%BC%89"><span class="nav-number">5.3.1.</span> <span class="nav-text">8️⃣ 红黑树（Red-Black Tree）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9%EF%B8%8F%E2%83%A3-%E5%9B%BE%EF%BC%88Graph%EF%BC%89"><span class="nav-number">5.3.2.</span> <span class="nav-text">9️⃣ 图（Graph）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%9F-Trie%EF%BC%88%E5%89%8D%E7%BC%80%E6%A0%91%EF%BC%89"><span class="nav-number">5.3.3.</span> <span class="nav-text">🔟 Trie（前缀树）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81C-%E9%9D%A2%E8%AF%95%E7%89%B9%E5%88%AB%E7%88%B1%E9%97%AE%E7%9A%84-STL-%E5%AE%B9%E5%99%A8"><span class="nav-number">5.4.</span> <span class="nav-text">四、C++ 面试特别爱问的 STL 容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%BB%BA%E8%AE%AE%EF%BC%88%E5%AE%9E%E6%88%98%E5%90%91%EF%BC%89"><span class="nav-number">5.4.1.</span> <span class="nav-text">准备建议（实战向）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E9%80%9F%E8%AE%B0%E8%84%91%E5%9B%BE"><span class="nav-number">6.</span> <span class="nav-text">数据结构速记脑图</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
