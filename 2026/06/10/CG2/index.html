@@ -28,7 +28,7 @@
 <meta property="og:description" content="理解图形学相关原理">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-06-10T15:27:01.000Z">
-<meta property="article:modified_time" content="2026-06-10T15:33:07.601Z">
+<meta property="article:modified_time" content="2026-06-11T15:48:18.830Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -173,10 +173,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2026-06-10 23:27:01 / Modified: 23:33:07" itemprop="dateCreated datePublished" datetime="2026-06-10T23:27:01+08:00">2026-06-10</time>
+              <time title="Created: 2026-06-10 23:27:01" itemprop="dateCreated datePublished" datetime="2026-06-10T23:27:01+08:00">2026-06-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-06-11 23:48:18" itemprop="dateModified" datetime="2026-06-11T23:48:18+08:00">2026-06-11</time>
+              </span>
 
           
 
@@ -223,7 +229,18 @@
 <p>Deferred Shading</p>
 <p>Forward变种</p>
 <p>Deferred变种</p>
-
+<h2 id="Forward-Shading"><a href="#Forward-Shading" class="headerlink" title="Forward Shading"></a>Forward Shading</h2><p>是最简单也最广泛支持的一种渲染技术，它的实现思想是遍历场景的所有物体，每个物体调用一次绘制指令，经由渲染管线光栅化后写入渲染纹理上。</p>
+<p>优点：<br>1。实现简单<br>2。无需 MRT 的支持，硬件支持广泛<br>3。完美地支持 MSAA抗锯齿。</p>
+<p>缺点：<br>1。 无法支撑大型复杂附带大量光源的场景渲染， 冗余计算多，过绘制严重</p>
+<pre><code>for each(object in ObjectsInScene){
+    color=0;
+    for each(light in LightsInScene){
+        color += light.Shade(object);// for all lights, huge cost when the number of lights is huge
+    }
+    WriteColorRenderTarget(color);
+}
+</code></pre>
+<h2 id="Deferred-Shading"><a href="#Deferred-Shading" class="headerlink" title="Deferred Shading"></a>Deferred Shading</h2>
     </div>
 
     
@@ -300,7 +317,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">渲染顺序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%86%E9%A1%BA%E5%BA%8F%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要分顺序？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rendering-Path"><span class="nav-number">2.</span> <span class="nav-text">Rendering Path</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">渲染顺序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%86%E9%A1%BA%E5%BA%8F%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要分顺序？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rendering-Path"><span class="nav-number">2.</span> <span class="nav-text">Rendering Path</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Forward-Shading"><span class="nav-number">2.1.</span> <span class="nav-text">Forward Shading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deferred-Shading"><span class="nav-number">2.2.</span> <span class="nav-text">Deferred Shading</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
