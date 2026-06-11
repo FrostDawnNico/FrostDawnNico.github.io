@@ -27,10 +27,12 @@
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
 <meta property="og:description" content="理解图形学相关原理">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frostdawnnico.github.io/2026/06/10/CG2/DeferredShading.png">
 <meta property="article:published_time" content="2026-06-10T15:27:01.000Z">
-<meta property="article:modified_time" content="2026-06-11T15:48:18.830Z">
+<meta property="article:modified_time" content="2026-06-11T15:58:44.927Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frostdawnnico.github.io/2026/06/10/CG2/DeferredShading.png">
 
 <link rel="canonical" href="https://frostdawnnico.github.io/2026/06/10/CG2/">
 
@@ -181,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-06-11 23:48:18" itemprop="dateModified" datetime="2026-06-11T23:48:18+08:00">2026-06-11</time>
+                <time title="Modified: 2026-06-11 23:58:44" itemprop="dateModified" datetime="2026-06-11T23:58:44+08:00">2026-06-11</time>
               </span>
 
           
@@ -232,15 +234,46 @@
 <h2 id="Forward-Shading"><a href="#Forward-Shading" class="headerlink" title="Forward Shading"></a>Forward Shading</h2><p>是最简单也最广泛支持的一种渲染技术，它的实现思想是遍历场景的所有物体，每个物体调用一次绘制指令，经由渲染管线光栅化后写入渲染纹理上。</p>
 <p>优点：<br>1。实现简单<br>2。无需 MRT 的支持，硬件支持广泛<br>3。完美地支持 MSAA抗锯齿。</p>
 <p>缺点：<br>1。 无法支撑大型复杂附带大量光源的场景渲染， 冗余计算多，过绘制严重</p>
-<pre><code>for each(object in ObjectsInScene){
+<pre><code>for each(object in ObjectsInScene)&#123;
     color=0;
-    for each(light in LightsInScene){
+    for each(light in LightsInScene)&#123;
         color += light.Shade(object);// for all lights, huge cost when the number of lights is huge
-    }
+    &#125;
     WriteColorRenderTarget(color);
-}
+&#125;
 </code></pre>
-<h2 id="Deferred-Shading"><a href="#Deferred-Shading" class="headerlink" title="Deferred Shading"></a>Deferred Shading</h2>
+<h2 id="Deferred-Shading"><a href="#Deferred-Shading" class="headerlink" title="Deferred Shading"></a>Deferred Shading</h2><p>是一种基于屏幕空间着色的技术，也是最普遍的一种渲染路径（Rendering Path）技术。它的核心思想是将场景的物体绘制分离成两个Pass：几何Pass和光照Pass，目的是将计算量大的光照Pass延后，和物体数量和光照数量解耦，以提升着色效率。在目前的主流渲染器和商业引擎中，有着广泛且充分的支持。</p>
+<img src="/2026/06/10/CG2/DeferredShading.png" class="" title="延迟渲染">
+
+<p>几何通道（Geometry Pass）将场景的物体信息光栅化到多个GBuffer中。这个阶段将场景中所有的不透明物体（Opaque）和Masked物体用无光照（Unlit）的材质执行渲染，然后将物体的几何信息写入到对应的渲染纹理（Render Target）中。</p>
+<p>其中物体的几何信息有：<br>1、位置（Position，也可以是深度，因为只要有深度和屏幕空间的uv就可以重建出位置）。<br>2、法线（Normal）。<br>3、材质参数(Diffuse Color, Emissive Color, Specular Scale, Specular Power, AO, Roughness, Shading Model, …)。</p>
+<p>注意：几何通道阶段不会执行光照计算，从而摒弃了很多冗余的光照计算逻辑，也就是避免了很多本被遮挡的物体光照计算，避免了过绘制（Overdraw）。</p>
+<pre><code>void RenderBasePass()&#123;
+    SetupBuffer();//设置集合数据缓冲区
+    //遍历场景的非半透明物体
+    for each(object in ObjectsInScene)&#123;
+        SetUnlitMaterial(Object); //设置无光照的材质
+        DrawObjectToBuffer(Object);//渲染几何信息到GBuffer，通常在GPU光栅化中完成
+    &#125;
+&#125;
+</code></pre>
+<p>光照通道（Lighting Pass）利用GBuffer的几何信息计算每个像素的光照结果，它的核心逻辑是遍历渲染分辨率数量相同的像素，根据每个像素的UV坐标从GBuffer采样获取该像素的几何信息，从而执行光照计算。</p>
+<pre><code>void RenderLightingPass()&#123;
+    BindGBuffer();//绑定集合数据缓冲区
+    SetupRenderTarget();//设置渲染纹理
+    //遍历RT所有像素
+    for each(pixel in RenderTargetPixels)&#123;
+        //获取GBuffer数据
+        pixelData = GetPixelDataFromGBuffer(pixel.uv);
+        color=0;
+        for each(light in LightsInScene)&#123;
+            color += CalculateLightColor(light,pixelData);//for all lights
+        &#125;
+        WriteColorRenderTarget(color);
+    &#125;
+</code></pre>
+<p>   }</p>
+
     </div>
 
     
