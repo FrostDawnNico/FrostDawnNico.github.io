@@ -28,7 +28,7 @@
 <meta property="og:description" content="IMR vs TBR vs TBDR | 从原理到硬件实现的全面对比">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-06-14T14:14:49.000Z">
-<meta property="article:modified_time" content="2026-06-15T16:12:19.433Z">
+<meta property="article:modified_time" content="2026-06-15T16:14:05.464Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="GPU">
 <meta name="twitter:card" content="summary">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-06-16 00:12:19" itemprop="dateModified" datetime="2026-06-16T00:12:19+08:00">2026-06-16</time>
+                <time title="Modified: 2026-06-16 00:14:05" itemprop="dateModified" datetime="2026-06-16T00:14:05+08:00">2026-06-16</time>
               </span>
 
           
@@ -200,7 +200,14 @@
 <span id="more"></span>
 
 
-<h1 id="渲染架构概览：目标与挑战"><a href="#渲染架构概览：目标与挑战" class="headerlink" title="渲染架构概览：目标与挑战"></a>渲染架构概览：目标与挑战</h1>
+<h1 id="渲染架构概览：目标与挑战"><a href="#渲染架构概览：目标与挑战" class="headerlink" title="渲染架构概览：目标与挑战"></a>渲染架构概览：目标与挑战</h1><p>渲染的核心目标：将复杂的三维模型数据，通过几何处理、光栅化、着色等流水线操作，实时、高效地转换为用户可见的二维图像，是连接虚拟数字世界与现实视觉呈现的关键桥梁。</p>
+<p>01 极致性能挑战<br>需兼顾高帧率(HFps)、高数据吞吐量与极低延迟，确保复杂场景下画面流畅无卡顿，是实时渲染的首要技术指标。</p>
+<p>02 功耗与能效平衡<br>移动端设备对功耗极其敏感，渲染单元的高负载运行直接影响续航时长与机身发热，需在性能释放与功耗管控间找到最佳平衡点。</p>
+<p>03 存储带宽瓶颈<br>GPU与外部DRAM之间的数据传输速度是核心瓶颈，海量纹理与几何数据的频繁交互极易引发带宽拥堵，制约整体渲染效率。</p>
+<h2 id="IMR-立即模式渲染"><a href="#IMR-立即模式渲染" class="headerlink" title="IMR 立即模式渲染"></a>IMR 立即模式渲染</h2><p>传统渲染架构，将数据流图元即时处理并直接写入帧缓冲，渲染灵活但在复杂场景下易造成带宽与功耗的浪费。</p>
+<h2 id="TBR-瓦片渲染"><a href="#TBR-瓦片渲染" class="headerlink" title="TBR 瓦片渲染"></a>TBR 瓦片渲染</h2><p>将屏幕划分为瓦片，先完成图元分配再逐块着色，大幅减少对外部DRAM的随机访问，但对被遮挡像素仍会执行着色计算。</p>
+<h2 id="TBDR-瓦片延迟渲染"><a href="#TBDR-瓦片延迟渲染" class="headerlink" title="TBDR 瓦片延迟渲染"></a>TBDR 瓦片延迟渲染</h2><p>TBR的进阶版，在瓦片内增加硬件级隐藏面消除(HSR)，只对可见像素执行着色，从根本上杜绝无效运算，是移动端主流的高效渲染架构。</p>
+
     </div>
 
     
@@ -280,7 +287,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88%EF%BC%9A%E7%9B%AE%E6%A0%87%E4%B8%8E%E6%8C%91%E6%88%98"><span class="nav-number">1.</span> <span class="nav-text">渲染架构概览：目标与挑战</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88%EF%BC%9A%E7%9B%AE%E6%A0%87%E4%B8%8E%E6%8C%91%E6%88%98"><span class="nav-number">1.</span> <span class="nav-text">渲染架构概览：目标与挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-%E7%AB%8B%E5%8D%B3%E6%A8%A1%E5%BC%8F%E6%B8%B2%E6%9F%93"><span class="nav-number">1.1.</span> <span class="nav-text">IMR 立即模式渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBR-%E7%93%A6%E7%89%87%E6%B8%B2%E6%9F%93"><span class="nav-number">1.2.</span> <span class="nav-text">TBR 瓦片渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-%E7%93%A6%E7%89%87%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93"><span class="nav-number">1.3.</span> <span class="nav-text">TBDR 瓦片延迟渲染</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
