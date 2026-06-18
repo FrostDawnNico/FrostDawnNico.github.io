@@ -27,11 +27,14 @@
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
 <meta property="og:description" content="IMR vs TBR vs TBDR | 从原理到硬件实现的全面对比">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frostdawnnico.github.io/2026/06/14/CG3/IMR.png">
+<meta property="og:image" content="https://frostdawnnico.github.io/2026/06/14/CG3/TBDR.png">
 <meta property="article:published_time" content="2026-06-14T14:14:49.000Z">
-<meta property="article:modified_time" content="2026-06-18T14:09:22.584Z">
+<meta property="article:modified_time" content="2026-06-18T14:51:09.328Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="GPU">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frostdawnnico.github.io/2026/06/14/CG3/IMR.png">
 
 <link rel="canonical" href="https://frostdawnnico.github.io/2026/06/14/CG3/">
 
@@ -182,7 +185,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-06-18 22:09:22" itemprop="dateModified" datetime="2026-06-18T22:09:22+08:00">2026-06-18</time>
+                <time title="Modified: 2026-06-18 22:51:09" itemprop="dateModified" datetime="2026-06-18T22:51:09+08:00">2026-06-18</time>
               </span>
 
           
@@ -243,6 +246,89 @@
 <h2 id="TBDR-架构：片上-SRAM-封闭计算"><a href="#TBDR-架构：片上-SRAM-封闭计算" class="headerlink" title="TBDR 架构：片上 SRAM 封闭计算"></a>TBDR 架构：片上 SRAM 封闭计算</h2><p>核心依赖：深度依赖大容量、低延迟的专用片上 Tile SRAM（瓦片缓存），将核心计算过程完全置于片上高速存储中。</p>
 <p>工作模式与逻辑：渲染全程在 SRAM 内封闭完成，仅在瓦片加载&#x2F;存储时与 DRAM 交互。通过牺牲一定场景灵活性，换取了极低的外部带宽消耗与优秀的功耗控制。</p>
 <h2 id="设计本质：硬件资源的工程取舍"><a href="#设计本质：硬件资源的工程取舍" class="headerlink" title="设计本质：硬件资源的工程取舍"></a>设计本质：硬件资源的工程取舍</h2><p>IMR与TBDR并非单纯的技术优劣，而是将有限的硬件资源与算力，在“低延迟缓存优化”和“高带宽显存访问”之间做不同侧重的分配，以适配PC高性能与移动高能效的差异化场景。</p>
+<h1 id="03-IMR-深度解析：渲染管线流程图"><a href="#03-IMR-深度解析：渲染管线流程图" class="headerlink" title="03 IMR 深度解析：渲染管线流程图"></a>03 IMR 深度解析：渲染管线流程图</h1><img src="/2026/06/14/CG3/IMR.png" class="" title="IMR渲染管线流程图">
+
+<ol>
+<li>顶点着色 (Vertex Shader)<br>接收并处理模型的顶点数据，执行坐标变换、骨骼动画等计算，将顶点从模型空间转换到裁剪空间，为后续阶段提供基础。</li>
+<li>光栅化 (Rasterization)<br>将经过变换的三维图元（如三角形）离散化，转换为屏幕空间中可显示的二维像素集合，即“片元”，是连接3D与2D的关键步骤。</li>
+<li>片元着色 (Fragment Shader)<br>为每个片元计算最终的颜色值，集成了纹理采样、光照计算、阴影处理等复杂逻辑，决定了画面的最终视觉效果。</li>
+<li>深度&#x2F;模板测试 (Test)<br>通过深度缓冲区判断该片元是否被其他物体遮挡，同时利用模板缓冲区实现特殊的遮罩或特效，决定片元是否能进入下一阶段。</li>
+<li>混合 (Blending)<br>将当前片元的颜色与帧缓存中已存在的颜色进行融合计算，用于实现半透明、反走样、辉光等效果，增强画面的层次感。</li>
+<li>写回显存 (FrameBuffer)<br>将经过所有处理的最终颜色值，写入片外DRAM中的帧缓存区域，完成一帧图像的渲染，等待显示控制器读取输出。</li>
+</ol>
+<h1 id="03-IMR-深度解析：优缺点与适用场景"><a href="#03-IMR-深度解析：优缺点与适用场景" class="headerlink" title="03 IMR 深度解析：优缺点与适用场景"></a>03 IMR 深度解析：优缺点与适用场景</h1><p>简单直接：渲染管线连续完整，逻辑链路清晰，易于底层驱动实现与渲染流程的极致优化。</p>
+<p>低延迟响应：每个Draw Call立即执行，无需复杂的批处理等待，画面响应速度极快，操作跟手感强。</p>
+<p>超高吞吐量：架构特性使其能够高效处理海量几何数据的并行计算，在复杂3D场景中保持高负载输出。</p>
+<p>渲染高灵活：天生适配多Pass渲染、后期特效处理等复杂图形技术，可实现电影级的视觉表现效果。</p>
+<h2 id="致命缺陷：Overdraw（过度绘制）"><a href="#致命缺陷：Overdraw（过度绘制）" class="headerlink" title="致命缺陷：Overdraw（过度绘制）"></a>致命缺陷：Overdraw（过度绘制）</h2><p>后绘制的片元覆盖先绘制的片元，导致前期着色计算完全浪费。这不仅消耗GPU算力，更因频繁读写片外DRAM造成带宽与功耗剧增。虽可通过Early-Z缓解，但无法根治。</p>
+<h2 id="核心主场：PC-高性能桌面平台"><a href="#核心主场：PC-高性能桌面平台" class="headerlink" title="核心主场：PC 高性能桌面平台"></a>核心主场：PC 高性能桌面平台</h2><p>PC配备高带宽GDDR独立显存，可硬扛IMR的带宽压力；同时平台追求极致渲染质量与灵活性，且对功耗和散热的物理容忍度远高于移动端设备。</p>
+<h1 id="04-TBR-深度解析：渲染管线流程图"><a href="#04-TBR-深度解析：渲染管线流程图" class="headerlink" title="04 TBR 深度解析：渲染管线流程图"></a>04 TBR 深度解析：渲染管线流程图</h1>
+
+<ol>
+<li>Tiling (瓦片划分) — 架构核心新增阶段<br>TBR在顶点处理后新增此关键步骤，将屏幕空间切分为小“瓦片”，并把所有图元信息归类到其覆盖的瓦片列表中，实现渲染任务的区域化管理。</li>
+<li>Primitive List — 精细化图元数据存储<br>系统建立并存储分箱后的图元索引与顶点数据清单，确保后续逐瓦片渲染时，仅调取当前瓦片相关的图元，有效剔除了无效数据的处理开销。</li>
+<li>On-Chip Buffers — 高速片上SRAM加速<br>渲染单个瓦片期间，深度缓冲和颜色缓冲完全驻留在低延迟的片上缓存中，而非慢速外部显存，这一设计极大提升了像素读写的吞吐量。</li>
+</ol>
+<h2 id="核心价值：显存访问模式的根本性优化"><a href="#核心价值：显存访问模式的根本性优化" class="headerlink" title="核心价值：显存访问模式的根本性优化"></a>核心价值：显存访问模式的根本性优化</h2><p>相比IMR的线性流程，TBR将对显存的零散随机访问转化为片上缓存的连续批量操作，从架构层面显著降低显存带宽占用，提升整体渲染能效。</p>
+<h1 id="04-TBR-深度解析：原理与流程"><a href="#04-TBR-深度解析：原理与流程" class="headerlink" title="04 TBR 深度解析：原理与流程"></a>04 TBR 深度解析：原理与流程</h1><p>核心思想：分块渲染，减少带宽</p>
+<p>TBR的核心逻辑是“分而治之”，将复杂的全屏渲染任务拆解为多个独立的瓦片（Tile）任务并行或串行处理，通过缩小单次数据处理范围，优化内存访问效率，从根本上减少对主存的频繁访问。</p>
+<ol>
+<li>图元分箱 (Binning)<br>首先将屏幕空间逻辑划分为若干固定大小的瓦片网格，遍历场景中所有图元，判断每个图元的覆盖范围，将图元的几何与属性信息精准分类并记录到其覆盖的所有瓦片对应的图元列表中，为后续渲染做好数据准备。</li>
+<li>逐瓦片渲染 (Per-Tile Rendering)<br>按顺序处理每个瓦片，仅将该瓦片关联的图元数据加载至片上高速缓存（SRAM），在缓存内完成光栅化、像素着色、深度测试等核心流程，处理完成后再将该瓦片的最终像素结果批量写回主存的帧缓存，最大化利用片上存储带宽。</li>
+</ol>
+<p>输入：场景图元——Triangles &#x2F; Primitives</p>
+<p>分箱归类——生成各瓦片图元列表</p>
+<p>片上并行渲染——SRAM内完成光栅&#x2F;着色</p>
+<p>输出：最终帧缓存——Framebuffer 批量写入</p>
+<p>核心价值：将主存“随机零散读写”转化为“批量连续读写”，大幅降低内存带宽消耗，提升渲染能效比。</p>
+<h1 id="04-TBR-深度解析：关键技术-瓦片划分-Tiling"><a href="#04-TBR-深度解析：关键技术-瓦片划分-Tiling" class="headerlink" title="04 TBR 深度解析：关键技术 - 瓦片划分 (Tiling)"></a>04 TBR 深度解析：关键技术 - 瓦片划分 (Tiling)</h1><p>什么是瓦片 (Tile)？<br>屏幕被GPU硬件切分成的固定大小的矩形像素块，是TBDR架构的核心处理单元。常见尺寸为16x16、32x32或64x64像素，该尺寸由硬件设计决定，软件层无法修改。</p>
+<p>缩小战场<br>将全屏的复杂渲染问题，拆解为多个独立的、小规模的瓦片渲染任务，化整为零，降低单次计算的复杂度与资源压力。</p>
+<p>数据本地化<br>让渲染单块瓦片所需的图元、深度、颜色等数据完整载入片上高速SRAM，避免频繁访问慢速显存，极大提升带宽效率。</p>
+<p>实现HSR<br>为隐藏面消除提供了封闭、可控的计算环境，在瓦片内部即可完成像素级的深度测试与颜色混合，减少无效的片上运算。</p>
+<p>全屏原始图元-&gt;Tiler 硬件单元-&gt;生成独立的瓦片图元列表 (Tile Lists)</p>
+<h1 id="04-TBR-深度解析：关键技术-Pixel-Quad"><a href="#04-TBR-深度解析：关键技术-Pixel-Quad" class="headerlink" title="04 TBR 深度解析：关键技术 - Pixel Quad"></a>04 TBR 深度解析：关键技术 - Pixel Quad</h1><p>什么是 Pixel Quad？<br>Pixel Quad 是 GPU 在像素着色器阶段的最小工作单元，核心逻辑是将相邻的 2x2 个像素作为一个不可分割的整体进行处理，而非逐个独立计算，这一设计是现代 GPU 图形渲染效率的基石之一。</p>
+<p>核心动因：辅助求导计算</p>
+<p>这是 2x2 打包最关键的原因。GPU 通过 Quad 内像素的相对位置计算纹理的变化率（Derivatives），从而精准确定 Mipmap 层级与各向异性过滤的采样方式，保障纹理渲染的清晰度与正确性。</p>
+<p>架构优化：简化硬件调度</p>
+<p>以 Quad 为基本单元进行任务分派与执行，大幅精简了 GPU 内部的控制逻辑与指令调度开销，避免了对单个像素的琐碎管理，让硬件设计更聚焦于并行计算的核心能力释放。</p>
+<p>性能提升：SIMD 并行优势</p>
+<p>利用 GPU 的单指令多数据（SIMD）架构，ALU 可通过一条指令同时并行处理 Quad 内四个像素的数据，最大化利用计算单元的吞吐量，显著提升像素着色阶段的整体执行效率。</p>
+<p>Pixel Quad 的代价：Overdraw 放大效应</p>
+<p>由于 Quad 是不可分割的执行单元，即使三角形仅覆盖其中 1 个像素，其余 3 个无效像素仍会被送入 Core 执行完整的 Fragment Shader，这可能导致严重的算力浪费与过绘制问题，是该架构必须权衡的设计取舍。</p>
+<p>局部性原理的完美契合</p>
+<p>Tiling 提供宏观的分块策略，Pixel Quad 作为微观执行粒度，保证了 Tile 内部纹理与帧缓存数据访问的极高空间局部性，大幅降低了显存带宽压力。</p>
+<p>隐面剔除的执行载体</p>
+<p>Early-Z 等硬件级隐面剔除操作的最小精度正是 Pixel Quad。通过在 Quad 级别提前剔除不可见像素，避免了无效片元着色，提升了渲染效率。</p>
+<p>跨 Tile 边界的 Quad 切割</p>
+<p>几何图元在 Tile 边缘会严格按照 2x2 Pixel Quad 边界进行切割处理，确保每个 Tile 都能作为独立单元并行高效运行，不产生依赖与数据冲突。</p>
+<p>核心总结：Tiling 提供宏观的“分治法”以节省显存带宽，Pixel Quad 则是微观的“流水线执行单元”完成实际着色计算。两者从宏观调度到微观执行深度结合，共同构成了移动端 GPU 实现高性能、低功耗渲染的核心基石。</p>
+<h1 id="04-TBR-深度解析：优缺点与适用场景"><a href="#04-TBR-深度解析：优缺点与适用场景" class="headerlink" title="04 TBR 深度解析：优缺点与适用场景"></a>04 TBR 深度解析：优缺点与适用场景</h1><p>核心技术优势</p>
+<ol>
+<li>降低DRAM带宽<br>通过瓦片缓存将随机读写转为批量读写，大幅减少片外内存数据交换，有效缓解内存带宽压力。</li>
+<li>中等功耗控制<br>减少高频片外内存访问，相比IMR架构，在渲染过程中实现了更优的功耗表现。</li>
+<li>硬件实现简单<br>无需复杂的隐藏面消除硬件逻辑，设计门槛低，适合早期GPU集成。</li>
+</ol>
+<p>架构固有局限</p>
+<ol>
+<li>仍存在严重 Overdraw<br>缺乏硬件级的隐藏面剔除机制，被遮挡的像素依然会完整执行片元着色流程，造成无效的算力浪费，尤其在复杂场景下表现明显。</li>
+<li>性能天花板较低<br>仅优化了内存访问模式，未从根本上解决无效计算问题，在高复杂度3D渲染场景中，性能提升效果有限。</li>
+</ol>
+<p>核心适用场景</p>
+<ol>
+<li>早期移动端 GPU<br>在硬件资源受限、对图形性能要求不高的早期智能手机和平板电脑中，TBR 凭借低带宽和简单架构成为主流选择。</li>
+<li>简单 2D&#x2F;UI 渲染<br>适用于 Overdraw 较低、以 2D 界面和简单 UI 元素为主的场景，能在保证流畅度的同时有效控制功耗。</li>
+</ol>
+<p>总结：TBR 是瓦片渲染的基础形态，平衡了实现复杂度与内存效率，但受限于无效计算，逐渐被 TBDR 等进阶架构取代。</p>
+<h1 id="05-TBDR-深度解析：渲染管线流程图"><a href="#05-TBDR-深度解析：渲染管线流程图" class="headerlink" title="05 TBDR 深度解析：渲染管线流程图"></a>05 TBDR 深度解析：渲染管线流程图</h1><img src="/2026/06/14/CG3/TBDR.png" class="" title="TBDR渲染管线流程图">
+
+<p>HSR &amp; 深度测试</p>
+<p>在执行昂贵的片元着色前，于片上缓存中完成所有可见性判断，精准剔除被遮挡的像素，避免无效计算开销。</p>
+<p>Tag Buffer 标签缓冲</p>
+<p>专门记录可见像素的标记缓存，仅让通过深度测试的像素进入后续的纹理采样与着色阶段，从源头减少计算量。</p>
+<p>片上高速缓存</p>
+<p>深度与颜色缓冲均驻留在片上SRAM中，利用片上内存的极高带宽特性，大幅降低对外部主存的访问依赖。</p>
+<p>架构核心变革</p>
+<p>相比TBR，将HSR移至纹理与着色之前，实现“先判断、后着色”的延迟机制，从根本上杜绝了Overdraw带来的资源浪费。</p>
 
     </div>
 
@@ -323,7 +409,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88%EF%BC%9A%E7%9B%AE%E6%A0%87%E4%B8%8E%E6%8C%91%E6%88%98"><span class="nav-number">1.</span> <span class="nav-text">渲染架构概览：目标与挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-%E7%AB%8B%E5%8D%B3%E6%A8%A1%E5%BC%8F%E6%B8%B2%E6%9F%93"><span class="nav-number">1.1.</span> <span class="nav-text">IMR 立即模式渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBR-%E7%93%A6%E7%89%87%E6%B8%B2%E6%9F%93"><span class="nav-number">1.2.</span> <span class="nav-text">TBR 瓦片渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-%E7%93%A6%E7%89%87%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93"><span class="nav-number">1.3.</span> <span class="nav-text">TBDR 瓦片延迟渲染</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#01-%E6%B8%B2%E6%9F%93%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88%EF%BC%9AIMR-vs-TBR-vs-TBDR-%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3%E5%AF%B9%E6%AF%94"><span class="nav-number">2.</span> <span class="nav-text">01 渲染架构概览：IMR vs TBR vs TBDR 核心思想对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-Immediate-Mode"><span class="nav-number">2.1.</span> <span class="nav-text">IMR (Immediate Mode)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBR-Tile-Based"><span class="nav-number">2.2.</span> <span class="nav-text">TBR (Tile-Based)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-Tile-Based-Deferred"><span class="nav-number">2.3.</span> <span class="nav-text">TBDR (Tile-Based Deferred)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93"><span class="nav-number">2.4.</span> <span class="nav-text">差异总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#02-%E7%A1%AC%E4%BB%B6%E7%BC%93%E5%AD%98%E4%BD%93%E7%B3%BB%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%AD%98%E5%82%A8%E5%B1%82%E7%BA%A7"><span class="nav-number">3.</span> <span class="nav-text">02 硬件缓存体系详解：存储层级</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#01-GPU-%E5%AD%98%E5%82%A8%E9%87%91%E5%AD%97%E5%A1%94%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">01. GPU 存储金字塔模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#02-%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91%EF%BC%9A%E9%80%9F%E5%BA%A6%E4%B8%8E%E5%AE%B9%E9%87%8F%E7%9A%84%E5%8D%9A%E5%BC%88"><span class="nav-number">3.2.</span> <span class="nav-text">02. 核心逻辑：速度与容量的博弈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#03-%E4%BB%8B%E8%B4%A8%E5%AF%B9%E6%AF%94%EF%BC%9ASRAM-%E4%B8%8E-DRAM"><span class="nav-number">3.3.</span> <span class="nav-text">03. 介质对比：SRAM 与 DRAM</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#02-%E7%A1%AC%E4%BB%B6%E7%BC%93%E5%AD%98%E4%BD%93%E7%B3%BB%E8%AF%A6%E8%A7%A3%EF%BC%9A%E7%BC%93%E5%AD%98%E7%B1%BB%E5%9E%8B%E4%B8%8E%E4%BD%9C%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">02 硬件缓存体系详解：缓存类型与作用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E7%BC%93%E5%AD%98-L1-L2-Cache"><span class="nav-number">4.1.</span> <span class="nav-text">通用缓存 (L1&#x2F;L2 Cache)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%93%E7%94%A8%E7%93%A6%E7%89%87%E7%BC%93%E5%AD%98-Tile-SRAM"><span class="nav-number">4.2.</span> <span class="nav-text">专用瓦片缓存 (Tile SRAM)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E4%BE%9D%E8%B5%96%E2%80%9C%E6%99%AE%E9%80%82%E7%BC%93%E5%AD%98%E2%80%9D%E7%9A%84%E9%A2%84%E6%B5%8B%E7%AD%96%E7%95%A5"><span class="nav-number">4.3.</span> <span class="nav-text">IMR 架构：依赖“普适缓存”的预测策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E4%BE%9D%E9%9D%A0%E2%80%9C%E4%B8%93%E5%B1%9E%E5%AD%98%E5%82%A8%E2%80%9D%E7%9A%84%E5%B0%81%E9%97%AD%E8%AE%A1%E7%AE%97"><span class="nav-number">4.4.</span> <span class="nav-text">TBDR 架构：依靠“专属存储”的封闭计算</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#02-%E7%A1%AC%E4%BB%B6%E7%BC%93%E5%AD%98%E4%BD%93%E7%B3%BB%E8%AF%A6%E8%A7%A3%EF%BC%9A%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%BC%93%E5%AD%98%E7%9A%84%E7%BB%91%E5%AE%9A%E5%85%B3%E7%B3%BB"><span class="nav-number">5.</span> <span class="nav-text">02 硬件缓存体系详解：架构与缓存的绑定关系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E9%80%9A%E7%94%A8%E7%BC%93%E5%AD%98-%E6%98%BE%E5%AD%98%E9%A9%B1%E5%8A%A8"><span class="nav-number">5.1.</span> <span class="nav-text">IMR 架构：通用缓存 + 显存驱动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E7%89%87%E4%B8%8A-SRAM-%E5%B0%81%E9%97%AD%E8%AE%A1%E7%AE%97"><span class="nav-number">5.2.</span> <span class="nav-text">TBDR 架构：片上 SRAM 封闭计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%9C%AC%E8%B4%A8%EF%BC%9A%E7%A1%AC%E4%BB%B6%E8%B5%84%E6%BA%90%E7%9A%84%E5%B7%A5%E7%A8%8B%E5%8F%96%E8%88%8D"><span class="nav-number">5.3.</span> <span class="nav-text">设计本质：硬件资源的工程取舍</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88%EF%BC%9A%E7%9B%AE%E6%A0%87%E4%B8%8E%E6%8C%91%E6%88%98"><span class="nav-number">1.</span> <span class="nav-text">渲染架构概览：目标与挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-%E7%AB%8B%E5%8D%B3%E6%A8%A1%E5%BC%8F%E6%B8%B2%E6%9F%93"><span class="nav-number">1.1.</span> <span class="nav-text">IMR 立即模式渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBR-%E7%93%A6%E7%89%87%E6%B8%B2%E6%9F%93"><span class="nav-number">1.2.</span> <span class="nav-text">TBR 瓦片渲染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-%E7%93%A6%E7%89%87%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93"><span class="nav-number">1.3.</span> <span class="nav-text">TBDR 瓦片延迟渲染</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#01-%E6%B8%B2%E6%9F%93%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88%EF%BC%9AIMR-vs-TBR-vs-TBDR-%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3%E5%AF%B9%E6%AF%94"><span class="nav-number">2.</span> <span class="nav-text">01 渲染架构概览：IMR vs TBR vs TBDR 核心思想对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-Immediate-Mode"><span class="nav-number">2.1.</span> <span class="nav-text">IMR (Immediate Mode)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBR-Tile-Based"><span class="nav-number">2.2.</span> <span class="nav-text">TBR (Tile-Based)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-Tile-Based-Deferred"><span class="nav-number">2.3.</span> <span class="nav-text">TBDR (Tile-Based Deferred)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93"><span class="nav-number">2.4.</span> <span class="nav-text">差异总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#02-%E7%A1%AC%E4%BB%B6%E7%BC%93%E5%AD%98%E4%BD%93%E7%B3%BB%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%AD%98%E5%82%A8%E5%B1%82%E7%BA%A7"><span class="nav-number">3.</span> <span class="nav-text">02 硬件缓存体系详解：存储层级</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#01-GPU-%E5%AD%98%E5%82%A8%E9%87%91%E5%AD%97%E5%A1%94%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">01. GPU 存储金字塔模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#02-%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91%EF%BC%9A%E9%80%9F%E5%BA%A6%E4%B8%8E%E5%AE%B9%E9%87%8F%E7%9A%84%E5%8D%9A%E5%BC%88"><span class="nav-number">3.2.</span> <span class="nav-text">02. 核心逻辑：速度与容量的博弈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#03-%E4%BB%8B%E8%B4%A8%E5%AF%B9%E6%AF%94%EF%BC%9ASRAM-%E4%B8%8E-DRAM"><span class="nav-number">3.3.</span> <span class="nav-text">03. 介质对比：SRAM 与 DRAM</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#02-%E7%A1%AC%E4%BB%B6%E7%BC%93%E5%AD%98%E4%BD%93%E7%B3%BB%E8%AF%A6%E8%A7%A3%EF%BC%9A%E7%BC%93%E5%AD%98%E7%B1%BB%E5%9E%8B%E4%B8%8E%E4%BD%9C%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">02 硬件缓存体系详解：缓存类型与作用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E7%BC%93%E5%AD%98-L1-L2-Cache"><span class="nav-number">4.1.</span> <span class="nav-text">通用缓存 (L1&#x2F;L2 Cache)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%93%E7%94%A8%E7%93%A6%E7%89%87%E7%BC%93%E5%AD%98-Tile-SRAM"><span class="nav-number">4.2.</span> <span class="nav-text">专用瓦片缓存 (Tile SRAM)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E4%BE%9D%E8%B5%96%E2%80%9C%E6%99%AE%E9%80%82%E7%BC%93%E5%AD%98%E2%80%9D%E7%9A%84%E9%A2%84%E6%B5%8B%E7%AD%96%E7%95%A5"><span class="nav-number">4.3.</span> <span class="nav-text">IMR 架构：依赖“普适缓存”的预测策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E4%BE%9D%E9%9D%A0%E2%80%9C%E4%B8%93%E5%B1%9E%E5%AD%98%E5%82%A8%E2%80%9D%E7%9A%84%E5%B0%81%E9%97%AD%E8%AE%A1%E7%AE%97"><span class="nav-number">4.4.</span> <span class="nav-text">TBDR 架构：依靠“专属存储”的封闭计算</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#02-%E7%A1%AC%E4%BB%B6%E7%BC%93%E5%AD%98%E4%BD%93%E7%B3%BB%E8%AF%A6%E8%A7%A3%EF%BC%9A%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%BC%93%E5%AD%98%E7%9A%84%E7%BB%91%E5%AE%9A%E5%85%B3%E7%B3%BB"><span class="nav-number">5.</span> <span class="nav-text">02 硬件缓存体系详解：架构与缓存的绑定关系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IMR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E9%80%9A%E7%94%A8%E7%BC%93%E5%AD%98-%E6%98%BE%E5%AD%98%E9%A9%B1%E5%8A%A8"><span class="nav-number">5.1.</span> <span class="nav-text">IMR 架构：通用缓存 + 显存驱动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBDR-%E6%9E%B6%E6%9E%84%EF%BC%9A%E7%89%87%E4%B8%8A-SRAM-%E5%B0%81%E9%97%AD%E8%AE%A1%E7%AE%97"><span class="nav-number">5.2.</span> <span class="nav-text">TBDR 架构：片上 SRAM 封闭计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%9C%AC%E8%B4%A8%EF%BC%9A%E7%A1%AC%E4%BB%B6%E8%B5%84%E6%BA%90%E7%9A%84%E5%B7%A5%E7%A8%8B%E5%8F%96%E8%88%8D"><span class="nav-number">5.3.</span> <span class="nav-text">设计本质：硬件资源的工程取舍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#03-IMR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">6.</span> <span class="nav-text">03 IMR 深度解析：渲染管线流程图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#03-IMR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E4%BC%98%E7%BC%BA%E7%82%B9%E4%B8%8E%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">7.</span> <span class="nav-text">03 IMR 深度解析：优缺点与适用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%B4%E5%91%BD%E7%BC%BA%E9%99%B7%EF%BC%9AOverdraw%EF%BC%88%E8%BF%87%E5%BA%A6%E7%BB%98%E5%88%B6%EF%BC%89"><span class="nav-number">7.1.</span> <span class="nav-text">致命缺陷：Overdraw（过度绘制）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E4%B8%BB%E5%9C%BA%EF%BC%9APC-%E9%AB%98%E6%80%A7%E8%83%BD%E6%A1%8C%E9%9D%A2%E5%B9%B3%E5%8F%B0"><span class="nav-number">7.2.</span> <span class="nav-text">核心主场：PC 高性能桌面平台</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#04-TBR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">8.</span> <span class="nav-text">04 TBR 深度解析：渲染管线流程图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E4%BB%B7%E5%80%BC%EF%BC%9A%E6%98%BE%E5%AD%98%E8%AE%BF%E9%97%AE%E6%A8%A1%E5%BC%8F%E7%9A%84%E6%A0%B9%E6%9C%AC%E6%80%A7%E4%BC%98%E5%8C%96"><span class="nav-number">8.1.</span> <span class="nav-text">核心价值：显存访问模式的根本性优化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#04-TBR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E5%8E%9F%E7%90%86%E4%B8%8E%E6%B5%81%E7%A8%8B"><span class="nav-number">9.</span> <span class="nav-text">04 TBR 深度解析：原理与流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#04-TBR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF-%E7%93%A6%E7%89%87%E5%88%92%E5%88%86-Tiling"><span class="nav-number">10.</span> <span class="nav-text">04 TBR 深度解析：关键技术 - 瓦片划分 (Tiling)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#04-TBR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF-Pixel-Quad"><span class="nav-number">11.</span> <span class="nav-text">04 TBR 深度解析：关键技术 - Pixel Quad</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#04-TBR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E4%BC%98%E7%BC%BA%E7%82%B9%E4%B8%8E%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">12.</span> <span class="nav-text">04 TBR 深度解析：优缺点与适用场景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#05-TBDR-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9A%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">13.</span> <span class="nav-text">05 TBDR 深度解析：渲染管线流程图</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
