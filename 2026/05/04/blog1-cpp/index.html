@@ -29,7 +29,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://frostdawnnico.github.io/2026/05/04/blog1-cpp/ENDFIELD_SHARE_1776597902.png">
 <meta property="article:published_time" content="2026-05-04T15:25:26.000Z">
-<meta property="article:modified_time" content="2026-05-15T16:52:51.711Z">
+<meta property="article:modified_time" content="2026-07-07T08:11:02.337Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -184,7 +184,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-05-16 00:52:51" itemprop="dateModified" datetime="2026-05-16T00:52:51+08:00">2026-05-16</time>
+                <time title="Modified: 2026-07-07 16:11:02" itemprop="dateModified" datetime="2026-07-07T16:11:02+08:00">2026-07-07</time>
               </span>
 
           
@@ -392,6 +392,7 @@ alignof(int);   // 通常 4
 </tbody></table>
 <p>空类 &#x2F; 空基类优化（EBO）</p>
 <pre><code>struct Empty &#123;&#125;;
+//sizeof(Empty)通常为 1
 struct A : Empty &#123;
 int x;
 &#125;;
@@ -1028,6 +1029,439 @@ char* p = reinterpret_cast&lt;char*&gt;(&amp;x);
 <p>✅ static_cast无运行时开销，dynamic_cast有 RTTI 开销。</p>
 <p>❓ reinterpret_cast能转函数指针吗？</p>
 <p>✅ 可以，但不可移植，强烈不推荐。</p>
+<h1 id="拓展1：-0与ascii码以及unicode和特殊进制"><a href="#拓展1：-0与ascii码以及unicode和特殊进制" class="headerlink" title="拓展1：\0与ascii码以及unicode和特殊进制"></a>拓展1：<code>\0</code>与ascii码以及unicode和特殊进制</h1><p><code>\0</code> 在字符串中通常被称为 <strong>空字符（Null Character）</strong>，它是 ASCII 码表中第一个字符，数值为 <code>0</code>。</p>
+<p>它的核心作用是 <strong>字符串终止符</strong>。</p>
+<h3 id="1-0-详解"><a href="#1-0-详解" class="headerlink" title="1. \0 详解"></a>1. <code>\0</code> 详解</h3><ul>
+<li><strong>本质</strong>：ASCII 值为 0 的控制字符。</li>
+<li><strong>在 C&#x2F;C++ 中</strong>：这是它最重要的应用场景。C 语言中的字符串本质是字符数组，依靠 <code>\0</code> 来判断字符串在哪里结束。<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> str[] = <span class="string">&quot;Hello&quot;</span>; <span class="comment">// 内存中是：H e l l o \0</span></span><br></pre></td></tr></table></figure>
+如果没有 <code>\0</code>，函数（如 <code>printf</code> 或 <code>strlen</code>）就不知道何时停止读取内存，会导致<strong>缓冲区溢出</strong>或乱码。</li>
+<li><strong>在其他语言中</strong>：<ul>
+<li><strong>Python&#x2F;Java&#x2F;JavaScript</strong>：字符串长度由解释器&#x2F;虚拟机管理，<code>\0</code> 只是一个普通的字符，<strong>不会</strong>终止字符串。</li>
+<li><strong>注意</strong>：在处理底层系统调用或与 C 库交互时，依然需要注意 <code>\0</code> 的影响。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-常用转义字符对照表"><a href="#2-常用转义字符对照表" class="headerlink" title="2. 常用转义字符对照表"></a>2. 常用转义字符对照表</h3><p>除了 <code>\0</code>，编程语言中定义了一系列以反斜杠 <code>\</code> 开头的<strong>转义字符</strong>，用来表示那些无法直接输入或具有特殊功能的字符。</p>
+<table>
+<thead>
+<tr>
+<th align="left">转义字符</th>
+<th align="left">名称</th>
+<th align="left">含义&#x2F;作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>\n</code></td>
+<td align="left">换行符</td>
+<td align="left">New Line。光标移到下一行开头。（Linux&#x2F;macOS 换行符）</td>
+</tr>
+<tr>
+<td align="left"><code>\r</code></td>
+<td align="left">回车符</td>
+<td align="left">Carriage Return。光标移到当前行开头。（早期 Mac 换行符）</td>
+</tr>
+<tr>
+<td align="left"><code>\t</code></td>
+<td align="left">水平制表符</td>
+<td align="left">Tab。相当于键盘上的 Tab 键，用于对齐文本。</td>
+</tr>
+<tr>
+<td align="left"><code>\b</code></td>
+<td align="left">退格符</td>
+<td align="left">Backspace。光标回退一格。</td>
+</tr>
+<tr>
+<td align="left"><code>\f</code></td>
+<td align="left">换页符</td>
+<td align="left">Form Feed。用于打印机换页，控制台中较少用。</td>
+</tr>
+<tr>
+<td align="left"><code>\v</code></td>
+<td align="left">垂直制表符</td>
+<td align="left">Vertical Tab。较少使用。</td>
+</tr>
+<tr>
+<td align="left"><code>\\</code></td>
+<td align="left">反斜杠</td>
+<td align="left">显示反斜杠本身。因为 <code>\</code> 是转义标志，所以要打两个。</td>
+</tr>
+<tr>
+<td align="left"><code>\&#39;</code></td>
+<td align="left">单引号</td>
+<td align="left">在单引号定义的字符串中显示单引号。例如：<code>&#39;It\&#39;s ok&#39;</code></td>
+</tr>
+<tr>
+<td align="left"><code>\&quot;</code></td>
+<td align="left">双引号</td>
+<td align="left">在双引号定义的字符串中显示双引号。例如：<code>&quot;He said \&quot;Hi\&quot;&quot;</code></td>
+</tr>
+<tr>
+<td align="left"><code>\0</code></td>
+<td align="left">空字符</td>
+<td align="left">Null Character。字符串结束符（C&#x2F;C++）。</td>
+</tr>
+<tr>
+<td align="left"><code>\a</code></td>
+<td align="left">响铃符</td>
+<td align="left">Alert&#x2F;Bell。触发系统蜂鸣声。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="3-高级-扩展表示法"><a href="#3-高级-扩展表示法" class="headerlink" title="3. 高级&#x2F;扩展表示法"></a>3. 高级&#x2F;扩展表示法</h3><p>在处理 Unicode 或特定进制数据时，还会用到以下形式：</p>
+<table>
+<thead>
+<tr>
+<th align="left">表示法</th>
+<th align="left">示例</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>八进制</strong></td>
+<td align="left"><code>\123</code></td>
+<td align="left">反斜杠后跟 1-3 位八进制数，代表对应 ASCII 码的字符。</td>
+</tr>
+<tr>
+<td align="left"><strong>十六进制</strong></td>
+<td align="left"><code>\x4A</code></td>
+<td align="left"><code>\x</code> 后跟两位十六进制数。例如 <code>\x4A</code> 代表字母 ‘J’。</td>
+</tr>
+<tr>
+<td align="left"><strong>Unicode</strong></td>
+<td align="left"><code>\u4F60</code></td>
+<td align="left"><code>\u</code> 后跟 4 位十六进制数，表示一个 Unicode 字符（基本平面）。</td>
+</tr>
+<tr>
+<td align="left"><strong>Unicode (ES6)</strong></td>
+<td align="left"><code>\u&#123;1F600&#125;</code></td>
+<td align="left">ES6 引入，支持大括号，可表示所有 Unicode 码点（如 Emoji）。</td>
+</tr>
+<tr>
+<td align="left"><strong>Unicode (Python)</strong></td>
+<td align="left"><code>\U0001F600</code></td>
+<td align="left">Python 中，8 位十六进制表示全范围的 Unicode。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="4-实际应用场景与坑点"><a href="#4-实际应用场景与坑点" class="headerlink" title="4. 实际应用场景与坑点"></a>4. 实际应用场景与坑点</h3><h4 id="A-Windows-文件路径"><a href="#A-Windows-文件路径" class="headerlink" title="A. Windows 文件路径"></a>A. Windows 文件路径</h4><p>在 Python 或 C# 的字符串中写 Windows 路径是经典的重灾区：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 错误写法：\t 会被识别为制表符</span></span><br><span class="line">path = <span class="string">&quot;C:\new_folder\txt_file.txt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 正确写法 1：使用双反斜杠</span></span><br><span class="line">path = <span class="string">&quot;C:\\new_folder\\txt_file.txt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 正确写法 2：使用原始字符串 (Raw String) - **最推荐**</span></span><br><span class="line">path = <span class="string">r&quot;C:\new_folder\txt_file.txt&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="B-正则表达式"><a href="#B-正则表达式" class="headerlink" title="B. 正则表达式"></a>B. 正则表达式</h4><p>在正则中，<code>\</code> 也是转义符，这就导致了“双重转义”。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="comment"># 匹配一个反斜杠 \</span></span><br><span class="line"><span class="comment"># 在正则语法中需要写成 \\</span></span><br><span class="line"><span class="comment"># 在字符串中 \\ 需要写成 \\\\</span></span><br><span class="line">result = re.findall(<span class="string">&quot;\\\\&quot;</span>, <span class="string">&quot;a\\b&quot;</span>)</span><br><span class="line"><span class="comment"># 或者使用原始字符串，避免混乱</span></span><br><span class="line">result = re.findall(<span class="string">r&quot;\\&quot;</span>, <span class="string">&quot;a\\b&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="C-字符截断（安全问题）"><a href="#C-字符截断（安全问题）" class="headerlink" title="C. 字符截断（安全问题）"></a>C. 字符截断（安全问题）</h4><p>在 C# 或 Java 中，虽然字符串不以 <code>\0</code> 结尾，但如果将包含 <code>\0</code> 的字符串传给底层 Win32 API（C&#x2F;C++编写），会造成逻辑漏洞。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 Windows API 调用中，以下路径可能会被截断为 &quot;C:\temp&quot;</span></span><br><span class="line"><span class="built_in">string</span> path = <span class="string">&quot;C:\\temp\\file.txt\0_evil.exe&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><strong><code>\0</code></strong>：主要是 <strong>C&#x2F;C++ 的字符串终结者</strong>。</li>
+<li><strong><code>\n</code>, <code>\t</code>, <code>\&quot;</code></strong>：日常编程中最常用来处理格式和引号的伙伴。</li>
+<li><strong><code>r&quot;...&quot;</code> (原始字符串)</strong>：处理文件路径时的救命稻草。</li>
+<li><strong><code>\u</code> &#x2F; <code>\x</code></strong>：处理非英文字符或特殊符号的利器。</li>
+</ul>
+<h1 id="sizeof和alignof有什么区别"><a href="#sizeof和alignof有什么区别" class="headerlink" title="sizeof和alignof有什么区别"></a>sizeof和alignof有什么区别</h1><p>这是 C&#x2F;C++ 中两个用于查询<strong>内存布局</strong>的关键字，但它们关注的重点完全不同：</p>
+<table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left"><code>sizeof</code></th>
+<th align="left"><code>alignof</code> (C++11起) &#x2F; <code>_Alignof</code> (C11起)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>关注点</strong></td>
+<td align="left"><strong>占用空间的大小</strong></td>
+<td align="left"><strong>对齐要求（Alignment）</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>含义</strong></td>
+<td align="left">对象或类型在内存中占用的<strong>字节数</strong>（包含填充字节）。</td>
+<td align="left">对象或类型在内存中存放时，其地址必须满足的<strong>整数倍要求</strong>。</td>
+</tr>
+<tr>
+<td align="left"><strong>返回值</strong></td>
+<td align="left"><code>size_t</code>（字节数）</td>
+<td align="left"><code>size_t</code>（字节数，表示对齐边界）</td>
+</tr>
+<tr>
+<td align="left"><strong>主要用途</strong></td>
+<td align="left">分配内存、计算数组大小、序列化。</td>
+<td align="left">优化性能、进行底层内存操作、满足硬件或 ABI 要求。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="1-sizeof：对象有多大？"><a href="#1-sizeof：对象有多大？" class="headerlink" title="1. sizeof：对象有多大？"></a>1. <code>sizeof</code>：对象有多大？</h3><p>它回答的问题是：“这个变量或类型需要占用多少个字节？”</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">MyStruct</span> &#123;</span><br><span class="line">    <span class="type">char</span> c;     <span class="comment">// 1 字节</span></span><br><span class="line">    <span class="type">int</span> i;      <span class="comment">// 4 字节</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">sizeof</span>(<span class="type">char</span>) &lt;&lt; <span class="string">&quot;\n&quot;</span>;      <span class="comment">// 输出: 1</span></span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">sizeof</span>(<span class="type">int</span>) &lt;&lt; <span class="string">&quot;\n&quot;</span>;       <span class="comment">// 输出: 4 (通常)</span></span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">sizeof</span>(MyStruct) &lt;&lt; <span class="string">&quot;\n&quot;</span>;  <span class="comment">// 输出: 8 (不是5!)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>关键点</strong>：<code>sizeof(MyStruct)</code> 是 8，而不是 1+4&#x3D;5。这是因为编译器为了效率，会在 <code>char</code> 后面插入 <strong>3 个填充字节</strong>，让 <code>int i</code> 的地址对齐到 4 的倍数。<code>sizeof</code> <strong>包含这些填充字节</strong>。</p>
+<hr>
+<h3 id="2-alignof：对象要放在哪里？"><a href="#2-alignof：对象要放在哪里？" class="headerlink" title="2. alignof：对象要放在哪里？"></a>2. <code>alignof</code>：对象要放在哪里？</h3><p>它回答的问题是：“这个类型的地址必须是几的倍数？”</p>
+<p>现代 CPU 访问内存时，如果数据的地址是其自然对齐要求的倍数，访问速度最快。例如，<code>int</code> 通常要求 4 字节对齐。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">MyStruct</span> &#123;</span><br><span class="line">    <span class="type">char</span> c;</span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">alignof</span>(<span class="type">char</span>) &lt;&lt; <span class="string">&quot;\n&quot;</span>;     <span class="comment">// 输出: 1</span></span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">alignof</span>(<span class="type">int</span>) &lt;&lt; <span class="string">&quot;\n&quot;</span>;      <span class="comment">// 输出: 4 (通常)</span></span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">alignof</span>(MyStruct) &lt;&lt; <span class="string">&quot;\n&quot;</span>; <span class="comment">// 输出: 4</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><code>alignof(int)</code> 通常是 4，意味着 <code>int</code> 变量的地址必须是 4 的倍数（如 0x0004, 0x0008）。</li>
+<li><code>alignof(MyStruct)</code> 是 4。结构体的对齐要求等于其<strong>所有成员中对齐要求最严格的那个</strong>。这里 <code>int</code> 要求 4，所以整个结构体也要按 4 对齐。这也解释了为什么 <code>sizeof</code> 的结果是 8（末尾可能也有填充，以保证数组中下一个元素也能正确对齐）。</li>
+</ul>
+<hr>
+<h3 id="核心联系：它们如何共同工作？"><a href="#核心联系：它们如何共同工作？" class="headerlink" title="核心联系：它们如何共同工作？"></a>核心联系：它们如何共同工作？</h3><p><code>sizeof</code> 和 <code>alignof</code> 经常一起决定内存布局。考虑一个结构体数组：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MyStruct arr[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+
+<p>内存布局可能是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">地址:  0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0A 0x0B 0x0C 0x0D 0x0E 0x0F</span><br><span class="line">内容: [ c ][ padding(3字节) ][      i      ][ c ][ padding(3字节) ][      i      ]</span><br><span class="line">大小: &lt;------ sizeof=8 ------&gt;&lt;------ sizeof=8 ------&gt;</span><br><span class="line">对齐: ^ (alignof=4的倍数)                ^ (alignof=4的倍数)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong><code>alignof</code></strong> 确保了每个 <code>MyStruct</code> 的起始地址都是 4 的倍数。</li>
+<li><strong><code>sizeof</code></strong> 决定了每个 <code>MyStruct</code> 占用 8 个字节，因此下一个元素的起始地址是当前地址 + 8，这依然满足 4 的倍数对齐。</li>
+</ul>
+<hr>
+<h3 id="实际应用场景"><a href="#实际应用场景" class="headerlink" title="实际应用场景"></a>实际应用场景</h3><ol>
+<li><p><strong>手动内存分配与对齐</strong>：<br>当你使用 <code>malloc</code>（不保证对齐到 <code>alignof(max_align_t)</code> 以外的要求）分配一块内存给有特殊对齐要求（如 SIMD 类型 <code>__m256</code>）的对象时，你需要 <code>alignof</code> 来确保地址正确。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="comment">// C++17 引入的 aligned_alloc，需要 size 和 alignment</span></span><br><span class="line"><span class="type">void</span>* ptr = std::<span class="built_in">aligned_alloc</span>(<span class="built_in">alignof</span>(MyAlignedType), <span class="built_in">sizeof</span>(MyAlignedType));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>反射与序列化</strong>：<br>编写需要将数据写入文件或通过网络发送的代码时，你需要 <code>sizeof</code> 知道要写多少字节，有时也需要 <code>alignof</code> 来处理不同平台间的兼容性。</p>
+</li>
+<li><p><strong>性能优化</strong>：<br>通过调整结构体成员顺序，减少因对齐产生的填充，可以减小 <code>sizeof</code>，节省内存。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 低效：sizeof = 24 (在64位系统，指针8字节对齐)</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Bad</span> &#123;</span><br><span class="line">    <span class="type">char</span> c;</span><br><span class="line">    <span class="type">char</span>* p;</span><br><span class="line">    <span class="type">char</span> d;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 高效：sizeof = 16</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Good</span> &#123;</span><br><span class="line">    <span class="type">char</span>* p;</span><br><span class="line">    <span class="type">char</span> c;</span><br><span class="line">    <span class="type">char</span> d;</span><br><span class="line">    <span class="comment">// 还有6字节填充，但比上面少</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><strong><code>sizeof</code> 是“有多胖”</strong>：告诉你对象占多少内存。</li>
+<li><strong><code>alignof</code> 是“站哪格”</strong>：告诉你要把对象放在内存中哪个合法的“格子”上（地址的倍数）。</li>
+</ul>
+<p>简单来说：<strong>对齐 (<code>alignof</code>) 的规则，直接导致了填充字节的产生，从而影响了最终的大小 (<code>sizeof</code>)</strong>。</p>
+<p>需要我进一步解释<strong>如何通过调整结构体成员顺序来优化 <code>sizeof</code></strong>，或者演示<strong>手动实现内存对齐</strong>的具体代码吗？</p>
+<h1 id="空类的sizeof是多少"><a href="#空类的sizeof是多少" class="headerlink" title="空类的sizeof是多少"></a>空类的sizeof是多少</h1><p>在 C++ 中，<strong>空类的 <code>sizeof</code> 结果是 <code>1</code></strong>（在大多数主流编译器如 GCC、Clang、MSVC 中）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">sizeof</span>(Empty) &lt;&lt; std::endl; <span class="comment">// 输出: 1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么不是-0？"><a href="#为什么不是-0？" class="headerlink" title="为什么不是 0？"></a>为什么不是 0？</h3><p>这是 C++ 标准明确规定的，主要有两个核心原因：</p>
+<h4 id="1-确保对象具有唯一的地址（对象唯一性）"><a href="#1-确保对象具有唯一的地址（对象唯一性）" class="headerlink" title="1. 确保对象具有唯一的地址（对象唯一性）"></a>1. 确保对象具有唯一的地址（对象唯一性）</h4><p>C++ 要求每个独立的对象都必须有一个独一无二的地址。如果空类的大小为 0，就会出现以下问题：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Empty a, b;</span><br></pre></td></tr></table></figure>
+<p>如果 <code>sizeof(Empty)</code> 是 0，那么 <code>a</code> 和 <code>b</code> 可能会分配到同一个内存地址，导致无法区分这两个不同的对象。分配 1 个字节可以确保每个实例都有自己的地址。</p>
+<h4 id="2-数组分配的要求"><a href="#2-数组分配的要求" class="headerlink" title="2. 数组分配的要求"></a>2. 数组分配的要求</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Empty arr[<span class="number">10</span>];</span><br></pre></td></tr></table></figure>
+<p>如果 <code>sizeof(Empty)</code> 是 0，那么 <code>arr</code> 将不占用任何空间，<code>arr[0]</code> 和 <code>arr[1]</code> 的地址将相同，这违反了数组元素必须连续存储且地址不同的基本原则。大小为 1 保证了数组中的每个元素都有正确的偏移量（<code>&amp;arr[i] == &amp;arr[0] + i * sizeof(Empty)</code>）。</p>
+<h3 id="深入细节：空基类优化-EBO"><a href="#深入细节：空基类优化-EBO" class="headerlink" title="深入细节：空基类优化 (EBO)"></a>深入细节：空基类优化 (EBO)</h3><p>虽然空类本身的大小是 1，但在<strong>继承</strong>场景下，编译器会进行一种重要的优化：<strong>空基类优化 (Empty Base Optimization, EBO)</strong>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Empty</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Empty &#123;</span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(Derived) &lt;&lt; std::endl; <span class="comment">// 输出通常是 4，而不是 5！</span></span><br></pre></td></tr></table></figure>
+<p><strong>原因</strong>：当空类作为基类时，编译器不会为空基类子对象分配那额外的 1 个字节。<code>Derived</code> 的大小仅由其成员 <code>x</code>（4 字节）和对齐规则决定。这是 C++ 标准中允许打破“空类大小为 1”规则的少数特例之一。</p>
+<h3 id="特殊情况：带成员的空类"><a href="#特殊情况：带成员的空类" class="headerlink" title="特殊情况：带成员的空类"></a>特殊情况：带成员的空类</h3><p>如果一个类虽然看起来“空”，但有成员函数、类型别名或静态成员，它的大小依然是 1。因为这些成员不存储在对象实例的内存布局中。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">StillEmpty</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;&#125;          <span class="comment">// 成员函数不影响大小</span></span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> static_var;  <span class="comment">// 静态成员不影响大小</span></span><br><span class="line">    <span class="keyword">using</span> Type = <span class="type">int</span>;       <span class="comment">// 类型别名不影响大小</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(StillEmpty) &lt;&lt; std::endl; <span class="comment">// 仍然是 1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a>总结</h3><table>
+<thead>
+<tr>
+<th align="left">场景</th>
+<th align="left"><code>sizeof</code> 结果</th>
+<th align="left">原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>独立空类</strong></td>
+<td align="left"><strong>1</strong></td>
+<td align="left">确保每个对象有唯一地址，支持数组分配。</td>
+</tr>
+<tr>
+<td align="left"><strong>空类作为基类</strong></td>
+<td align="left"><strong>0</strong> (不占空间)</td>
+<td align="left">空基类优化 (EBO)，常见于 STL（如 <code>std::less</code> 继承自空类）。</td>
+</tr>
+<tr>
+<td align="left"><strong>空类数组</strong></td>
+<td align="left"><code>N * 1</code></td>
+<td align="left">每个元素占据 1 字节，地址递增。</td>
+</tr>
+</tbody></table>
+<p>这个“1 字节”是 C++ 对象模型中的一个基础概念，也是理解<strong>内存布局</strong>和<strong>性能优化</strong>（如 EBO）的起点。</p>
+<h1 id="空基类优化在标准库中的应用（比如-std-unique-ptr的实现）"><a href="#空基类优化在标准库中的应用（比如-std-unique-ptr的实现）" class="headerlink" title="空基类优化在标准库中的应用（比如 std::unique_ptr的实现）"></a>空基类优化在标准库中的应用（比如 std::unique_ptr的实现）</h1><p>好，那我们就从 <strong>STL 的“空间魔法”</strong> 角度来看空基类优化（EBO）。你会发现，它绝不是编译器的炫技，而是现代 C++ 标准库能够如此高效的核心原因之一。</p>
+<p>其中最经典的案例，就是 <code>std::unique_ptr</code>。</p>
+<h3 id="1-std-unique-ptr-中的-EBO"><a href="#1-std-unique-ptr-中的-EBO" class="headerlink" title="1. std::unique_ptr 中的 EBO"></a>1. <code>std::unique_ptr</code> 中的 EBO</h3><p><code>std::unique_ptr</code> 不仅要管理一个指针，还要保存一个<strong>删除器（Deleter）</strong>。</p>
+<ul>
+<li>如果删除器是一个<strong>函数指针</strong>（有运行时开销），<code>unique_ptr</code> 的大小会变成 <strong>16 字节</strong>（指针 + 函数指针）。</li>
+<li>如果删除器是一个<strong>无状态的空类</strong>（比如默认的 <code>std::default_delete</code>），情况就不同了。</li>
+</ul>
+<p><strong>示例代码：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">EmptyDeleter</span> &#123; </span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">int</span>* p)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 什么都不做，或者打印日志</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 默认删除器版本</span></span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>&gt; p1;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 自定义空删除器版本</span></span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>, EmptyDeleter&gt; p2;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Default deleter size: &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(p1) &lt;&lt; std::endl; <span class="comment">// 输出 8 (仅指针大小)</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Empty deleter size:   &quot;</span> &lt;&lt; <span class="built_in">sizeof</span>(p2) &lt;&lt; std::endl; <span class="comment">// 输出 8 (依然是8!)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>原理剖析：</strong><br><code>std::unique_ptr</code> 的内部实现大致是这样的（简化版）：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简化模型</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Deleter&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">unique_ptr</span> &#123;</span><br><span class="line">    T* ptr;           <span class="comment">// 8 字节</span></span><br><span class="line">    Deleter deleter;  <span class="comment">// 如果是空类，这里本该是 1 字节</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如果没有 EBO，<code>sizeof(p2)</code> 应该是 <code>8 + 1 = 9</code> 字节（考虑到对齐可能会变成 16 字节）。<br>但是，由于 <code>EmptyDeleter</code> 是空类，编译器应用了 <strong>EBO</strong>，将 <code>deleter</code> 这个成员变量“压缩”掉了，让它不占用任何存储空间。因此，<code>p2</code> 的大小仅仅是指针 <code>ptr</code> 的大小。</p>
+<p><strong>为什么要这么做？</strong><br>因为删除器通常是无状态的（像 <code>std::default_delete</code> 这种），把它塞进对象里会浪费宝贵的缓存行（Cache Line）。EBO 使得 <code>std::unique_ptr</code> 在功能极其丰富的同时，内存占用却和一个裸指针一样小。</p>
+<hr>
+<h3 id="2-std-allocator-在容器中的-EBO"><a href="#2-std-allocator-在容器中的-EBO" class="headerlink" title="2. std::allocator 在容器中的 EBO"></a>2. <code>std::allocator</code> 在容器中的 EBO</h3><p>几乎所有的 STL 容器（<code>std::vector</code>, <code>std::list</code>, <code>std::map</code> 等）都接受一个 <code>Allocator</code>（分配器）模板参数。</p>
+<p>传统的 <code>std::allocator</code> 也是一个<strong>空类</strong>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;<span class="type">int</span>&gt; v1;</span><br><span class="line">std::vector&lt;<span class="type">int</span>, std::allocator&lt;<span class="type">int</span>&gt;&gt; v2;</span><br></pre></td></tr></table></figure>
+<p>在这些容器的实现中，分配器对象通常被作为空基类继承下来。这样，容器对象本身不会因为携带一个分配器而增加哪怕 1 个字节的大小。这对于频繁创建的小容器（如 <code>std::pair</code> 或小型 <code>std::vector</code>）至关重要。</p>
+<hr>
+<h3 id="3-std-less-在函数对象中的-EBO"><a href="#3-std-less-在函数对象中的-EBO" class="headerlink" title="3. std::less 在函数对象中的 EBO"></a>3. <code>std::less</code> 在函数对象中的 EBO</h3><p>在旧标准或未开启优化的某些情况下，关联容器（如 <code>std::set</code>, <code>std::map</code>）默认使用 <code>std::less</code> 作为比较器。<br><code>std::less</code> 也是一个空类（因为它没有成员变量，只有 <code>operator()</code>）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Compare</span> : <span class="keyword">public</span> std::less&lt;<span class="type">int</span>&gt; &#123;</span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果没有 EBO: sizeof(Compare) = 4 (data) + 1 (less) -&gt; 8 (对齐后)</span></span><br><span class="line"><span class="comment">// 有了 EBO: sizeof(Compare) = 4</span></span><br></pre></td></tr></table></figure>
+<p>这使得 <code>std::map</code> 在不需要自定义比较状态时，不会因为携带比较器而产生额外的内存开销。</p>
+<hr>
+<h3 id="4-no-unique-address-C-20-：EBO-的现代进化"><a href="#4-no-unique-address-C-20-：EBO-的现代进化" class="headerlink" title="4. [[no_unique_address]] (C++20)：EBO 的现代进化"></a>4. <code>[[no_unique_address]]</code> (C++20)：EBO 的现代进化</h3><p>在 C++20 之前，EBO <strong>只对基类生效</strong>。如果你把一个空类作为<strong>成员变量</strong>，它还是会占用 1 个字节。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C++17 及之前</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">BadWrapper</span> &#123;</span><br><span class="line">    Empty e; <span class="comment">// 作为成员，即使 Empty 是空的，这里也占 1 字节</span></span><br><span class="line">    <span class="type">int</span> x;   <span class="comment">// 4 字节</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// sizeof(BadWrapper) = 8 (1字节e + 3字节填充 + 4字节x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// C++20 引入 [[no_unique_address]]</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">GoodWrapper</span> &#123;</span><br><span class="line">    [[no_unique_address]] Empty e; <span class="comment">// 告诉编译器：如果它是空的，别给它地址</span></span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// sizeof(GoodWrapper) = 4</span></span><br></pre></td></tr></table></figure>
+<p><code>[[no_unique_address]]</code> 属性允许编译器对<strong>数据成员</strong>也应用类似 EBO 的优化。这在实现紧凑的数据结构（如 <code>std::optional</code> 的某些实现）时非常有用。</p>
+<hr>
+<h3 id="总结：STL-如何利用-EBO-提升性能"><a href="#总结：STL-如何利用-EBO-提升性能" class="headerlink" title="总结：STL 如何利用 EBO 提升性能"></a>总结：STL 如何利用 EBO 提升性能</h3><table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">利用方式</th>
+<th align="left">收益</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>std::unique_ptr</code></strong></td>
+<td align="left">继承&#x2F;封装空删除器</td>
+<td align="left">零开销抽象，大小和裸指针一致。</td>
+</tr>
+<tr>
+<td align="left"><strong>Containers (<code>vector</code>等)</strong></td>
+<td align="left">继承空分配器 (<code>Allocator</code>)</td>
+<td align="left">容器对象本身不膨胀，节省内存。</td>
+</tr>
+<tr>
+<td align="left"><strong>Associative Containers</strong></td>
+<td align="left">继承空比较器 (<code>Compare</code>)</td>
+<td align="left">红黑树节点更小，缓存命中率更高。</td>
+</tr>
+<tr>
+<td align="left"><strong><code>std::tuple</code></strong></td>
+<td align="left">递归继承空元素</td>
+<td align="left">压缩元组大小，特别是 <code>std::tuple&lt;&gt;</code> 的大小为 1 而非 N。</td>
+</tr>
+</tbody></table>
+<p><strong>一句话总结：</strong><br>EBO 是 C++ 实现 <strong>“零开销抽象”（Zero-overhead abstraction）</strong> 的基石之一。它让我们可以放心地在类中使用策略模式（Policy-based Design），而不必担心每一个策略类都会增加一个字节的包袱。</p>
+<h1 id="进一步拆解-std-unique-ptr-的简化源码结构，具体组织这两个部分（指针和删除器）"><a href="#进一步拆解-std-unique-ptr-的简化源码结构，具体组织这两个部分（指针和删除器）" class="headerlink" title="进一步拆解 std::unique_ptr 的简化源码结构，具体组织这两个部分（指针和删除器）"></a>进一步拆解 <strong><code>std::unique_ptr</code> 的简化源码结构</strong>，具体组织这两个部分（指针和删除器）</h1><p>好，我们直接“剖开” <code>std::unique_ptr</code>。为了让你看清本质，我会剥离掉异常处理、<code>nullptr_t</code> 重载等干扰项，只保留最核心的<strong>内存布局逻辑</strong>。</p>
+<h3 id="1-核心矛盾"><a href="#1-核心矛盾" class="headerlink" title="1. 核心矛盾"></a>1. 核心矛盾</h3><p><code>std::unique_ptr&lt;T, Deleter&gt;</code> 必须管理两样东西：</p>
+<ol>
+<li><strong>指针</strong> (<code>T*</code>)</li>
+<li><strong>删除器</strong> (<code>Deleter</code>)</li>
+</ol>
+<p>如果直接写成这样，会有什么问题？</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Deleter&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">unique_ptr_bad</span> &#123;</span><br><span class="line">    T* ptr;</span><br><span class="line">    Deleter deleter; <span class="comment">// 如果 Deleter 是空类，这里也会占 1 字节</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这会导致即使使用默认的空删除器，<code>sizeof(unique_ptr_bad&lt;int&gt;)</code> 也会是 <strong>16 字节</strong>（8字节指针 + 1字节空类 + 7字节对齐填充）。</p>
+<h3 id="2-解决方案：空基类优化-EBO"><a href="#2-解决方案：空基类优化-EBO" class="headerlink" title="2. 解决方案：空基类优化 (EBO)"></a>2. 解决方案：空基类优化 (EBO)</h3><p>STL 的解决方案非常巧妙：<strong>把删除器作为基类</strong>，而不是成员变量。</p>
+<p>让我们看看简化后的源码结构（这是 libstdc++ 和 libc++ 实际采用的设计思想）：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 基础版本：不包含删除器（用于默认删除器的情况）</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Deleter, <span class="type">bool</span> = std::is_empty_v&lt;Deleter&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> unique_ptr_base &#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    T* ptr;</span><br><span class="line">    Deleter deleter; <span class="comment">// 如果不是空类，就老老实实当成员</span></span><br><span class="line">    <span class="comment">// ...构造函数等</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 特化版本：当 Deleter 是空类时</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Deleter&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">unique_ptr_base</span>&lt;T, Deleter, <span class="literal">true</span>&gt; &#123; <span class="comment">// 注意这里的 true</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    T* ptr;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 魔法在这里：私有继承 Deleter</span></span><br><span class="line">    <span class="comment">// private 继承意味着 &quot;is-implemented-in-terms-of&quot;</span></span><br><span class="line">    <span class="comment">// 既然 Deleter 是空的，编译器就会应用 EBO，不占空间</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    [[no_unique_address]] Deleter deleter; <span class="comment">// C++20 后常用这个属性</span></span><br><span class="line">    <span class="comment">// 在 C++20 之前，直接继承：</span></span><br><span class="line">    <span class="comment">// struct Impl : public Deleter &#123;</span></span><br><span class="line">    <span class="comment">//     T* ptr;</span></span><br><span class="line">    <span class="comment">// &#125; impl;</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 提供访问删除器的方法</span></span><br><span class="line">    <span class="function">Deleter&amp; <span class="title">get_deleter</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> deleter; &#125;</span><br><span class="line">    <span class="function"><span class="type">const</span> Deleter&amp; <span class="title">get_deleter</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> deleter; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-完整的简化实现"><a href="#3-完整的简化实现" class="headerlink" title="3. 完整的简化实现"></a>3. 完整的简化实现</h3><p>结合上面的 <code>unique_ptr_base</code>，最终的 <code>unique_ptr</code> 看起来像这样：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Deleter = std::default_delete&lt;T&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> unique_ptr &#123;</span><br><span class="line">    <span class="comment">// 继承我们上面的 base 类</span></span><br><span class="line">    <span class="comment">// 如果 Deleter 是空的，base 类会通过 EBO 把 deleter 压掉</span></span><br><span class="line">    <span class="keyword">struct</span> Base : <span class="keyword">public</span> unique_ptr_base&lt;T, Deleter&gt; &#123;</span><br><span class="line">        <span class="keyword">using</span> unique_ptr_base&lt;T, Deleter&gt;::ptr;</span><br><span class="line">        <span class="keyword">using</span> unique_ptr_base&lt;T, Deleter&gt;::get_deleter;</span><br><span class="line">    &#125; base;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="title">unique_ptr</span><span class="params">(T* p = <span class="literal">nullptr</span>)</span> <span class="keyword">noexcept</span> : base&#123;</span>p&#125; &#123;&#125;</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">unique_ptr</span>() &#123;</span><br><span class="line">        <span class="keyword">if</span> (base.ptr) &#123;</span><br><span class="line">            <span class="comment">// 调用删除器</span></span><br><span class="line">            <span class="comment">// 如果 Deleter 是空的，这里没有任何额外的内存寻址开销</span></span><br><span class="line">            base.<span class="built_in">get_deleter</span>()(base.ptr);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 禁止拷贝（核心语义）</span></span><br><span class="line">    <span class="built_in">unique_ptr</span>(<span class="type">const</span> unique_ptr&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    unique_ptr&amp; <span class="keyword">operator</span>=(<span class="type">const</span> unique_ptr&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 允许移动</span></span><br><span class="line">    <span class="built_in">unique_ptr</span>(unique_ptr&amp;&amp; other) <span class="keyword">noexcept</span> : base&#123;other.base.ptr&#125; &#123;</span><br><span class="line">        other.base.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">T* <span class="title">get</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span> </span>&#123; <span class="keyword">return</span> base.ptr; &#125;</span><br><span class="line">    T&amp; <span class="keyword">operator</span>*() <span class="type">const</span> &#123; <span class="keyword">return</span> *base.ptr; &#125;</span><br><span class="line">    T* <span class="keyword">operator</span>-&gt;() <span class="type">const</span> <span class="keyword">noexcept</span> &#123; <span class="keyword">return</span> base.ptr; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-内存布局对比"><a href="#4-内存布局对比" class="headerlink" title="4. 内存布局对比"></a>4. 内存布局对比</h3><p>假设我们有一个自定义的空删除器：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">MyEmptyDeleter</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">int</span>* p)</span> <span class="type">const</span> </span>&#123; <span class="keyword">delete</span> p; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>场景 A：默认删除器</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::unique_ptr&lt;<span class="type">int</span>&gt; p1;</span><br></pre></td></tr></table></figure>
+<p>内存布局：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+----------------+</span><br><span class="line">| ptr (8 bytes)  |</span><br><span class="line">+----------------+</span><br><span class="line">总大小: 8 bytes</span><br></pre></td></tr></table></figure>
+<p><em>解析：<code>std::default_delete</code> 是空类，被 EBO 优化掉了。</em></p>
+<p><strong>场景 B：函数指针删除器</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">my_free</span><span class="params">(<span class="type">int</span>* p)</span> </span>&#123; <span class="built_in">free</span>(p); &#125;</span><br><span class="line"><span class="function">std::unique_ptr&lt;<span class="type">int</span>, <span class="title">decltype</span><span class="params">(&amp;my_free)</span>&gt; <span class="title">p2</span><span class="params">(&amp;my_free)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>内存布局：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+----------------+ +----------------+</span><br><span class="line">| ptr (8 bytes)  | | deleter (8 bytes)|</span><br><span class="line">+----------------+ +----------------+</span><br><span class="line">总大小: 16 bytes</span><br></pre></td></tr></table></figure>
+<p><em>解析：函数指针不是空类，必须占用存储空间。</em></p>
+<p><strong>场景 C：我们的自定义空删除器</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::unique_ptr&lt;<span class="type">int</span>, MyEmptyDeleter&gt; p3;</span><br></pre></td></tr></table></figure>
+<p>内存布局：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+----------------+</span><br><span class="line">| ptr (8 bytes)  |</span><br><span class="line">+----------------+</span><br><span class="line">总大小: 8 bytes</span><br></pre></td></tr></table></figure>
+<p><em>解析：虽然我们使用了自定义删除器，但它依然是空类，EBO 再次生效。</em></p>
+<h3 id="5-为什么这种设计很“妙”？"><a href="#5-为什么这种设计很“妙”？" class="headerlink" title="5. 为什么这种设计很“妙”？"></a>5. 为什么这种设计很“妙”？</h3><ol>
+<li><strong>零开销抽象</strong>：当删除器是无状态（Stateless）的时候，<code>std::unique_ptr</code> 在内存占用上完全等同于一个裸指针 <code>T*</code>。</li>
+<li><strong>性能无损</strong>：调用删除器 <code>deleter(ptr)</code> 时，因为 <code>deleter</code> 是基类（或基类的成员），编译器可以直接内联这个函数调用，没有任何间接寻址的开销。</li>
+<li><strong>灵活性</strong>：当删除器是有状态（Stateful，比如需要引用计数或自定义内存池句柄）时，它自动退化为成员变量，虽然体积变大了，但功能依然正常。</li>
+</ol>
+<h3 id="总结-3"><a href="#总结-3" class="headerlink" title="总结"></a>总结</h3><p><code>std::unique_ptr</code> 并没有什么黑魔法，它只是<strong>严格遵守了 C++ 的对象模型</strong>：</p>
+<ul>
+<li>利用 <strong>模板特化</strong> 来区分“空删除器”和“非空删除器”。</li>
+<li>利用 <strong>空基类优化 (EBO)</strong> 让空删除器不占空间。</li>
+<li>利用 <strong>RAII</strong> 保证资源释放。</li>
+</ul>
+<p>这就是 C++ 标准库设计的典范：<strong>给用户提供高级的语法糖，但在底层生成最紧凑、最高效的机器码。</strong></p>
+<h1 id="std-shared-ptr-为什么做不到这一点（为什么它总是比-unique-ptr-大很多）？-控制块（Control-Block）-的设计取舍。"><a href="#std-shared-ptr-为什么做不到这一点（为什么它总是比-unique-ptr-大很多）？-控制块（Control-Block）-的设计取舍。" class="headerlink" title="std::shared_ptr 为什么做不到这一点（为什么它总是比 unique_ptr 大很多）？**控制块（Control Block）**的设计取舍。"></a><code>std::shared_ptr</code> 为什么做不到这一点（为什么它总是比 <code>unique_ptr</code> 大很多）？**控制块（Control Block）**的设计取舍。</h1><p>好，这就来讲讲 <code>std::shared_ptr</code> 为什么<strong>注定“胖”</strong>，以及它为了这份“胖”付出了多少代价，又换来了什么。</p>
+<p>如果说 <code>std::unique_ptr</code> 是<strong>贴身保镖</strong>（一对一，人随事走），那 <code>std::shared_ptr</code> 就是<strong>物业公司</strong>（一对多，统一管理）。</p>
+<h3 id="核心痛点：共享所有权"><a href="#核心痛点：共享所有权" class="headerlink" title="核心痛点：共享所有权"></a>核心痛点：共享所有权</h3><p><code>unique_ptr</code> 之所以能瘦，是因为它知道：“我是这个指针的唯一主人。”<br><code>shared_ptr</code> 不行，它必须时刻准备着回答两个问题：</p>
+<ol>
+<li><strong>还有几个人在用这个资源？</strong>（强引用计数）</li>
+<li><strong>还有没有人监视着这个资源？（哪怕不用它，只是在观察）</strong>（弱引用计数）</li>
+</ol>
+<p>为了解决这两个问题，<code>shared_ptr</code> 引入了一个核心概念：<strong>控制块（Control Block）</strong>。</p>
+<hr>
+<h3 id="1-内存布局：指针-控制块"><a href="#1-内存布局：指针-控制块" class="headerlink" title="1. 内存布局：指针 + 控制块"></a>1. 内存布局：指针 + 控制块</h3><p>一个典型的 <code>std::shared_ptr</code> 对象内部通常包含两个指针（这是它通常是 16 字节的原因）：</p>
+<ol>
+<li><strong>托管对象指针</strong> (<code>T*</code>): 指向实际的数据（如 <code>int</code>）。</li>
+<li><strong>控制块指针</strong>: 指向堆上的一块数据，里面包含了引用计数等信息。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">栈内存 (Stack)                堆内存 (Heap)</span><br><span class="line">+---------------------+</span><br><span class="line">| shared_ptr (16字节) |        +--------------------+</span><br><span class="line">| - ptr  ------------&gt;|------&gt; | 实际对象 (Object)   |</span><br><span class="line">| - ctrl -------------|-\      | (比如 int = 4字节)  |</span><br><span class="line">+---------------------+ |      +--------------------+</span><br><span class="line">                         \--&gt; +--------------------+</span><br><span class="line">                              | 控制块 (Control Block) |</span><br><span class="line">                              | - 强引用计数 (2)    |</span><br><span class="line">                              | - 弱引用计数 (1)    |</span><br><span class="line">                              | - 删除器 (Deleter)  |</span><br><span class="line">                              | - 分配器 (Allocator)|</span><br><span class="line">                              +--------------------+</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-为什么不能像-unique-ptr-那样用-EBO？"><a href="#2-为什么不能像-unique-ptr-那样用-EBO？" class="headerlink" title="2. 为什么不能像 unique_ptr 那样用 EBO？"></a>2. 为什么不能像 <code>unique_ptr</code> 那样用 EBO？</h3><p><code>unique_ptr</code> 能把删除器“压”进基类，是因为删除器是<strong>编译期绑定</strong>的（<code>unique_ptr&lt;int, MyDeleter&gt;</code> 的类型本身就包含了 <code>MyDeleter</code>）。<br><code>shared_ptr</code> 做不到，因为：</p>
+<ol>
+<li><strong>引用计数必须在堆上</strong>：多个 <code>shared_ptr</code> 实例分布在内存的不同角落，它们必须共享同一份计数。唯一的办法就是把计数放在堆上。</li>
+<li><strong>类型擦除 (Type Erasure)</strong>：<code>shared_ptr</code> 支持拷贝构造，甚至可以从 <code>unique_ptr</code> 转换过来。这意味着 <code>shared_ptr</code> 内部存储的删除器，在编译期不一定是确定的类型（它可能被包装在一个 <code>std::function</code> 类似的机制里）。为了支持这种灵活性，删除器必须存在于运行时的控制块中，而不能作为模板参数被 EBO 优化掉。</li>
+</ol>
+<hr>
+<h3 id="3-std-make-shared：一次优化，但依然“胖”"><a href="#3-std-make-shared：一次优化，但依然“胖”" class="headerlink" title="3. std::make_shared：一次优化，但依然“胖”"></a>3. <code>std::make_shared</code>：一次优化，但依然“胖”</h3><p>为了缓解堆分配两次（一次给对象，一次给控制块）的性能问题，C++ 提供了 <code>std::make_shared</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> sp = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">42</span>);</span><br></pre></td></tr></table></figure>
+<p>此时，内存布局变成了这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">堆内存 (Heap)</span><br><span class="line">+--------------------------------------------------+</span><br><span class="line">| 控制块 | 填充字节 | 实际对象 (int = 42)            |</span><br><span class="line">+--------------------------------------------------+</span><br></pre></td></tr></table></figure>
+<p><strong>优点</strong>：</p>
+<ul>
+<li><strong>一次内存分配</strong>：速度更快。</li>
+<li><strong>缓存友好</strong>：控制块和数据挨在一起，访问时更容易命中缓存。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>即便如此，<code>shared_ptr</code> 对象本身依然需要存储<strong>两个指针</strong>（一个指向数据，一个指向控制块头）。只不过现在这两个指针的差值是固定的。</li>
+<li>更重要的是，<strong>生命周期延长</strong>：只要还有 <code>weak_ptr</code> 存在，即使对象已经死了，控制块（包含那块内存）也不能释放。如果直接用 <code>new</code> 构造，对象内存可以早释放，只有控制块留到最后。</li>
+</ul>
+<hr>
+<h3 id="4-对比总结：unique-ptr-vs-shared-ptr"><a href="#4-对比总结：unique-ptr-vs-shared-ptr" class="headerlink" title="4. 对比总结：unique_ptr vs shared_ptr"></a>4. 对比总结：<code>unique_ptr</code> vs <code>shared_ptr</code></h3><table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left"><code>std::unique_ptr</code></th>
+<th align="left"><code>std::shared_ptr</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>典型大小</strong></td>
+<td align="left"><strong>8 字节</strong> (仅指针)</td>
+<td align="left"><strong>16 字节</strong> (指针 + 控制块指针)</td>
+</tr>
+<tr>
+<td align="left"><strong>内存分配</strong></td>
+<td align="left">1 次 (仅对象)</td>
+<td align="left">2 次 (对象 + 控制块)，<code>make_shared</code> 可优化为 1 次</td>
+</tr>
+<tr>
+<td align="left"><strong>删除器存储</strong></td>
+<td align="left"><strong>编译期绑定</strong> (利用 EBO，零开销)</td>
+<td align="left"><strong>运行期绑定</strong> (在控制块内，有开销)</td>
+</tr>
+<tr>
+<td align="left"><strong>线程安全</strong></td>
+<td align="left">不需要考虑 (不可共享)</td>
+<td align="left"><strong>原子操作</strong> (增减引用计数，有性能损耗)</td>
+</tr>
+<tr>
+<td align="left"><strong>弱引用</strong></td>
+<td align="left">不支持</td>
+<td align="left">支持 (<code>weak_ptr</code>)</td>
+</tr>
+<tr>
+<td align="left"><strong>适用场景</strong></td>
+<td align="left">明确单一所有权 (99% 的场景)</td>
+<td align="left">需要共享所有权 (循环引用、跨线程回调等)</td>
+</tr>
+</tbody></table>
+<h3 id="5-为什么说-shared-ptr-是“性能杀手”？"><a href="#5-为什么说-shared-ptr-是“性能杀手”？" class="headerlink" title="5. 为什么说 shared_ptr 是“性能杀手”？"></a>5. 为什么说 <code>shared_ptr</code> 是“性能杀手”？</h3><p>除了体积大，它还有隐形成本：</p>
+<ol>
+<li><strong>原子操作开销</strong>：每次拷贝或析构，都要执行原子递增&#x2F;递减指令（CAS 操作），这在高并发下是昂贵的。</li>
+<li><strong>控制块访问</strong>：每次解引用，理论上都要通过控制块检查是否合法（虽然编译器会优化，但逻辑上存在）。</li>
+<li><strong>内存碎片</strong>：频繁分配和释放控制块可能导致内存碎片。</li>
+</ol>
+<h3 id="经典陷阱：循环引用"><a href="#经典陷阱：循环引用" class="headerlink" title="经典陷阱：循环引用"></a>经典陷阱：循环引用</h3><p>这也是 <code>shared_ptr</code> 特有的坑，直接导致内存泄漏。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span>;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">A</span> &#123; std::shared_ptr&lt;B&gt; b; &#125;;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">B</span> &#123; std::shared_ptr&lt;A&gt; a; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> pa = std::<span class="built_in">make_shared</span>&lt;A&gt;();</span><br><span class="line"><span class="keyword">auto</span> pb = std::<span class="built_in">make_shared</span>&lt;B&gt;();</span><br><span class="line">pa-&gt;b = pb; <span class="comment">// 计数变为 2</span></span><br><span class="line">pb-&gt;a = pa; <span class="comment">// 计数变为 2</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 离开作用域后，pa 和 pb 析构，计数各减为 1</span></span><br><span class="line"><span class="comment">// 因为互相引用，计数永远不为 0，内存泄漏！</span></span><br></pre></td></tr></table></figure>
+<p>解决方法是使用 <code>std::weak_ptr</code>（它只观察，不增加强引用计数）。</p>
+<h3 id="一句话总结"><a href="#一句话总结" class="headerlink" title="一句话总结"></a>一句话总结</h3><ul>
+<li><strong><code>unique_ptr</code></strong> 是<strong>极致的内敛</strong>：能用编译期解决的绝不留到运行期，能用继承压缩的绝不占空间。</li>
+<li><strong><code>shared_ptr</code></strong> 是<strong>周全的管家</strong>：为了支持共享、弱引用和线程安全，它不得不引入控制块，从而牺牲了体积和速度。</li>
+</ul>
+<p><strong>设计哲学</strong>：<strong>能用 <code>unique_ptr</code> 就别用 <code>shared_ptr</code></strong>。除非你真的需要共享所有权，否则 <code>shared_ptr</code> 的那 16 字节和原子操作开销是不值得的。</p>
 
     </div>
 
@@ -1111,7 +1545,7 @@ char* p = reinterpret_cast&lt;char*&gt;(&amp;x);
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-%E5%9F%BA%E7%A1%80"><span class="nav-number">1.</span> <span class="nav-text">C++基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">内存与数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%AD%97%E4%B8%8E%E4%BF%AE%E9%A5%B0%E7%AC%A6"><span class="nav-number">1.2.</span> <span class="nav-text">关键字与修饰符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E4%B8%8E%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">1.3.</span> <span class="nav-text">类与结构体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#class%E4%B8%8Estruct%E5%8C%BA%E5%88%AB"><span class="nav-number">1.3.1.</span> <span class="nav-text">class与struct区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86%E4%B8%8E%E5%AE%8F"><span class="nav-number">1.4.</span> <span class="nav-text">预处理与宏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.5.</span> <span class="nav-text">强制类型转换</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-%E5%9F%BA%E7%A1%80"><span class="nav-number">1.</span> <span class="nav-text">C++基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">内存与数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%AD%97%E4%B8%8E%E4%BF%AE%E9%A5%B0%E7%AC%A6"><span class="nav-number">1.2.</span> <span class="nav-text">关键字与修饰符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E4%B8%8E%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">1.3.</span> <span class="nav-text">类与结构体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#class%E4%B8%8Estruct%E5%8C%BA%E5%88%AB"><span class="nav-number">1.3.1.</span> <span class="nav-text">class与struct区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86%E4%B8%8E%E5%AE%8F"><span class="nav-number">1.4.</span> <span class="nav-text">预处理与宏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.5.</span> <span class="nav-text">强制类型转换</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8B%93%E5%B1%951%EF%BC%9A-0%E4%B8%8Eascii%E7%A0%81%E4%BB%A5%E5%8F%8Aunicode%E5%92%8C%E7%89%B9%E6%AE%8A%E8%BF%9B%E5%88%B6"><span class="nav-number">2.</span> <span class="nav-text">拓展1：\0与ascii码以及unicode和特殊进制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.1.</span> <span class="nav-text">1. \0 详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%B8%B8%E7%94%A8%E8%BD%AC%E4%B9%89%E5%AD%97%E7%AC%A6%E5%AF%B9%E7%85%A7%E8%A1%A8"><span class="nav-number">2.2.</span> <span class="nav-text">2. 常用转义字符对照表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%AB%98%E7%BA%A7-%E6%89%A9%E5%B1%95%E8%A1%A8%E7%A4%BA%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">3. 高级&#x2F;扩展表示法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%8E%E5%9D%91%E7%82%B9"><span class="nav-number">2.4.</span> <span class="nav-text">4. 实际应用场景与坑点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#A-Windows-%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84"><span class="nav-number">2.4.1.</span> <span class="nav-text">A. Windows 文件路径</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#B-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">2.4.2.</span> <span class="nav-text">B. 正则表达式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#C-%E5%AD%97%E7%AC%A6%E6%88%AA%E6%96%AD%EF%BC%88%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98%EF%BC%89"><span class="nav-number">2.4.3.</span> <span class="nav-text">C. 字符截断（安全问题）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.5.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sizeof%E5%92%8Calignof%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">sizeof和alignof有什么区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-sizeof%EF%BC%9A%E5%AF%B9%E8%B1%A1%E6%9C%89%E5%A4%9A%E5%A4%A7%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">1. sizeof：对象有多大？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-alignof%EF%BC%9A%E5%AF%B9%E8%B1%A1%E8%A6%81%E6%94%BE%E5%9C%A8%E5%93%AA%E9%87%8C%EF%BC%9F"><span class="nav-number">3.2.</span> <span class="nav-text">2. alignof：对象要放在哪里？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E8%81%94%E7%B3%BB%EF%BC%9A%E5%AE%83%E4%BB%AC%E5%A6%82%E4%BD%95%E5%85%B1%E5%90%8C%E5%B7%A5%E4%BD%9C%EF%BC%9F"><span class="nav-number">3.3.</span> <span class="nav-text">核心联系：它们如何共同工作？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.4.</span> <span class="nav-text">实际应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">3.5.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A9%BA%E7%B1%BB%E7%9A%84sizeof%E6%98%AF%E5%A4%9A%E5%B0%91"><span class="nav-number">4.</span> <span class="nav-text">空类的sizeof是多少</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%98%AF-0%EF%BC%9F"><span class="nav-number">4.1.</span> <span class="nav-text">为什么不是 0？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%A1%AE%E4%BF%9D%E5%AF%B9%E8%B1%A1%E5%85%B7%E6%9C%89%E5%94%AF%E4%B8%80%E7%9A%84%E5%9C%B0%E5%9D%80%EF%BC%88%E5%AF%B9%E8%B1%A1%E5%94%AF%E4%B8%80%E6%80%A7%EF%BC%89"><span class="nav-number">4.1.1.</span> <span class="nav-text">1. 确保对象具有唯一的地址（对象唯一性）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%95%B0%E7%BB%84%E5%88%86%E9%85%8D%E7%9A%84%E8%A6%81%E6%B1%82"><span class="nav-number">4.1.2.</span> <span class="nav-text">2. 数组分配的要求</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%85%A5%E7%BB%86%E8%8A%82%EF%BC%9A%E7%A9%BA%E5%9F%BA%E7%B1%BB%E4%BC%98%E5%8C%96-EBO"><span class="nav-number">4.2.</span> <span class="nav-text">深入细节：空基类优化 (EBO)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E6%83%85%E5%86%B5%EF%BC%9A%E5%B8%A6%E6%88%90%E5%91%98%E7%9A%84%E7%A9%BA%E7%B1%BB"><span class="nav-number">4.3.</span> <span class="nav-text">特殊情况：带成员的空类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-2"><span class="nav-number">4.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A9%BA%E5%9F%BA%E7%B1%BB%E4%BC%98%E5%8C%96%E5%9C%A8%E6%A0%87%E5%87%86%E5%BA%93%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%EF%BC%88%E6%AF%94%E5%A6%82-std-unique-ptr%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">空基类优化在标准库中的应用（比如 std::unique_ptr的实现）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-std-unique-ptr-%E4%B8%AD%E7%9A%84-EBO"><span class="nav-number">5.1.</span> <span class="nav-text">1. std::unique_ptr 中的 EBO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-std-allocator-%E5%9C%A8%E5%AE%B9%E5%99%A8%E4%B8%AD%E7%9A%84-EBO"><span class="nav-number">5.2.</span> <span class="nav-text">2. std::allocator 在容器中的 EBO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-std-less-%E5%9C%A8%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1%E4%B8%AD%E7%9A%84-EBO"><span class="nav-number">5.3.</span> <span class="nav-text">3. std::less 在函数对象中的 EBO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-no-unique-address-C-20-%EF%BC%9AEBO-%E7%9A%84%E7%8E%B0%E4%BB%A3%E8%BF%9B%E5%8C%96"><span class="nav-number">5.4.</span> <span class="nav-text">4. [[no_unique_address]] (C++20)：EBO 的现代进化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9ASTL-%E5%A6%82%E4%BD%95%E5%88%A9%E7%94%A8-EBO-%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD"><span class="nav-number">5.5.</span> <span class="nav-text">总结：STL 如何利用 EBO 提升性能</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E4%B8%80%E6%AD%A5%E6%8B%86%E8%A7%A3-std-unique-ptr-%E7%9A%84%E7%AE%80%E5%8C%96%E6%BA%90%E7%A0%81%E7%BB%93%E6%9E%84%EF%BC%8C%E5%85%B7%E4%BD%93%E7%BB%84%E7%BB%87%E8%BF%99%E4%B8%A4%E4%B8%AA%E9%83%A8%E5%88%86%EF%BC%88%E6%8C%87%E9%92%88%E5%92%8C%E5%88%A0%E9%99%A4%E5%99%A8%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">进一步拆解 std::unique_ptr 的简化源码结构，具体组织这两个部分（指针和删除器）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A0%B8%E5%BF%83%E7%9F%9B%E7%9B%BE"><span class="nav-number">6.1.</span> <span class="nav-text">1. 核心矛盾</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9A%E7%A9%BA%E5%9F%BA%E7%B1%BB%E4%BC%98%E5%8C%96-EBO"><span class="nav-number">6.2.</span> <span class="nav-text">2. 解决方案：空基类优化 (EBO)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%8C%E6%95%B4%E7%9A%84%E7%AE%80%E5%8C%96%E5%AE%9E%E7%8E%B0"><span class="nav-number">6.3.</span> <span class="nav-text">3. 完整的简化实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%AF%B9%E6%AF%94"><span class="nav-number">6.4.</span> <span class="nav-text">4. 内存布局对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E7%A7%8D%E8%AE%BE%E8%AE%A1%E5%BE%88%E2%80%9C%E5%A6%99%E2%80%9D%EF%BC%9F"><span class="nav-number">6.5.</span> <span class="nav-text">5. 为什么这种设计很“妙”？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-3"><span class="nav-number">6.6.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-shared-ptr-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%81%9A%E4%B8%8D%E5%88%B0%E8%BF%99%E4%B8%80%E7%82%B9%EF%BC%88%E4%B8%BA%E4%BB%80%E4%B9%88%E5%AE%83%E6%80%BB%E6%98%AF%E6%AF%94-unique-ptr-%E5%A4%A7%E5%BE%88%E5%A4%9A%EF%BC%89%EF%BC%9F-%E6%8E%A7%E5%88%B6%E5%9D%97%EF%BC%88Control-Block%EF%BC%89-%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8F%96%E8%88%8D%E3%80%82"><span class="nav-number">7.</span> <span class="nav-text">std::shared_ptr 为什么做不到这一点（为什么它总是比 unique_ptr 大很多）？**控制块（Control Block）**的设计取舍。</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%97%9B%E7%82%B9%EF%BC%9A%E5%85%B1%E4%BA%AB%E6%89%80%E6%9C%89%E6%9D%83"><span class="nav-number">7.1.</span> <span class="nav-text">核心痛点：共享所有权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%EF%BC%9A%E6%8C%87%E9%92%88-%E6%8E%A7%E5%88%B6%E5%9D%97"><span class="nav-number">7.2.</span> <span class="nav-text">1. 内存布局：指针 + 控制块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E5%83%8F-unique-ptr-%E9%82%A3%E6%A0%B7%E7%94%A8-EBO%EF%BC%9F"><span class="nav-number">7.3.</span> <span class="nav-text">2. 为什么不能像 unique_ptr 那样用 EBO？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-std-make-shared%EF%BC%9A%E4%B8%80%E6%AC%A1%E4%BC%98%E5%8C%96%EF%BC%8C%E4%BD%86%E4%BE%9D%E7%84%B6%E2%80%9C%E8%83%96%E2%80%9D"><span class="nav-number">7.4.</span> <span class="nav-text">3. std::make_shared：一次优化，但依然“胖”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%AF%B9%E6%AF%94%E6%80%BB%E7%BB%93%EF%BC%9Aunique-ptr-vs-shared-ptr"><span class="nav-number">7.5.</span> <span class="nav-text">4. 对比总结：unique_ptr vs shared_ptr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%AF%B4-shared-ptr-%E6%98%AF%E2%80%9C%E6%80%A7%E8%83%BD%E6%9D%80%E6%89%8B%E2%80%9D%EF%BC%9F"><span class="nav-number">7.6.</span> <span class="nav-text">5. 为什么说 shared_ptr 是“性能杀手”？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E9%99%B7%E9%98%B1%EF%BC%9A%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8"><span class="nav-number">7.7.</span> <span class="nav-text">经典陷阱：循环引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="nav-number">7.8.</span> <span class="nav-text">一句话总结</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -1125,7 +1559,7 @@ char* p = reinterpret_cast&lt;char*&gt;(&amp;x);
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
