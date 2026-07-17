@@ -28,7 +28,7 @@
 <meta property="og:description" content="熟悉UE的使用 跟随UE5.7入门界面的顺序依次学习">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-14T04:25:04.000Z">
-<meta property="article:modified_time" content="2026-07-17T15:30:31.719Z">
+<meta property="article:modified_time" content="2026-07-17T15:50:09.873Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-07-17 23:30:31" itemprop="dateModified" datetime="2026-07-17T23:30:31+08:00">2026-07-17</time>
+                <time title="Modified: 2026-07-17 23:50:09" itemprop="dateModified" datetime="2026-07-17T23:50:09+08:00">2026-07-17</time>
               </span>
 
           
@@ -246,52 +246,65 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">你写 C++ 代码</span><br><span class="line">   ↓ UnrealBuildTool (.NET 跑的)</span><br><span class="line">   ↓ 调 MSVC 或 LLVM/Clang</span><br><span class="line">   ↓ 链接时找 Windows SDK 里的 DX/Win32 库</span><br><span class="line">   ↓ 出 Game.exe + 一堆 dll</span><br></pre></td></tr></table></figure>
 
 <p>所以装 VS 给 UE 用时，”使用 C++ 的桌面开发”那个勾<strong>必选</strong>（它把 MSVC + Windows SDK 一起拉），”.NET”那边一般也已经被连带装上，不用单独操心。LLVM 是可选的，普通用 UE 不装也完全 OK。</p>
-<h4 id="新安装Visual-Studio时的选项"><a href="#新安装Visual-Studio时的选项" class="headerlink" title="新安装Visual Studio时的选项"></a>新安装Visual Studio时的选项</h4><p>如果你是初次安装Visual Studio，请务必启用下列选项。</p>
+<h4 id="新安装Visual-Studio时的选项"><a href="#新安装Visual-Studio时的选项" class="headerlink" title="新安装Visual Studio时的选项"></a>新安装Visual Studio时的选项</h4><p>如果你是初次安装Visual Studio（VS）或修改现存的安装版本，请确保启用下列工作负载和组件。</p>
 <ol>
-<li>Visual Studio工作负载<br>使用VS进行虚幻引擎开发需要安装以下可选的 工作负载 ：</li>
+<li>添加必要工作负载<br>转到安装程序桌面端和移动端（Desktop &amp; Mobile）下的工作负载（Workloads）选项卡，启用下列选项：</li>
 </ol>
-<p>· .NET桌面开发<br>· 使用C++的桌面开发<br>· 通用Windows平台开发<br>· 使用C++的游戏开发</p>
+<p>· .NET桌面开发<br>· 使用C++的桌面开发<br>· .NET多平台App UI开发（.NET Multi-platform App UI development）</p>
+<p>转到游戏（Gaming），勾选C++游戏开发（Game development with C++）。</p>
 <ol start="2">
-<li>C++工具<br>要在安装Visual Studio时添加C++工具，请在 工作量（Workloads） 下选择 用C++开发游戏（Game development with C++） ，并使用以下选项：</li>
+<li>添加必要组件<br>转到安装程序的安装细节（Installation Details）面板，展开C++游戏开发（Game development with C++）并启用下列选项：</li>
 </ol>
-<p>· C++分析工具<br>· C++ AddressSanitizer（可选）<br>· Windows 10 SDK（10.0.18362或更高版本）<br>· 虚幻引擎安装程序</p>
-<h4 id="推荐设置"><a href="#推荐设置" class="headerlink" title="推荐设置"></a>推荐设置</h4><p>以下是使用Visual Studio和虚幻引擎的开发者的推荐设置。</p>
-<p><strong>增加解决方案配置下拉菜单的宽度</strong></p>
+<p>· C++分析工具<br>· C++ AddressSanitizer（可选）<br>· Windows 10或11 SDK（10.0.18362或更高版本）<br>· 虚幻引擎安装程序</p>
+<p>❗当你在VS中打开首个虚幻引擎C++项目时，你可能会在解决方案浏览器中看到一条”组件缺失”警告。 单击安装（Install）以允许VS安装项目所需的所有额外组件。</p>
+<p>经测试，这里缺失的是6个单个组件:</p>
 <ol>
-<li>启动VS。如果你是第一次打开VS，会弹出 快速入门（Get Started） 窗口。点击 不添加代码继续（Continue without code） 。</li>
-<li>右键点击工具栏，选择弹出菜单底部的 自定义（Customize） 。</li>
-<li>点击 命令（Commands） 选项卡并选择 工具栏（Toolbar） 单选按钮。</li>
-<li>在 工具栏（Toolbar） 旁边的下拉菜单中，选择 标准（Standard） 。</li>
-<li>在 预览（Preview） 列表中，选择 解决方案配置（Solution Configurations） 功能按钮（你可能需要向下滚动），然后点击右侧的 修改选项（Modify Selection） 。</li>
-<li>将 宽度（Width） 设置为 200 ，然后点击 确定（OK） 。</li>
-<li>点击 自定义（Customization） 上的 关闭（Close） 。你的工具栏应该会立刻更新。</li>
+<li>C++v14.38(17.8) ATL for v143 生成工具(x86和x64)(不受支持) </li>
+<li>MSVC v143 -VS 2022 C++x64&#x2F;x86 生成工具(v14.38-17.8)(不受支持) </li>
+<li>适用于v143生成工具的C++v14.44(17.14)ATL (x86和 x64) </li>
+<li>MSVC v143- VS 2022 C++x64&#x2F;x86 生成工具(v14.44-17.14) </li>
+<li>适用于Windows的C++ Clang编译器(19.1.5) </li>
+<li>Windows 11 SDK (10.0.22621.0)</li>
 </ol>
-<p>添加解决方案平台下拉菜单</p>
+<h4 id="推荐设置"><a href="#推荐设置" class="headerlink" title="推荐设置"></a>推荐设置</h4><p>下文的可选VS界面调整项能让你的开发体验更便捷。</p>
+<h5 id="关闭错误列表窗口"><a href="#关闭错误列表窗口" class="headerlink" title="关闭错误列表窗口"></a>关闭错误列表窗口</h5><p>通常情况下，若代码出错，VS会自动弹出一个错误列表（Error List）。 然而在使用虚幻引擎时，错误列表窗口可能会显示一些额外的下游错误，这反而加大了找出根本原因的难度。 在使用虚幻引擎时，你可以禁用错误列表窗口，改为使用输出日志查看实际的代码错误。</p>
+<p>要关闭错误列表窗口，请执行以下步骤：</p>
 <ol>
-<li>找到 标准（Standard） 工具栏最右侧的按钮（若将光标悬停在此处，将显示 标准工具栏选项（Standard Toolbar Options） ）。</li>
-<li>点击下拉按钮，选择 添加或移除按钮（Add or Remove Buttons） ，然后点击 解决方案平台（Solution Platforms） ，将菜单添加到工具栏中（此步骤可能已经默认完成）。</li>
-</ol>
-<p>关闭错误列表窗口</p>
-<p>通常情况下，若代码出错，会自动弹出错误列表（Error List） 。但使用虚幻引擎时，错误列表窗口会误报错误信息。建议在使用虚幻引擎时，禁用错误列表窗口，并使用 输出（Output） 窗口查看实际代码错误。以下是关闭错误列表窗口的步骤。</p>
-<ol>
-<li><p>若已打开 错误列表（Error List） 窗口，先请关闭。</p>
+<li><p>转到VS，前往工具（Tools） &gt; 选项（Options）。</p>
 </li>
-<li><p>在 工具（Tools） 菜单中打开 选项（Options） 对话框。</p>
+<li><p>转到选项（Options）窗口左侧，选择项目和解决方案（Projects and Solutions）。</p>
 </li>
-<li><p>选择 项目和解决方案（Projects and Solutions） 并禁用 编译出错时始终显示错误列表（Always show Error List if build finishes with error） 。</p>
+<li><p>禁用编译出错时始终显示错误列表（Always show Error List if build finished with errors）。</p>
+</li>
+<li><p>（可选）更改下表中与项目相关的其他选项和功能。</p>
+</li>
+<li><p>点击确定（OK）。</p>
 </li>
 </ol>
-<p>以下是其他一些可能有用的配置设置：</p>
-<ol>
-<li><p>关闭 显示非活跃代码块（Show Inactive Blocks） 。如不关闭，文本编辑器中的很多代码块将变灰。前往 工具 &gt; 选项 &gt; 文本编辑器 &gt; C&#x2F;C++ &gt; 视图） 关闭此设置</p>
-</li>
-<li><p>设置 禁用外部依赖性文件夹 为 True ，以在 解决方案浏览器（Solution Explorer） 中隐藏不必要的文件夹。在 工具 &gt; 选项 &gt; 文本编辑器 &gt; C&#x2F;C++ &gt; 高级 中找到 禁用外部依赖项性文件夹 。</p>
-</li>
-<li><p>关闭 编辑并继续（Edit &amp; Continue） 功能，无需使用。前往 工具 &gt; 选项 &gt; 调试（Debugging） &gt; 编辑并继续（Edit and Continue） 。</p>
-</li>
-<li><p>打开 智能提示（IntelliSense） 。</p>
-</li>
-</ol>
+<table>
+<thead>
+<tr>
+<th align="left">为</th>
+<th align="left">在选项栏中，转到</th>
+<th align="left">并修改此选项</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">阻止文本编辑器中的代码块变为灰显</td>
+<td align="left">文本编辑器（Text Editor） &gt; C&#x2F;C++ &gt; 视图（View）</td>
+<td align="left">将显示非活跃代码块（Show Inactive Blocks）设为False</td>
+</tr>
+<tr>
+<td align="left">在解决方案浏览器（Solution Explorer）中隐藏不必要的文件夹</td>
+<td align="left">文本编辑器（Text Editor） &gt; C&#x2F;C++ &gt; 高级（Advanced）</td>
+<td align="left">将禁用外部依赖性文件夹（Disable External Dependencies Folders）设为True</td>
+</tr>
+<tr>
+<td align="left">启用智能感知（IntelliSense），即在你编写代码时提供代码补全、建议以及自动代码格式化。</td>
+<td align="left">文本编辑器（Text Editor） &gt; C&#x2F;C++ &gt; 智能感知（IntelliSense）</td>
+<td align="left">开启启用64位智能感知（Enable 64-bit IntelliSense）</td>
+</tr>
+</tbody></table>
 
     </div>
 
@@ -372,7 +385,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">虚幻引擎简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Get-Started-with-Unreal-Engine"><span class="nav-number">2.</span> <span class="nav-text">Get Started with Unreal Engine</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Installing-Unreal-Engine"><span class="nav-number">2.1.</span> <span class="nav-text">Installing Unreal Engine</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Creating-your-first-project-in-Unreal-Engine"><span class="nav-number">2.2.</span> <span class="nav-text">Creating your first project in Unreal Engine</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unreal-Engine-Editor-Interface"><span class="nav-number">2.3.</span> <span class="nav-text">Unreal Engine: Editor Interface</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unreal-Engine-Viewport"><span class="nav-number">2.4.</span> <span class="nav-text">Unreal Engine: Viewport</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Packaging-Unreal-Engine-Projects"><span class="nav-number">2.5.</span> <span class="nav-text">Packaging Unreal Engine Projects</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Cook-Content"><span class="nav-number">2.5.1.</span> <span class="nav-text">Cook Content</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Enable-cooking-on-the-fly"><span class="nav-number">2.5.2.</span> <span class="nav-text">Enable cooking on the fly</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%8C%85%E5%89%8D%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.5.3.</span> <span class="nav-text">打包前工作</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%96%B0%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97"><span class="nav-number">3.</span> <span class="nav-text">虚幻引擎新用户指南</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E"><span class="nav-number">3.1.</span> <span class="nav-text">安装虚幻引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%A6%96%E4%B8%AA%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E9%A1%B9%E7%9B%AE"><span class="nav-number">3.2.</span> <span class="nav-text">创建首个虚幻引擎项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E7%BC%96%E8%BE%91%E5%99%A8%E7%95%8C%E9%9D%A2"><span class="nav-number">3.3.</span> <span class="nav-text">了解虚幻引擎编辑器界面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3-%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E7%BC%96%E8%BE%91%E5%99%A8%E8%A7%86%E5%8F%A3%E5%8A%9F%E8%83%BD%E6%8C%89%E9%92%AE"><span class="nav-number">3.4.</span> <span class="nav-text">了解 虚幻引擎编辑器视口功能按钮</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E5%AD%A6%E4%B9%A0%E8%B7%AF%E5%BE%84%E2%80%94%E2%80%94%E7%A8%8B%E5%BA%8F%E5%91%98%E8%B7%AF%E5%BE%84%EF%BC%9A%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%BA%BA%E7%A7%B0%E5%86%92%E9%99%A9%E6%B8%B8%E6%88%8F"><span class="nav-number">3.5.</span> <span class="nav-text">选择学习路径——程序员路径：编写第一人称冒险游戏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEVisual-Studio"><span class="nav-number">3.5.1.</span> <span class="nav-text">为虚幻引擎设置Visual Studio</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E7%89%88%E6%9C%AC"><span class="nav-number">3.5.1.1.</span> <span class="nav-text">软件版本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%AE%89%E8%A3%85Visual-Studio%E6%97%B6%E7%9A%84%E9%80%89%E9%A1%B9"><span class="nav-number">3.5.1.2.</span> <span class="nav-text">新安装Visual Studio时的选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90%E8%AE%BE%E7%BD%AE"><span class="nav-number">3.5.1.3.</span> <span class="nav-text">推荐设置</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">虚幻引擎简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Get-Started-with-Unreal-Engine"><span class="nav-number">2.</span> <span class="nav-text">Get Started with Unreal Engine</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Installing-Unreal-Engine"><span class="nav-number">2.1.</span> <span class="nav-text">Installing Unreal Engine</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Creating-your-first-project-in-Unreal-Engine"><span class="nav-number">2.2.</span> <span class="nav-text">Creating your first project in Unreal Engine</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unreal-Engine-Editor-Interface"><span class="nav-number">2.3.</span> <span class="nav-text">Unreal Engine: Editor Interface</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unreal-Engine-Viewport"><span class="nav-number">2.4.</span> <span class="nav-text">Unreal Engine: Viewport</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Packaging-Unreal-Engine-Projects"><span class="nav-number">2.5.</span> <span class="nav-text">Packaging Unreal Engine Projects</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Cook-Content"><span class="nav-number">2.5.1.</span> <span class="nav-text">Cook Content</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Enable-cooking-on-the-fly"><span class="nav-number">2.5.2.</span> <span class="nav-text">Enable cooking on the fly</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%8C%85%E5%89%8D%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.5.3.</span> <span class="nav-text">打包前工作</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E6%96%B0%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97"><span class="nav-number">3.</span> <span class="nav-text">虚幻引擎新用户指南</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E"><span class="nav-number">3.1.</span> <span class="nav-text">安装虚幻引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%A6%96%E4%B8%AA%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E9%A1%B9%E7%9B%AE"><span class="nav-number">3.2.</span> <span class="nav-text">创建首个虚幻引擎项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E7%BC%96%E8%BE%91%E5%99%A8%E7%95%8C%E9%9D%A2"><span class="nav-number">3.3.</span> <span class="nav-text">了解虚幻引擎编辑器界面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3-%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E7%BC%96%E8%BE%91%E5%99%A8%E8%A7%86%E5%8F%A3%E5%8A%9F%E8%83%BD%E6%8C%89%E9%92%AE"><span class="nav-number">3.4.</span> <span class="nav-text">了解 虚幻引擎编辑器视口功能按钮</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E5%AD%A6%E4%B9%A0%E8%B7%AF%E5%BE%84%E2%80%94%E2%80%94%E7%A8%8B%E5%BA%8F%E5%91%98%E8%B7%AF%E5%BE%84%EF%BC%9A%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%BA%BA%E7%A7%B0%E5%86%92%E9%99%A9%E6%B8%B8%E6%88%8F"><span class="nav-number">3.5.</span> <span class="nav-text">选择学习路径——程序员路径：编写第一人称冒险游戏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEVisual-Studio"><span class="nav-number">3.5.1.</span> <span class="nav-text">为虚幻引擎设置Visual Studio</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E7%89%88%E6%9C%AC"><span class="nav-number">3.5.1.1.</span> <span class="nav-text">软件版本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%AE%89%E8%A3%85Visual-Studio%E6%97%B6%E7%9A%84%E9%80%89%E9%A1%B9"><span class="nav-number">3.5.1.2.</span> <span class="nav-text">新安装Visual Studio时的选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90%E8%AE%BE%E7%BD%AE"><span class="nav-number">3.5.1.3.</span> <span class="nav-text">推荐设置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B3%E9%97%AD%E9%94%99%E8%AF%AF%E5%88%97%E8%A1%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">3.5.1.3.1.</span> <span class="nav-text">关闭错误列表窗口</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
