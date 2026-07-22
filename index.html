@@ -173,7 +173,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-07-22 23:28:51 / Modified: 23:44:05" itemprop="dateCreated datePublished" datetime="2026-07-22T23:28:51+08:00">2026-07-22</time>
+              <time title="Created: 2026-07-22 23:28:51 / Modified: 23:45:27" itemprop="dateCreated datePublished" datetime="2026-07-22T23:28:51+08:00">2026-07-22</time>
             </span>
 
           
@@ -187,15 +187,734 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>1</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/07/22/UE3/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+          <span id="more"></span>
+<h1 id="Unreal-Engine-渲染管线学习笔记"><a href="#Unreal-Engine-渲染管线学习笔记" class="headerlink" title="Unreal Engine 渲染管线学习笔记"></a>Unreal Engine 渲染管线学习笔记</h1><p>本文基于当前 Unreal Engine 5.7.4 源码整理，目标是建立对 UE 渲染管线的整体认识，并给出后续源码阅读路径。</p>
+<p>核心先记住一句话：</p>
+<blockquote>
+<p>Game Thread 准备视图和场景代理，Render Thread 编排渲染 Pass，RDG 管理资源和依赖，RHI 把命令提交给具体图形 API&#x2F;GPU。</p>
+</blockquote>
+<h2 id="1-总体链路"><a href="#1-总体链路" class="headerlink" title="1. 总体链路"></a>1. 总体链路</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">flowchart TD</span><br><span class="line">    subgraph GT[Game Thread]</span><br><span class="line">        A[UGameEngine::Tick]</span><br><span class="line">        B[UGameEngine::RedrawViewports]</span><br><span class="line">        C[FViewport::Draw]</span><br><span class="line">        D[UGameViewportClient::Draw]</span><br><span class="line">        E[构建 FSceneViewFamily / FSceneView]</span><br><span class="line">        F[FRendererModule::BeginRenderingViewFamily]</span><br><span class="line">        G[FSceneRenderBuilder::CreateLinkedSceneRenderers]</span><br><span class="line">        H[FSceneRenderBuilder::Execute]</span><br><span class="line">        I[ENQUEUE_RENDER_COMMAND SceneRenderBuilder_Render]</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    subgraph RT[Render Thread]</span><br><span class="line">        J[FRDGBuilder 创建]</span><br><span class="line">        K[RenderViewFamily_RenderThread]</span><br><span class="line">        L[FDeferredShadingSceneRenderer::Render]</span><br><span class="line">        M[OnRenderBegin]</span><br><span class="line">        N[BeginInitViews / EndInitViews]</span><br><span class="line">        O[GPUScene Update]</span><br><span class="line">        P[RenderPrePass]</span><br><span class="line">        Q[RenderShadowDepthMaps]</span><br><span class="line">        R[RenderBasePass]</span><br><span class="line">        S[RenderDiffuseIndirectAndAmbientOcclusion]</span><br><span class="line">        T[RenderLights]</span><br><span class="line">        U[RenderTranslucency]</span><br><span class="line">        V[AddPostProcessingPasses]</span><br><span class="line">        W[OnRenderFinish]</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    subgraph Draw[Mesh Draw Command]</span><br><span class="line">        X[FParallelMeshDrawCommandPass::BuildRenderingCommands]</span><br><span class="line">        Y[FParallelMeshDrawCommandPass::Dispatch]</span><br><span class="line">        Z[SubmitMeshDrawCommandsRange]</span><br><span class="line">        AA[FMeshDrawCommand::SubmitDraw]</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    subgraph RDG_RHI[RDG / RHI / GPU]</span><br><span class="line">        AB[FRDGBuilder::Execute]</span><br><span class="line">        AC[FRHICommandList::DrawIndexedPrimitive]</span><br><span class="line">        AD[FRHICommandListExecutor::Submit]</span><br><span class="line">        AE[FViewport::EndRenderFrame]</span><br><span class="line">        AF[GPU Present]</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    A --&gt; B --&gt; C --&gt; D --&gt; E --&gt; F --&gt; G --&gt; H --&gt; I</span><br><span class="line">    I --&gt; J --&gt; K --&gt; L</span><br><span class="line">    L --&gt; M --&gt; N --&gt; O --&gt; P --&gt; Q --&gt; R --&gt; S --&gt; T --&gt; U --&gt; V --&gt; W</span><br><span class="line">    R --&gt; X --&gt; Y --&gt; Z --&gt; AA --&gt; AC</span><br><span class="line">    P --&gt; AB</span><br><span class="line">    Q --&gt; AB</span><br><span class="line">    R --&gt; AB</span><br><span class="line">    S --&gt; AB</span><br><span class="line">    T --&gt; AB</span><br><span class="line">    U --&gt; AB</span><br><span class="line">    V --&gt; AB</span><br><span class="line">    W --&gt; AB</span><br><span class="line">    AB --&gt; AC --&gt; AD --&gt; AE --&gt; AF</span><br></pre></td></tr></table></figure>
+
+<p>UE 的一帧渲染不是单个函数直接画完，而是跨越多个线程和模块：</p>
+<ul>
+<li><strong>Game Thread</strong>：负责游戏逻辑、世界更新、组件状态、视图构建。</li>
+<li><strong>Render Thread</strong>：负责渲染数据处理、Pass 编排、RDG 构图和执行。</li>
+<li><strong>RHI Thread</strong>：可选线程，用于把 RHI 命令进一步提交给底层图形 API。</li>
+<li><strong>GPU</strong>：执行最终的 draw、dispatch、copy、present 等命令。</li>
+</ul>
+<h2 id="2-核心模块职责"><a href="#2-核心模块职责" class="headerlink" title="2. 核心模块职责"></a>2. 核心模块职责</h2><h3 id="Engine"><a href="#Engine" class="headerlink" title="Engine"></a>Engine</h3><p>路径：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Engine</code></li>
+</ul>
+<p>职责：</p>
+<ul>
+<li>管理 <code>World</code>、<code>Actor</code>、<code>Component</code> 等游戏侧对象。</li>
+<li>构建 <code>FSceneViewFamily</code>、<code>FSceneView</code>。</li>
+<li>通过 <code>UGameViewportClient::Draw()</code> 发起渲染。</li>
+<li>通过 <code>FPrimitiveSceneProxy</code> 把组件的渲染数据传给 Render Thread。</li>
+</ul>
+<p>重点文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Engine/Private/GameEngine.cpp</code></li>
+<li><code>Engine/Source/Runtime/Engine/Private/UnrealClient.cpp</code></li>
+<li><code>Engine/Source/Runtime/Engine/Private/GameViewportClient.cpp</code></li>
+<li><code>Engine/Source/Runtime/Engine/Public/SceneView.h</code></li>
+<li><code>Engine/Source/Runtime/Engine/Public/SceneManagement.h</code></li>
+<li><code>Engine/Source/Runtime/Engine/Public/SceneInterface.h</code></li>
+</ul>
+<h3 id="Renderer"><a href="#Renderer" class="headerlink" title="Renderer"></a>Renderer</h3><p>路径：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer</code></li>
+</ul>
+<p>职责：</p>
+<ul>
+<li>实现核心场景渲染流程。</li>
+<li>管理延迟渲染、移动端渲染、阴影、BasePass、光照、半透明、后处理等。</li>
+<li>维护 Render Thread 侧的 <code>FScene</code>。</li>
+<li>通过 <code>FSceneRenderer</code> &#x2F; <code>FDeferredShadingSceneRenderer</code> 编排一帧渲染。</li>
+</ul>
+<p>重点文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneRenderBuilder.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/DeferredShadingRenderer.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/DeferredShadingRenderer.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/MobileShadingRenderer.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/ScenePrivate.h</code></li>
+</ul>
+<h3 id="RenderCore"><a href="#RenderCore" class="headerlink" title="RenderCore"></a>RenderCore</h3><p>路径：</p>
+<ul>
+<li><code>Engine/Source/Runtime/RenderCore</code></li>
+</ul>
+<p>职责：</p>
+<ul>
+<li>管理 Render Thread 基础设施。</li>
+<li>提供 <code>ENQUEUE_RENDER_COMMAND</code>。</li>
+<li>提供 RDG，也就是 Render Dependency Graph。</li>
+<li>提供 Shader 参数、渲染资源、渲染模块接口等基础能力。</li>
+</ul>
+<p>重点文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RenderingThread.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RendererInterface.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RenderGraph.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RenderGraphBuilder.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Private/RenderGraphBuilder.cpp</code></li>
+</ul>
+<h3 id="RHI"><a href="#RHI" class="headerlink" title="RHI"></a>RHI</h3><p>路径：</p>
+<ul>
+<li><code>Engine/Source/Runtime/RHI</code></li>
+</ul>
+<p>职责：</p>
+<ul>
+<li>抽象不同图形 API。</li>
+<li>定义纹理、Buffer、Shader、Pipeline、RenderTarget 等 GPU 资源。</li>
+<li>定义 <code>FRHICommandList</code>，作为平台无关的 GPU 命令录制层。</li>
+<li>通过平台 RHI 对接 D3D12、Vulkan、Metal 等后端。</li>
+</ul>
+<p>重点文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/RHI/Public/RHI.h</code></li>
+<li><code>Engine/Source/Runtime/RHI/Public/RHIResources.h</code></li>
+<li><code>Engine/Source/Runtime/RHI/Public/RHICommandList.h</code></li>
+<li><code>Engine/Source/Runtime/RHI/Public/DynamicRHI.h</code></li>
+</ul>
+<p>平台实现：</p>
+<ul>
+<li><code>Engine/Source/Runtime/D3D12RHI</code></li>
+<li><code>Engine/Source/Runtime/VulkanRHI</code></li>
+<li><code>Engine/Source/Runtime/Apple/MetalRHI</code></li>
+</ul>
+<h2 id="3-一帧渲染主流程"><a href="#3-一帧渲染主流程" class="headerlink" title="3. 一帧渲染主流程"></a>3. 一帧渲染主流程</h2><h3 id="3-1-Game-Thread-入口"><a href="#3-1-Game-Thread-入口" class="headerlink" title="3.1 Game Thread 入口"></a>3.1 Game Thread 入口</h3><p>调用链大致如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">UGameEngine::Tick()</span><br><span class="line">  -&gt; UGameEngine::RedrawViewports()</span><br><span class="line">    -&gt; FViewport::Draw()</span><br><span class="line">      -&gt; UGameViewportClient::Draw()</span><br><span class="line">        -&gt; 构建 FSceneViewFamily / FSceneView</span><br><span class="line">        -&gt; GetRendererModule().BeginRenderingViewFamily()</span><br></pre></td></tr></table></figure>
+
+<p>关键点：</p>
+<ul>
+<li><code>UGameEngine::Tick()</code> 推动每帧更新。</li>
+<li><code>FViewport::Draw()</code> 是视口绘制的总入口。</li>
+<li><code>UGameViewportClient::Draw()</code> 会为本地玩家计算视图。</li>
+<li><code>FSceneViewFamily</code> 表示一组相关视图，比如普通单视图、分屏、多视口等。</li>
+<li><code>FSceneView</code> 表示某个具体视角。</li>
+</ul>
+<h3 id="3-2-从-Game-Thread-到-Render-Thread"><a href="#3-2-从-Game-Thread-到-Render-Thread" class="headerlink" title="3.2 从 Game Thread 到 Render Thread"></a>3.2 从 Game Thread 到 Render Thread</h3><p><code>BeginRenderingViewFamily()</code> 不会直接在 Game Thread 里完成所有渲染工作，而是通过 <code>ENQUEUE_RENDER_COMMAND</code> 把渲染任务投递给 Render Thread。</p>
+<p>典型链路：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FRendererModule::BeginRenderingViewFamily()</span><br><span class="line">  -&gt; FRendererModule::BeginRenderingViewFamilies()</span><br><span class="line">    -&gt; FSceneRenderBuilder::CreateLinkedSceneRenderers()</span><br><span class="line">    -&gt; FSceneRenderBuilder::Execute()</span><br><span class="line">      -&gt; ENQUEUE_RENDER_COMMAND(...)</span><br></pre></td></tr></table></figure>
+
+<p>这里会根据当前 shading path 创建不同 renderer：</p>
+<ul>
+<li>桌面端常见路径：<code>FDeferredShadingSceneRenderer</code></li>
+<li>移动端路径：<code>FMobileSceneRenderer</code></li>
+</ul>
+<h3 id="3-3-Render-Thread-渲染入口"><a href="#3-3-Render-Thread-渲染入口" class="headerlink" title="3.3 Render Thread 渲染入口"></a>3.3 Render Thread 渲染入口</h3><p>Render Thread 上的主要调用链：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RenderViewFamily_RenderThread()</span><br><span class="line">  -&gt; FSceneRenderer::Render()</span><br><span class="line">    -&gt; FDeferredShadingSceneRenderer::Render()</span><br></pre></td></tr></table></figure>
+
+<p><code>FDeferredShadingSceneRenderer::Render()</code> 是理解 UE 桌面延迟渲染管线的核心入口。阅读渲染管线时，可以把它当成主目录，从上往下看每个阶段调用了哪些 Pass。</p>
+<h3 id="3-4-RDG-构建和执行"><a href="#3-4-RDG-构建和执行" class="headerlink" title="3.4 RDG 构建和执行"></a>3.4 RDG 构建和执行</h3><p>UE 现代渲染大量使用 RDG，也就是 Render Dependency Graph。</p>
+<p>关键类：</p>
+<ul>
+<li><code>FRDGBuilder</code></li>
+<li><code>FRDGTexture</code></li>
+<li><code>FRDGBuffer</code></li>
+<li><code>FRDGPass</code></li>
+</ul>
+<p>RDG 的作用：</p>
+<ul>
+<li>声明每个 Pass 读写哪些资源。</li>
+<li>自动推导 Pass 依赖。</li>
+<li>管理临时资源生命周期。</li>
+<li>插入必要的资源 barrier。</li>
+<li>调度 Pass 执行。</li>
+</ul>
+<p>常见形式：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GraphBuilder.<span class="built_in">AddPass</span>(</span><br><span class="line">    <span class="built_in">RDG_EVENT_NAME</span>(<span class="string">&quot;SomePass&quot;</span>),</span><br><span class="line">    PassParameters,</span><br><span class="line">    ERDGPassFlags::Raster,</span><br><span class="line">    [](FRHICommandList&amp; RHICmdList)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 在这里录制 RHI 命令</span></span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>最终 <code>FRDGBuilder::Execute()</code> 会编译并执行整个 Render Graph。</p>
+<h3 id="3-5-渲染步骤与函数入口对照"><a href="#3-5-渲染步骤与函数入口对照" class="headerlink" title="3.5 渲染步骤与函数入口对照"></a>3.5 渲染步骤与函数入口对照</h3><p>下面的行号是当前源码版本中的大致位置，用来快速定位入口。阅读时建议先顺着“函数入口”从上到下跑通主线，再回头展开每个 Pass 的内部实现。</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>线程 &#x2F; 层级</th>
+<th>函数入口</th>
+<th>源码位置</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Game Thread</td>
+<td><code>UGameEngine::Tick()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/GameEngine.cpp:1740</code></td>
+<td>游戏主循环入口，驱动一帧更新。</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Game Thread</td>
+<td><code>UGameEngine::RedrawViewports()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/GameEngine.cpp:775</code></td>
+<td>遍历并刷新游戏视口。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Game Thread</td>
+<td><code>FViewport::Draw()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/UnrealClient.cpp:1707</code></td>
+<td>视口绘制总入口，包住帧开始和帧结束。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Game Thread</td>
+<td><code>FViewport::EnqueueBeginRenderFrame()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/UnrealClient.cpp:1686</code></td>
+<td>投递 Render Thread 的 BeginFrame。</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Game Thread</td>
+<td><code>UGameViewportClient::Draw()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/GameViewportClient.cpp:1411</code></td>
+<td>创建 <code>FSceneViewFamily</code>，为本地玩家计算 <code>FSceneView</code>。</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Game Thread</td>
+<td><code>GetRendererModule().BeginRenderingViewFamily()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/GameViewportClient.cpp:1971</code></td>
+<td>从 Engine 模块进入 Renderer 模块。</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Game Thread</td>
+<td><code>FRendererModule::BeginRenderingViewFamily()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.cpp:5034</code></td>
+<td>单个 ViewFamily 的渲染调度入口。</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Game Thread</td>
+<td><code>FRendererModule::BeginRenderingViewFamilies()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.cpp:5039</code></td>
+<td>支持多个 ViewFamily 的调度入口。</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Game Thread</td>
+<td><code>FSceneRenderBuilder::CreateLinkedSceneRenderers()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRenderBuilder.cpp:983</code></td>
+<td>根据 shading path 创建 <code>FDeferredShadingSceneRenderer</code> 或 <code>FMobileSceneRenderer</code>。</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Game Thread</td>
+<td><code>FSceneRenderBuilder::Execute()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRenderBuilder.cpp:1079</code></td>
+<td>触发渲染任务执行，把后续工作交给 Render Thread。</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Game Thread 调度</td>
+<td><code>FSceneRenderProcessor::Execute()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRenderBuilder.cpp:759</code></td>
+<td>遍历渲染操作，并通过 <code>ENQUEUE_RENDER_COMMAND(SceneRenderBuilder_Render)</code> 投递真正的 Render Thread 执行块。</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Render Thread</td>
+<td><code>RenderViewFamily_RenderThread()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.cpp:4895</code></td>
+<td>Render Thread 上的 ViewFamily 渲染入口。</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Render Thread</td>
+<td><code>FDeferredShadingSceneRenderer::Render()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/DeferredShadingRenderer.cpp:1736</code></td>
+<td>桌面延迟渲染主流程入口。</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Render Thread</td>
+<td><code>FSceneRenderer::OnRenderBegin()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.cpp:3913</code></td>
+<td>帧渲染开始，准备 ViewExtension、Ray Tracing、LightFunction 等。</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Render Thread</td>
+<td><code>FDeferredShadingSceneRenderer::BeginInitViews()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneVisibility.cpp:5852</code></td>
+<td>开始可见性、动态 Mesh 收集、View 初始化等工作。</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Render Thread</td>
+<td><code>FDeferredShadingSceneRenderer::EndInitViews()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneVisibility.cpp:6000</code></td>
+<td>完成 InitViews，整理可见性和 Mesh Pass 结果。</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Render Thread &#x2F; GPUScene</td>
+<td><code>Scene-&gt;GPUScene.UploadDynamicPrimitiveShaderDataForView()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/DeferredShadingRenderer.cpp:2172</code></td>
+<td>上传动态 Primitive 的 GPU Scene 数据。</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FDeferredShadingSceneRenderer::RenderPrePass()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/DepthRendering.cpp:525</code></td>
+<td>深度 PrePass &#x2F; Early-Z。</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FSceneRenderer::RenderShadowDepthMaps()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/ShadowDepthRendering.cpp:1678</code></td>
+<td>渲染阴影深度图。</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FDeferredShadingSceneRenderer::RenderBasePass()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/BasePassRendering.cpp:1071</code></td>
+<td>渲染不透明 BasePass，写入 GBuffer。</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FDeferredShadingSceneRenderer::RenderDiffuseIndirectAndAmbientOcclusion()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/IndirectLightRendering.cpp:977</code></td>
+<td>处理间接光、Lumen、AO 等。</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FDeferredShadingSceneRenderer::RenderLights()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/LightRendering.cpp:1520</code></td>
+<td>延迟光照主入口。</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FDeferredShadingSceneRenderer::RenderTranslucency()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/TranslucentRendering.cpp:1838</code></td>
+<td>半透明渲染入口。</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>AddPostProcessingPasses()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/PostProcess/PostProcessing.cpp:347</code></td>
+<td>后处理 Pass 入口。</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FSceneRenderer::OnRenderFinish()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.cpp:4133</code></td>
+<td>渲染收尾，处理 ViewExtension、History、ViewFamily 输出等。</td>
+</tr>
+<tr>
+<td>26</td>
+<td>Render Thread &#x2F; MeshDraw</td>
+<td><code>FParallelMeshDrawCommandPass::DispatchPassSetup()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/MeshDrawCommands.cpp:1359</code></td>
+<td>并行准备 Mesh Draw Command。</td>
+</tr>
+<tr>
+<td>27</td>
+<td>Render Thread &#x2F; MeshDraw</td>
+<td><code>FParallelMeshDrawCommandPass::BuildRenderingCommands()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/MeshDrawCommands.cpp:1629</code></td>
+<td>根据可见性和实例剔除结果生成最终绘制命令。</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Render Thread &#x2F; MeshDraw</td>
+<td><code>FParallelMeshDrawCommandPass::Dispatch()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/MeshDrawCommands.cpp:1757</code></td>
+<td>把 Mesh Draw Command 派发到 RHI 命令录制。</td>
+</tr>
+<tr>
+<td>29</td>
+<td>Render Thread &#x2F; MeshDraw</td>
+<td><code>SubmitMeshDrawCommandsRange()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/MeshPassProcessor.cpp:1616</code></td>
+<td>遍历可见 Mesh Draw Command 并提交。</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Render Thread &#x2F; MeshDraw</td>
+<td><code>FMeshDrawCommand::SubmitDraw()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/MeshPassProcessor.cpp:1447</code></td>
+<td>单个 draw command 的提交入口。</td>
+</tr>
+<tr>
+<td>31</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FRDGBuilder::Execute()</code></td>
+<td><code>Engine/Source/Runtime/RenderCore/Private/RenderGraphBuilder.cpp:1755</code></td>
+<td>编译并执行 Render Graph。</td>
+</tr>
+<tr>
+<td>32</td>
+<td>Render Thread &#x2F; RDG</td>
+<td><code>FRDGBuilder::ExecutePass()</code></td>
+<td><code>Engine/Source/Runtime/RenderCore/Private/RenderGraphBuilder.cpp:3482</code></td>
+<td>执行单个 RDG Pass。</td>
+</tr>
+<tr>
+<td>33</td>
+<td>Render Thread &#x2F; RHI</td>
+<td><code>FRHICommandList::DrawIndexedPrimitive()</code></td>
+<td><code>Engine/Source/Runtime/RHI/Public/RHICommandList.h:3973</code></td>
+<td>录制平台无关的 indexed draw 命令。</td>
+</tr>
+<tr>
+<td>34</td>
+<td>RHI Thread &#x2F; RHI</td>
+<td><code>FRHICommandListExecutor::Submit()</code></td>
+<td><code>Engine/Source/Runtime/RHI/Private/RHICommandList.cpp:1302</code></td>
+<td>提交 RHI 命令列表。</td>
+</tr>
+<tr>
+<td>35</td>
+<td>Render Thread &#x2F; RHI</td>
+<td><code>FRHICommandListImmediate::ImmediateFlush()</code></td>
+<td><code>Engine/Source/Runtime/RHI/Private/RHICommandList.cpp:1573</code></td>
+<td>根据 flush 类型把命令派发或等待完成。</td>
+</tr>
+<tr>
+<td>36</td>
+<td>Render Thread &#x2F; Viewport</td>
+<td><code>FViewport::EndRenderFrame()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/UnrealClient.cpp:1661</code></td>
+<td>结束视口绘制，内部调用 <code>EndDrawingViewport()</code>。</td>
+</tr>
+<tr>
+<td>37</td>
+<td>Render Thread &#x2F; RHI</td>
+<td><code>FRHICommandListImmediate::EndDrawingViewport()</code></td>
+<td><code>Engine/Source/Runtime/RHI/Public/RHICommandList.h:4660</code></td>
+<td>结束 Viewport 渲染并触发 Present。</td>
+</tr>
+</tbody></table>
+<p>主线可以压缩成下面这条函数调用路径：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">UGameEngine::Tick()</span><br><span class="line">  -&gt; UGameEngine::RedrawViewports()</span><br><span class="line">    -&gt; FViewport::Draw()</span><br><span class="line">      -&gt; UGameViewportClient::Draw()</span><br><span class="line">        -&gt; FRendererModule::BeginRenderingViewFamily()</span><br><span class="line">          -&gt; FSceneRenderBuilder::CreateLinkedSceneRenderers()</span><br><span class="line">          -&gt; FSceneRenderBuilder::Execute()</span><br><span class="line">            -&gt; FSceneRenderProcessor::Execute()</span><br><span class="line">              -&gt; RenderViewFamily_RenderThread()</span><br><span class="line">                -&gt; FDeferredShadingSceneRenderer::Render()</span><br><span class="line">                  -&gt; FSceneRenderer::OnRenderBegin()</span><br><span class="line">                  -&gt; BeginInitViews() / EndInitViews()</span><br><span class="line">                  -&gt; RenderPrePass()</span><br><span class="line">                  -&gt; RenderShadowDepthMaps()</span><br><span class="line">                  -&gt; RenderBasePass()</span><br><span class="line">                  -&gt; RenderDiffuseIndirectAndAmbientOcclusion()</span><br><span class="line">                  -&gt; RenderLights()</span><br><span class="line">                  -&gt; RenderTranslucency()</span><br><span class="line">                  -&gt; AddPostProcessingPasses()</span><br><span class="line">                  -&gt; FSceneRenderer::OnRenderFinish()</span><br><span class="line">                -&gt; FRDGBuilder::Execute()</span><br><span class="line">                  -&gt; FRHICommandList::DrawIndexedPrimitive()</span><br><span class="line">                  -&gt; FRHICommandListExecutor::Submit()</span><br><span class="line">                    -&gt; FViewport::EndRenderFrame()</span><br><span class="line">                      -&gt; EndDrawingViewport()</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-6-场景数据同步支线（Scene-Proxy）"><a href="#3-6-场景数据同步支线（Scene-Proxy）" class="headerlink" title="3.6 场景数据同步支线（Scene Proxy）"></a>3.6 场景数据同步支线（Scene Proxy）</h3><p>上面讲的是”一帧怎么被画出来”的主线；但 Render Thread 能画的前提，是它手里已经有一份<strong>与 Game Thread 解耦的场景数据镜像</strong>。渲染线程不能直接依赖 Game Thread 上的 <code>UObject</code> 状态（生命周期不受控、有竞争风险），因此 UE 用 <strong>Scene Proxy 模型</strong>在两条线程之间同步渲染数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">flowchart TD</span><br><span class="line">    A[&quot;UPrimitiveComponent&lt;br/&gt;(Game Thread 组件)&quot;]</span><br><span class="line">    B[&quot;CreateRenderState_Concurrent&quot;]</span><br><span class="line">    C[&quot;CreateSceneProxy&quot;]</span><br><span class="line">    D[&quot;FPrimitiveSceneProxy&lt;br/&gt;(Render Thread 渲染代理)&quot;]</span><br><span class="line">    E[&quot;FScene::AddPrimitive&quot;]</span><br><span class="line">    F[&quot;ENQUEUE_RENDER_COMMAND&lt;br/&gt;(AddPrimitiveCommand)&quot;]</span><br><span class="line">    G[&quot;FPrimitiveSceneInfo&lt;br/&gt;(Renderer 内部场景节点)&quot;]</span><br><span class="line">    H[&quot;FScene Render Thread 数据结构&quot;]</span><br><span class="line">    I[&quot;MeshDrawCommand / GPUScene / Pass 收集&quot;]</span><br><span class="line"></span><br><span class="line">    A --&gt; B --&gt; C --&gt; D</span><br><span class="line">    D --&gt; E --&gt; F --&gt; G --&gt; H --&gt; I</span><br><span class="line"></span><br><span class="line">    style A fill:#e3f2fd</span><br><span class="line">    style D fill:#fff3e0</span><br><span class="line">    style G fill:#e8f5e9</span><br></pre></td></tr></table></figure>
+
+<p>三个对象的职责边界（很容易混淆，重点区分）：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>线程</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>UPrimitiveComponent</code></td>
+<td>Game Thread</td>
+<td>游戏侧组件，持有可见性&#x2F;材质&#x2F;变换等业务状态</td>
+</tr>
+<tr>
+<td><code>FPrimitiveSceneProxy</code></td>
+<td>Render Thread</td>
+<td>组件的渲染代理，渲染线程只读它、不碰组件</td>
+</tr>
+<tr>
+<td><code>FPrimitiveSceneInfo</code></td>
+<td>Renderer 内部</td>
+<td>场景管理、可见性、绘制命令构建用的数据节点</td>
+</tr>
+</tbody></table>
+<p>关键点：</p>
+<ul>
+<li>组件的增加、删除、变换更新，都通过 <code>ENQUEUE_RENDER_COMMAND</code> 排队到 Render Thread 执行，保证线程边界清晰。</li>
+<li>Proxy 在 <code>CreateSceneProxy()</code> 里创建，是”Game Thread 状态”到”Render Thread 数据”的一次性快照 + 后续增量更新。</li>
+<li>这条支线是主线的”前置数据准备”：主线里 <code>BeginInitViews</code> 能遍历到的 <code>FPrimitiveSceneInfo</code>，正是这条支线灌进 <code>FScene</code> 的。</li>
+</ul>
+<p>代码入口（同步支线）：</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>源码位置</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>UPrimitiveComponent::CreateRenderState_Concurrent()</code></td>
+<td><code>Engine/Source/Runtime/Engine/Private/Components/PrimitiveComponent.cpp:643</code></td>
+<td>组件注册渲染状态，触发创建 Proxy</td>
+</tr>
+<tr>
+<td><code>FScene::AddPrimitive()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/RendererScene.cpp:1302</code></td>
+<td>把 Primitive 加入渲染场景（内部排 Render Command）</td>
+</tr>
+<tr>
+<td><code>FScene::UpdatePrimitiveTransform()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/RendererScene.cpp:1556</code></td>
+<td>变换更新同步到 Render Thread</td>
+</tr>
+<tr>
+<td><code>FScene::AddPrimitiveSceneInfo_RenderThread()</code></td>
+<td><code>Engine/Source/Runtime/Renderer/Private/RendererScene.cpp:1037</code></td>
+<td>Render Thread 侧真正把 <code>FPrimitiveSceneInfo</code> 挂入场景</td>
+</tr>
+</tbody></table>
+<h2 id="4-延迟渲染主要阶段"><a href="#4-延迟渲染主要阶段" class="headerlink" title="4. 延迟渲染主要阶段"></a>4. 延迟渲染主要阶段</h2><p><code>FDeferredShadingSceneRenderer::Render()</code> 中的一帧大致可以拆成下面这些阶段。</p>
+<h3 id="4-1-帧初始化"><a href="#4-1-帧初始化" class="headerlink" title="4.1 帧初始化"></a>4.1 帧初始化</h3><p>主要工作：</p>
+<ul>
+<li>初始化 View 和 ViewFamily 的渲染状态。</li>
+<li>准备 Ray Tracing 场景。</li>
+<li>更新 Virtual Texture。</li>
+<li>准备 Lumen、Sky、Reflection 等系统。</li>
+<li>初始化 GPU 侧资源状态。</li>
+</ul>
+<h3 id="4-2-InitViews"><a href="#4-2-InitViews" class="headerlink" title="4.2 InitViews"></a>4.2 InitViews</h3><p>主要工作：</p>
+<ul>
+<li>视锥剔除。</li>
+<li>遮挡剔除相关准备。</li>
+<li>收集动态 Mesh。</li>
+<li>为不同 Mesh Pass 准备 draw command。</li>
+<li>初始化 View Uniform Buffer。</li>
+<li>启动部分阴影相关任务。</li>
+</ul>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneVisibility.cpp</code></li>
+</ul>
+<p>重点函数：</p>
+<ul>
+<li><code>BeginInitViews</code></li>
+<li><code>EndInitViews</code></li>
+</ul>
+<h3 id="4-3-GPU-Scene-更新"><a href="#4-3-GPU-Scene-更新" class="headerlink" title="4.3 GPU Scene 更新"></a>4.3 GPU Scene 更新</h3><p>GPU Scene 会把场景中 Primitive、Instance 等数据上传到 GPU，供后续 shader 和 instance culling 使用。</p>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/GPUScene.cpp</code></li>
+</ul>
+<h3 id="4-4-PrePass-Early-Z"><a href="#4-4-PrePass-Early-Z" class="headerlink" title="4.4 PrePass &#x2F; Early-Z"></a>4.4 PrePass &#x2F; Early-Z</h3><p>PrePass 主要先写深度，后续 BasePass 和 Lighting 可以利用深度减少无效像素着色。</p>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/DepthRendering.cpp</code></li>
+</ul>
+<p>典型内容：</p>
+<ul>
+<li>Depth PrePass</li>
+<li>Nanite depth raster</li>
+<li>Velocity 写入</li>
+<li>HZB &#x2F; HiZ 相关准备</li>
+</ul>
+<h3 id="4-5-Shadow-Pass"><a href="#4-5-Shadow-Pass" class="headerlink" title="4.5 Shadow Pass"></a>4.5 Shadow Pass</h3><p>阴影阶段生成阴影图或 Virtual Shadow Maps。</p>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/ShadowDepthRendering.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/ShadowRendering.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/VirtualShadowMaps</code></li>
+</ul>
+<h3 id="4-6-BasePass"><a href="#4-6-BasePass" class="headerlink" title="4.6 BasePass"></a>4.6 BasePass</h3><p>BasePass 是延迟渲染中非常关键的阶段，会把不透明物体的材质属性写入 GBuffer。</p>
+<p>GBuffer 常见内容：</p>
+<ul>
+<li>BaseColor</li>
+<li>Normal</li>
+<li>Roughness</li>
+<li>Metallic</li>
+<li>Specular</li>
+<li>Depth</li>
+</ul>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/BasePassRendering.cpp</code></li>
+</ul>
+<h3 id="4-7-Decal-SSAO-Composition"><a href="#4-7-Decal-SSAO-Composition" class="headerlink" title="4.7 Decal &#x2F; SSAO &#x2F; Composition"></a>4.7 Decal &#x2F; SSAO &#x2F; Composition</h3><p>BasePass 前后会穿插 DBuffer Decal、Deferred Decal、SSAO 等处理。</p>
+<p>相关内容：</p>
+<ul>
+<li>贴花写入或修改 GBuffer。</li>
+<li>屏幕空间环境遮蔽。</li>
+<li>部分 composition lighting。</li>
+</ul>
+<h3 id="4-8-Lighting"><a href="#4-8-Lighting" class="headerlink" title="4.8 Lighting"></a>4.8 Lighting</h3><p>延迟渲染的光照通常在 GBuffer 之后进行。</p>
+<p>主要工作：</p>
+<ul>
+<li>直接光照。</li>
+<li>延迟光源累加。</li>
+<li>Lumen 间接光。</li>
+<li>Ambient Occlusion。</li>
+<li>Reflection。</li>
+<li>Sky Light。</li>
+</ul>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/LightRendering.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/IndirectLightRendering.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/Lumen</code></li>
+</ul>
+<h3 id="4-9-Translucency"><a href="#4-9-Translucency" class="headerlink" title="4.9 Translucency"></a>4.9 Translucency</h3><p>半透明物体通常不能完全走标准 GBuffer 延迟路径，需要单独渲染。</p>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/TranslucentRendering.cpp</code></li>
+</ul>
+<h3 id="4-10-PostProcess"><a href="#4-10-PostProcess" class="headerlink" title="4.10 PostProcess"></a>4.10 PostProcess</h3><p>后处理阶段把前面得到的场景结果加工成最终画面。</p>
+<p>常见内容：</p>
+<ul>
+<li>TAA &#x2F; TSR</li>
+<li>Bloom</li>
+<li>Depth of Field</li>
+<li>Motion Blur</li>
+<li>Tone Mapping</li>
+<li>Color Grading</li>
+<li>Upscale</li>
+</ul>
+<p>相关文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/PostProcess/PostProcessing.cpp</code></li>
+</ul>
+<h2 id="5-Mesh-Draw-Command-链路"><a href="#5-Mesh-Draw-Command-链路" class="headerlink" title="5. Mesh Draw Command 链路"></a>5. Mesh Draw Command 链路</h2><p>详细内容请参考：<a href="./FMeshBatch_FMeshPassProcessor.md">FMeshBatch 和 FMeshPassProcessor</a></p>
+<p>UE 不会在每个组件上直接调用 draw。大体流程是先把场景里的 mesh 转成 <code>FMeshBatch</code>，再由不同 pass 的 processor 转成 <code>FMeshDrawCommand</code>，最后提交给 RHI。</p>
+<p>核心链路：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">FPrimitiveSceneProxy</span><br><span class="line">  -&gt; FMeshBatch</span><br><span class="line">    -&gt; FMeshPassProcessor</span><br><span class="line">      -&gt; FMeshDrawCommand</span><br><span class="line">        -&gt; FParallelMeshDrawCommandPass</span><br><span class="line">          -&gt; SubmitMeshDrawCommandsRange()</span><br><span class="line">            -&gt; FMeshDrawCommand::SubmitDraw()</span><br><span class="line">              -&gt; FRHICommandList::DrawIndexedPrimitive()</span><br></pre></td></tr></table></figure>
+
+<p>重点类：</p>
+<ul>
+<li><code>FPrimitiveSceneProxy</code></li>
+<li><code>FMeshBatch</code></li>
+<li><code>FMeshPassProcessor</code></li>
+<li><code>FMeshDrawCommand</code></li>
+<li><code>FParallelMeshDrawCommandPass</code></li>
+</ul>
+<p>重点文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Engine/Public/SceneManagement.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Public/MeshPassProcessor.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/MeshPassProcessor.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/MeshDrawCommands.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/MeshDrawCommands.cpp</code></li>
+</ul>
+<h2 id="6-RDG-到-RHI"><a href="#6-RDG-到-RHI" class="headerlink" title="6. RDG 到 RHI"></a>6. RDG 到 RHI</h2><p>RDG Pass 最终还是要录制到 <code>FRHICommandList</code>。</p>
+<p>典型流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">FRDGBuilder::Execute()</span><br><span class="line">  -&gt; 编译 Render Graph</span><br><span class="line">  -&gt; 计算资源生命周期</span><br><span class="line">  -&gt; 插入 barrier</span><br><span class="line">  -&gt; ExecutePass()</span><br><span class="line">    -&gt; 使用 FRHICommandList 录制命令</span><br><span class="line">      -&gt; Draw / Dispatch / Copy / Clear</span><br><span class="line">        -&gt; FRHICommandListExecutor::Submit()</span><br></pre></td></tr></table></figure>
+
+<p>重点文件：</p>
+<ul>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RenderGraphBuilder.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Private/RenderGraphBuilder.cpp</code></li>
+<li><code>Engine/Source/Runtime/RHI/Public/RHICommandList.h</code></li>
+</ul>
+<h2 id="7-推荐源码阅读顺序"><a href="#7-推荐源码阅读顺序" class="headerlink" title="7. 推荐源码阅读顺序"></a>7. 推荐源码阅读顺序</h2><h3 id="第一阶段：线程和边界"><a href="#第一阶段：线程和边界" class="headerlink" title="第一阶段：线程和边界"></a>第一阶段：线程和边界</h3><p>先看：</p>
+<ul>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RenderingThread.h</code></li>
+<li><code>Engine/Source/Runtime/RHI/Public/RHI.h</code></li>
+<li><code>Engine/Source/Runtime/RHI/Public/RHICommandList.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RendererInterface.h</code></li>
+</ul>
+<p>目标：</p>
+<ul>
+<li>理解 Game Thread、Render Thread、RHI Thread 的分工。</li>
+<li>理解 <code>ENQUEUE_RENDER_COMMAND</code> 的作用。</li>
+<li>理解 RHI 为什么存在。</li>
+</ul>
+<h3 id="第二阶段：从视口进入-Renderer"><a href="#第二阶段：从视口进入-Renderer" class="headerlink" title="第二阶段：从视口进入 Renderer"></a>第二阶段：从视口进入 Renderer</h3><p>再看：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Engine/Private/GameEngine.cpp</code></li>
+<li><code>Engine/Source/Runtime/Engine/Private/UnrealClient.cpp</code></li>
+<li><code>Engine/Source/Runtime/Engine/Private/GameViewportClient.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneRenderBuilder.cpp</code></li>
+</ul>
+<p>目标：</p>
+<ul>
+<li>搞清楚一帧是怎么从 <code>Tick</code> 走到 <code>BeginRenderingViewFamily</code> 的。</li>
+<li>搞清楚 View 和 ViewFamily 是怎么创建的。</li>
+<li>搞清楚渲染任务怎么投递到 Render Thread。</li>
+</ul>
+<h3 id="第三阶段：延迟渲染主干"><a href="#第三阶段：延迟渲染主干" class="headerlink" title="第三阶段：延迟渲染主干"></a>第三阶段：延迟渲染主干</h3><p>重点看：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneRendering.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/DeferredShadingRenderer.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/SceneVisibility.cpp</code></li>
+</ul>
+<p>目标：</p>
+<ul>
+<li>把 <code>FDeferredShadingSceneRenderer::Render()</code> 从头到尾过一遍。</li>
+<li>先不追每个函数内部细节，只建立阶段顺序。</li>
+</ul>
+<h3 id="第四阶段：按-Pass-深入"><a href="#第四阶段：按-Pass-深入" class="headerlink" title="第四阶段：按 Pass 深入"></a>第四阶段：按 Pass 深入</h3><p>按需阅读：</p>
+<ul>
+<li>PrePass：<code>Engine/Source/Runtime/Renderer/Private/DepthRendering.cpp</code></li>
+<li>BasePass：<code>Engine/Source/Runtime/Renderer/Private/BasePassRendering.cpp</code></li>
+<li>Shadow：<code>Engine/Source/Runtime/Renderer/Private/ShadowDepthRendering.cpp</code></li>
+<li>Lighting：<code>Engine/Source/Runtime/Renderer/Private/LightRendering.cpp</code></li>
+<li>Lumen：<code>Engine/Source/Runtime/Renderer/Private/Lumen</code></li>
+<li>Translucency：<code>Engine/Source/Runtime/Renderer/Private/TranslucentRendering.cpp</code></li>
+<li>PostProcess：<code>Engine/Source/Runtime/Renderer/Private/PostProcess/PostProcessing.cpp</code></li>
+</ul>
+<h3 id="第五阶段：Draw-Call-生成"><a href="#第五阶段：Draw-Call-生成" class="headerlink" title="第五阶段：Draw Call 生成"></a>第五阶段：Draw Call 生成</h3><p>重点看：</p>
+<ul>
+<li><code>Engine/Source/Runtime/Renderer/Public/MeshPassProcessor.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/MeshPassProcessor.cpp</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/MeshDrawCommands.h</code></li>
+<li><code>Engine/Source/Runtime/Renderer/Private/MeshDrawCommands.cpp</code></li>
+</ul>
+<p>目标：</p>
+<ul>
+<li>理解 <code>FMeshBatch</code> 如何转成 <code>FMeshDrawCommand</code>。</li>
+<li>理解不同 Pass 为什么有不同的 <code>FMeshPassProcessor</code>。</li>
+<li>理解并行生成 draw command 的意义。</li>
+</ul>
+<h3 id="第六阶段：RDG"><a href="#第六阶段：RDG" class="headerlink" title="第六阶段：RDG"></a>第六阶段：RDG</h3><p>重点看：</p>
+<ul>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RenderGraph.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Public/RenderGraphBuilder.h</code></li>
+<li><code>Engine/Source/Runtime/RenderCore/Private/RenderGraphBuilder.cpp</code></li>
+</ul>
+<p>目标：</p>
+<ul>
+<li>理解 <code>GraphBuilder.AddPass()</code>。</li>
+<li>理解 RDG 资源生命周期。</li>
+<li>理解 RDG 如何在执行阶段转成 RHI 命令。</li>
+</ul>
+<h2 id="8-常用调试入口"><a href="#8-常用调试入口" class="headerlink" title="8. 常用调试入口"></a>8. 常用调试入口</h2><p>可以优先在这些位置下断点：</p>
+<ul>
+<li><code>FViewport::Draw</code></li>
+<li><code>UGameViewportClient::Draw</code></li>
+<li><code>FRendererModule::BeginRenderingViewFamily</code></li>
+<li><code>RenderViewFamily_RenderThread</code></li>
+<li><code>FDeferredShadingSceneRenderer::Render</code></li>
+<li><code>FRDGBuilder::Execute</code></li>
+<li><code>FParallelMeshDrawCommandPass::Dispatch</code></li>
+<li><code>SubmitMeshDrawCommandsRange</code></li>
+<li><code>FRHICommandList::DrawIndexedPrimitive</code></li>
+</ul>
+<p>常用控制台命令：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">stat unit</span><br><span class="line">stat scenerendering</span><br><span class="line">stat rhi</span><br><span class="line">stat gpu</span><br></pre></td></tr></table></figure>
+
+<p>RDG 调试可以关注：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">r.RDG.ImmediateMode</span><br><span class="line">r.RDG.Debug</span><br><span class="line">r.RDG.Visualize</span><br></pre></td></tr></table></figure>
+
+<p>具体 CVar 名称可能随引擎版本变化，以当前源码和控制台自动补全为准。</p>
+<h2 id="9-学习时的抓手"><a href="#9-学习时的抓手" class="headerlink" title="9. 学习时的抓手"></a>9. 学习时的抓手</h2><p>建议带着下面几个问题读源码：</p>
+<ol>
+<li>这一帧的 View 是在哪里创建的？</li>
+<li>Game Thread 的对象如何变成 Render Thread 可用的数据？</li>
+<li>一个 StaticMesh 最终如何变成 GPU Draw Call？</li>
+<li>BasePass 往哪些 Render Target 写了什么？</li>
+<li>Lighting 阶段为什么可以只依赖 GBuffer？</li>
+<li>RDG 是在哪里创建、在哪里 Execute 的？</li>
+<li>RHI 命令最终在哪里 Present 到屏幕？</li>
+</ol>
+<p>如果能沿着这些问题把源码串起来，就基本建立了 UE 渲染管线的主干认知。</p>
+<h2 id="10-最简心智模型"><a href="#10-最简心智模型" class="headerlink" title="10. 最简心智模型"></a>10. 最简心智模型</h2><p>可以把 UE 渲染管线理解为下面这条数据流：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">World / Component</span><br><span class="line">  -&gt; SceneProxy</span><br><span class="line">    -&gt; FScene</span><br><span class="line">      -&gt; FSceneViewFamily / FSceneView</span><br><span class="line">        -&gt; FSceneRenderer</span><br><span class="line">          -&gt; Render Pass</span><br><span class="line">            -&gt; RDG</span><br><span class="line">              -&gt; RHI</span><br><span class="line">                -&gt; GPU</span><br></pre></td></tr></table></figure>
+
+<p>也可以把一帧理解为下面这条执行流：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Tick</span><br><span class="line">  -&gt; Viewport Draw</span><br><span class="line">    -&gt; Build ViewFamily</span><br><span class="line">      -&gt; Enqueue Render Command</span><br><span class="line">        -&gt; Render Thread</span><br><span class="line">          -&gt; Deferred Renderer</span><br><span class="line">            -&gt; RDG Passes</span><br><span class="line">              -&gt; RHI Commands</span><br><span class="line">                -&gt; GPU Execute</span><br><span class="line">                  -&gt; Present</span><br></pre></td></tr></table></figure>
       
     </div>
 
