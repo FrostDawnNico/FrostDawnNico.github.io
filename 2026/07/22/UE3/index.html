@@ -20,30 +20,32 @@
     var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="one step per day | each effort counts">
-<meta property="og:type" content="website">
-<meta property="og:title" content="FrostDawn&#39;s Blog">
-<meta property="og:url" content="https://frostdawnnico.github.io/index.html">
+  <meta name="description" content="Unreal Engine 渲染管线学习笔记本文基于当前 Unreal Engine 5.7.4 源码整理，目标是建立对 UE 渲染管线的整体认识，并给出后续源码阅读路径。 核心先记住一句话：  Game Thread 准备视图和场景代理，Render Thread 编排渲染 Pass，RDG 管理资源和依赖，RHI 把命令提交给具体图形 API&#x2F;GPU。  1. 总体链路123456">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UE渲染管线">
+<meta property="og:url" content="https://frostdawnnico.github.io/2026/07/22/UE3/index.html">
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
-<meta property="og:description" content="one step per day | each effort counts">
+<meta property="og:description" content="Unreal Engine 渲染管线学习笔记本文基于当前 Unreal Engine 5.7.4 源码整理，目标是建立对 UE 渲染管线的整体认识，并给出后续源码阅读路径。 核心先记住一句话：  Game Thread 准备视图和场景代理，Render Thread 编排渲染 Pass，RDG 管理资源和依赖，RHI 把命令提交给具体图形 API&#x2F;GPU。  1. 总体链路123456">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-07-22T15:28:51.000Z">
+<meta property="article:modified_time" content="2026-07-22T15:30:16.611Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://frostdawnnico.github.io/">
+<link rel="canonical" href="https://frostdawnnico.github.io/2026/07/22/UE3/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 
-  <title>FrostDawn's Blog</title>
+  <title>UE渲染管线 | FrostDawn's Blog</title>
   
 
 
@@ -142,9 +144,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
@@ -160,10 +163,9 @@
       <meta itemprop="name" content="FrostDawn's Blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/07/22/UE3/" class="post-title-link" itemprop="url">UE渲染管线</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          UE渲染管线
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -187,7 +189,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <span id="more"></span>
+        <span id="more"></span>
 <h1 id="Unreal-Engine-渲染管线学习笔记"><a href="#Unreal-Engine-渲染管线学习笔记" class="headerlink" title="Unreal Engine 渲染管线学习笔记"></a>Unreal Engine 渲染管线学习笔记</h1><p>本文基于当前 Unreal Engine 5.7.4 源码整理，目标是建立对 UE 渲染管线的整体认识，并给出后续源码阅读路径。</p>
 <p>核心先记住一句话：</p>
 <blockquote>
@@ -915,744 +917,31 @@
 
 <p>也可以把一帧理解为下面这条执行流：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Tick</span><br><span class="line">  -&gt; Viewport Draw</span><br><span class="line">    -&gt; Build ViewFamily</span><br><span class="line">      -&gt; Enqueue Render Command</span><br><span class="line">        -&gt; Render Thread</span><br><span class="line">          -&gt; Deferred Renderer</span><br><span class="line">            -&gt; RDG Passes</span><br><span class="line">              -&gt; RHI Commands</span><br><span class="line">                -&gt; GPU Execute</span><br><span class="line">                  -&gt; Present</span><br></pre></td></tr></table></figure>
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/07/17/VideoNote1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/07/17/VideoNote1/" class="post-title-link" itemprop="url">视频学习记录</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2026-07-17 16:33:56 / Modified: 17:51:13" itemprop="dateCreated datePublished" datetime="2026-07-17T16:33:56+08:00">2026-07-17</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Youtube的一些视频</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/07/17/VideoNote1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/07/14/UE2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/07/14/UE2/" class="post-title-link" itemprop="url">UE2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2026-07-14 12:25:04" itemprop="dateCreated datePublished" datetime="2026-07-14T12:25:04+08:00">2026-07-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-07-20 23:24:47" itemprop="dateModified" datetime="2026-07-20T23:24:47+08:00">2026-07-20</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>熟悉UE的使用</p>
-<p>跟随UE5.7入门界面的顺序依次学习</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/07/14/UE2/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/07/17/VideoNote1/" rel="prev" title="视频学习记录">
+      <i class="fa fa-chevron-left"></i> 视频学习记录
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
   
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/07/12/UE1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/07/12/UE1/" class="post-title-link" itemprop="url">虚幻引擎核心架构与开发指南</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2026-07-12 23:34:09" itemprop="dateCreated datePublished" datetime="2026-07-12T23:34:09+08:00">2026-07-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-07-14 12:25:19" itemprop="dateModified" datetime="2026-07-14T12:25:19+08:00">2026-07-14</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>从引擎底层到实战应用 · 实时3D创作的工业标准</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/07/12/UE1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/07/04/CG4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/07/04/CG4/" class="post-title-link" itemprop="url">CG4</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2026-07-04 12:52:56 / Modified: 12:53:34" itemprop="dateCreated datePublished" datetime="2026-07-04T12:52:56+08:00">2026-07-04</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <span id="more"></span>
-<h1 id="如何在延迟渲染管线中渲染半透明物体"><a href="#如何在延迟渲染管线中渲染半透明物体" class="headerlink" title="如何在延迟渲染管线中渲染半透明物体"></a>如何在延迟渲染管线中渲染半透明物体</h1><p>延迟渲染（Deferred Shading）的天性跟半透明是矛盾的——GBuffer 每个像素只存<strong>最前面那一个</strong>表面的几何&#x2F;材质，而半透明需要”光线穿透多层”并逐层 α 混合，所以标准延迟管线没法直接吞半透明。工业界的解法本质是<strong>绕开或扩充</strong>这两点，下面按”为什么难 → 主流怎么做 → 进阶 OIT → 怎么选”讲。</p>
-<hr>
-<h2 id="根因：GBuffer-和-α-混合的三重冲突"><a href="#根因：GBuffer-和-α-混合的三重冲突" class="headerlink" title="根因：GBuffer 和 α 混合的三重冲突"></a>根因：GBuffer 和 α 混合的三重冲突</h2><ol>
-<li><strong>单深度</strong>：深度测试只留最近片段，半透明要 N 层叠加，单层 GBuffer 存不下</li>
-<li><strong>单材质</strong>：位置&#x2F;法线&#x2F;反照率每像素一套，多层半透明各有各的 BRDF，混不了</li>
-<li><strong>混合顺序</strong>：α 混合要求从后往前（back-to-front），延迟光照是逐像素并行一次性出结果，没有”层”的概念</li>
-</ol>
-<p>所以结论先给：<strong>标准延迟着色阶段只管不透明，半透明必须另开通道</strong>。</p>
-<hr>
-<h2 id="方案一（工程主流）：延迟不透明-前向半透明"><a href="#方案一（工程主流）：延迟不透明-前向半透明" class="headerlink" title="方案一（工程主流）：延迟不透明 + 前向半透明"></a>方案一（工程主流）：延迟不透明 + 前向半透明</h2><p>这是 Unity Deferred、UE 的默认路径，也叫 <strong>Hybrid &#x2F; Deferred-Forward</strong>。</p>
-<p>流程：</p>
-<ol>
-<li><strong>Geometry Pass</strong>：不透明物体写 GBuffer（含深度）</li>
-<li><strong>Lighting Pass</strong>：屏幕空间算完所有不透明光照，出一张 <code>opaqueColor</code></li>
-<li><strong>Transparent Pass</strong>（切前向）：<ul>
-<li>复用第 1 步的<strong>不透明深度缓冲</strong>做深度测试（透明不能穿到不透明后面）</li>
-<li><strong>关深度写入</strong>，开 <code>GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA</code></li>
-<li>CPU 侧对半透明按<strong>从后往前</strong>粗略排序，逐个物体前向绘制</li>
-<li>着色器自己算光照（因为 GBuffer 里没它的数据）</li>
-</ul>
-</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">不透明(Deferred) ──→ 光照 ──→ 半透明(Forward, α混合) ──→ 后处理</span><br></pre></td></tr></table></figure>
-
-<p><strong>优点</strong>：简单、所有引擎都能用、效果可控<br><strong>代价</strong>：</p>
-<ul>
-<li>半透明那段要<strong>重算光照</strong>，光源多就亏（Deferred+ 的做法是把透明那段也改成 Forward+，用 tile&#x2F;clustered 光列表补）</li>
-<li>CPU 排序只是近似，物体交错&#x2F;自遮挡仍有穿帮</li>
-</ul>
-<blockquote>
-<p>💡 UE 里”半透明 &#x3D; 自动走前向”就是这套；URP 的 Deferred 模式同理，透明物体强制 fallback 到 Forward。</p>
-</blockquote>
-<hr>
-<h2 id="方案二：OIT-系（想要精确、不想排序）"><a href="#方案二：OIT-系（想要精确、不想排序）" class="headerlink" title="方案二：OIT 系（想要精确、不想排序）"></a>方案二：OIT 系（想要精确、不想排序）</h2><p>混合管线的”从后往前排序”在物体交错、粒子密集时会崩，于是有了<strong>顺序无关透明度（OIT）</strong>，常见几个变种：</p>
-<h3 id="Depth-Peeling（剥洋葱）"><a href="#Depth-Peeling（剥洋葱）" class="headerlink" title="Depth Peeling（剥洋葱）"></a>Depth Peeling（剥洋葱）</h3><p>多次渲染同一场景，每次用上一次的深度做测试，”剥”出第 1 层、第 2 层…第 N 层，最后从里往外混合。</p>
-<ul>
-<li>质量好，<strong>N 层 &#x3D; N 个全屏 Pass</strong>，开销爆炸，基本只做研究用</li>
-<li>Dual Depth Peeling 优化到 N&#x2F;2+1 个 Pass，仍重</li>
-</ul>
-<h3 id="Weighted-Blended-OIT（McGuire-Bavoil-2013）⭐-实用派"><a href="#Weighted-Blended-OIT（McGuire-Bavoil-2013）⭐-实用派" class="headerlink" title="Weighted Blended OIT（McGuire &amp; Bavoil 2013）⭐ 实用派"></a>Weighted Blended OIT（McGuire &amp; Bavoil 2013）⭐ 实用派</h3><p>不改硬件、不改排序，<strong>改混合算子让它变成顺序无关</strong>，近似解。</p>
-<p>做法：</p>
-<ol>
-<li>开两个 RT：<code>accum</code>（累颜色）和 <code>reveal</code>（累”可见度”）</li>
-<li>每个透明 fragment 算一个权重 <code>w(a, z)</code>（跟 α 和 view-space 深度有关），<code>accum += Ci * ai * w</code>，<code>reveal += ai * w</code></li>
-<li>全屏归一化：<code>Cfinal = accum / (reveal + eps)</code>，再跟不透明结果合成</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">不透明(Deferred) → GBuffer+光照 → Transparent 写 accum/reveal → 全屏 composite → 输出</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>✅ 不用排序、不用存 fragment 链表、移动端&#x2F;主机都能跑</li>
-<li>❌ 是近似，两层靠很近时分不清；权重函数要按项目深度范围调参</li>
-<li>❌ <strong>不支持折射</strong>（玻璃那种偏 SceneColor 的做不到）</li>
-<li>粒子、头发、烟雾首选</li>
-</ul>
-<h3 id="PPLL-A-buffer（精确-OIT）"><a href="#PPLL-A-buffer（精确-OIT）" class="headerlink" title="PPLL &#x2F; A-buffer（精确 OIT）"></a>PPLL &#x2F; A-buffer（精确 OIT）</h3><p>每个像素挂一个链表存所有 fragment，最后逐像素排序混合——精确但<strong>内存无上限</strong>，要 DX11+ 的 UAV&#x2F;原子操作，Intel 有 Pixel Sync 方案。CAD、DCC 工具用得多，游戏少见。</p>
-<hr>
-<h2 id="方案三：取巧路线"><a href="#方案三：取巧路线" class="headerlink" title="方案三：取巧路线"></a>方案三：取巧路线</h2><h3 id="DitherMask（抖动遮罩，UE-常用）"><a href="#DitherMask（抖动遮罩，UE-常用）" class="headerlink" title="DitherMask（抖动遮罩，UE 常用）"></a>DitherMask（抖动遮罩，UE 常用）</h3><p>本质还是 <strong>Masked&#x2F;Opaque</strong>，用蓝噪抖动做”假半透明”——</p>
-<ul>
-<li>✅ 能走完整延迟管线，光照&#x2F;阴影&#x2F;Nanite 全吃得到，无排序问题，无 overdraw</li>
-<li>❌ 有颗粒感（靠 TAA 抹），<strong>做不到真折射</strong></li>
-</ul>
-<p>适合：树叶、栏杆、纱网、便宜的”玻璃感”——很多游戏其实大量用这个代替真半透明。</p>
-<h3 id="ShaderX7-交错-GBuffer-老法"><a href="#ShaderX7-交错-GBuffer-老法" class="headerlink" title="ShaderX7 交错 GBuffer 老法"></a>ShaderX7 交错 GBuffer 老法</h3><p>几何阶段不透明+透明一起写 GBuffer，光照后解交错再混合，省掉前向重算光照但实现重、现在提的人少了。</p>
-<hr>
-<h2 id="怎么选"><a href="#怎么选" class="headerlink" title="怎么选"></a>怎么选</h2><table>
-<thead>
-<tr>
-<th>场景</th>
-<th>推荐</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>通用游戏（玻璃、水、角色dissolve）</td>
-<td>延迟不透明 + 前向半透明（混合管线）</td>
-</tr>
-<tr>
-<td>粒子&#x2F;烟雾&#x2F;头发，多层交错</td>
-<td>WBOIT 叠加在前向那段上</td>
-</tr>
-<tr>
-<td>CAD &#x2F; 需要像素级精确</td>
-<td>Depth Peeling 或 PPLL</td>
-</tr>
-<tr>
-<td>植被、栅栏、”假透”</td>
-<td>DitherMask，当不透明走延迟</td>
-</tr>
-<tr>
-<td>大量动态光 + 透明</td>
-<td>Deferred+ 不透明 &#x2F; Forward+ 透明</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>⚠️ 一个常被忽略的点：半透明+<strong>折射</strong>是另一个坑。WBOIT &#x2F; 普通前向都搞不定物理折射（要抓 Screen Color 做偏移），真玻璃一般还是得单独一个折射 Pass 或者靠 GrabPass&#x2F;SceneColor 采样，这块延迟管线帮不上什么。</p>
-</blockquote>
-<p>如果你是在搭自己的渲染器，想聊具体哪一段（比如 WBOIT 的权重函数怎么调、Deferred+ 的 light culling 怎么复用给透明），可以再往下钻。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/06/14/CG3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/06/14/CG3/" class="post-title-link" itemprop="url">GPU渲染架构解析</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2026-06-14 22:14:49" itemprop="dateCreated datePublished" datetime="2026-06-14T22:14:49+08:00">2026-06-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-06-21 22:32:18" itemprop="dateModified" datetime="2026-06-21T22:32:18+08:00">2026-06-21</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>IMR vs TBR vs TBDR | 从原理到硬件实现的全面对比</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/06/14/CG3/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/06/02/CG1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/06/02/CG1/" class="post-title-link" itemprop="url">图形学相关原理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2026-06-02 23:21:09" itemprop="dateCreated datePublished" datetime="2026-06-02T23:21:09+08:00">2026-06-02</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-06-07 13:59:13" itemprop="dateModified" datetime="2026-06-07T13:59:13+08:00">2026-06-07</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>理解图形学相关原理</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/06/02/CG1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/05/31/ADS2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/05/31/ADS2/" class="post-title-link" itemprop="url">STL容器的数据结构和算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2026-05-31 13:51:03" itemprop="dateCreated datePublished" datetime="2026-05-31T13:51:03+08:00">2026-05-31</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-06-02 23:20:58" itemprop="dateModified" datetime="2026-06-02T23:20:58+08:00">2026-06-02</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>STL容器的数据结构和算法</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/05/31/ADS2/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/05/31/ADS1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/05/31/ADS1/" class="post-title-link" itemprop="url">算法与数据结构</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2026-05-31 11:23:36 / Modified: 13:47:04" itemprop="dateCreated datePublished" datetime="2026-05-31T11:23:36+08:00">2026-05-31</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>复习排序算法的时间复杂度、红黑树等经典数据结构的原理等。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/05/31/ADS1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/05/23/blog5-cppModern2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/05/23/blog5-cppModern2/" class="post-title-link" itemprop="url">C++特性-模板与泛型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2026-05-23 18:54:05 / Modified: 18:59:19" itemprop="dateCreated datePublished" datetime="2026-05-23T18:54:05+08:00">2026-05-23</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li><p>模板（函数模板+类模板），模板特化（全特化+偏特化），完美转发，Lambda例子</p>
-</li>
-<li><p>C++ 特性中模板&amp;泛型，实用工具中常见的考题</p>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/05/23/blog5-cppModern2/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
-  </nav>
 
 
 
@@ -1704,6 +993,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Unreal-Engine-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">Unreal Engine 渲染管线学习笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%80%BB%E4%BD%93%E9%93%BE%E8%B7%AF"><span class="nav-number">1.1.</span> <span class="nav-text">1. 总体链路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97%E8%81%8C%E8%B4%A3"><span class="nav-number">1.2.</span> <span class="nav-text">2. 核心模块职责</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Engine"><span class="nav-number">1.2.1.</span> <span class="nav-text">Engine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Renderer"><span class="nav-number">1.2.2.</span> <span class="nav-text">Renderer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RenderCore"><span class="nav-number">1.2.3.</span> <span class="nav-text">RenderCore</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RHI"><span class="nav-number">1.2.4.</span> <span class="nav-text">RHI</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%80%E5%B8%A7%E6%B8%B2%E6%9F%93%E4%B8%BB%E6%B5%81%E7%A8%8B"><span class="nav-number">1.3.</span> <span class="nav-text">3. 一帧渲染主流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Game-Thread-%E5%85%A5%E5%8F%A3"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 Game Thread 入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E4%BB%8E-Game-Thread-%E5%88%B0-Render-Thread"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 从 Game Thread 到 Render Thread</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Render-Thread-%E6%B8%B2%E6%9F%93%E5%85%A5%E5%8F%A3"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 Render Thread 渲染入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-RDG-%E6%9E%84%E5%BB%BA%E5%92%8C%E6%89%A7%E8%A1%8C"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4 RDG 构建和执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E6%B8%B2%E6%9F%93%E6%AD%A5%E9%AA%A4%E4%B8%8E%E5%87%BD%E6%95%B0%E5%85%A5%E5%8F%A3%E5%AF%B9%E7%85%A7"><span class="nav-number">1.3.5.</span> <span class="nav-text">3.5 渲染步骤与函数入口对照</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E5%9C%BA%E6%99%AF%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E6%94%AF%E7%BA%BF%EF%BC%88Scene-Proxy%EF%BC%89"><span class="nav-number">1.3.6.</span> <span class="nav-text">3.6 场景数据同步支线（Scene Proxy）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93%E4%B8%BB%E8%A6%81%E9%98%B6%E6%AE%B5"><span class="nav-number">1.4.</span> <span class="nav-text">4. 延迟渲染主要阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%B8%A7%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 帧初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-InitViews"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 InitViews</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-GPU-Scene-%E6%9B%B4%E6%96%B0"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 GPU Scene 更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-PrePass-Early-Z"><span class="nav-number">1.4.4.</span> <span class="nav-text">4.4 PrePass &#x2F; Early-Z</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-Shadow-Pass"><span class="nav-number">1.4.5.</span> <span class="nav-text">4.5 Shadow Pass</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-BasePass"><span class="nav-number">1.4.6.</span> <span class="nav-text">4.6 BasePass</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-Decal-SSAO-Composition"><span class="nav-number">1.4.7.</span> <span class="nav-text">4.7 Decal &#x2F; SSAO &#x2F; Composition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-Lighting"><span class="nav-number">1.4.8.</span> <span class="nav-text">4.8 Lighting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-Translucency"><span class="nav-number">1.4.9.</span> <span class="nav-text">4.9 Translucency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-10-PostProcess"><span class="nav-number">1.4.10.</span> <span class="nav-text">4.10 PostProcess</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Mesh-Draw-Command-%E9%93%BE%E8%B7%AF"><span class="nav-number">1.5.</span> <span class="nav-text">5. Mesh Draw Command 链路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-RDG-%E5%88%B0-RHI"><span class="nav-number">1.6.</span> <span class="nav-text">6. RDG 到 RHI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%8E%A8%E8%8D%90%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.7.</span> <span class="nav-text">7. 推荐源码阅读顺序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%EF%BC%9A%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BE%B9%E7%95%8C"><span class="nav-number">1.7.1.</span> <span class="nav-text">第一阶段：线程和边界</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5%EF%BC%9A%E4%BB%8E%E8%A7%86%E5%8F%A3%E8%BF%9B%E5%85%A5-Renderer"><span class="nav-number">1.7.2.</span> <span class="nav-text">第二阶段：从视口进入 Renderer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93%E4%B8%BB%E5%B9%B2"><span class="nav-number">1.7.3.</span> <span class="nav-text">第三阶段：延迟渲染主干</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E9%98%B6%E6%AE%B5%EF%BC%9A%E6%8C%89-Pass-%E6%B7%B1%E5%85%A5"><span class="nav-number">1.7.4.</span> <span class="nav-text">第四阶段：按 Pass 深入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E9%98%B6%E6%AE%B5%EF%BC%9ADraw-Call-%E7%94%9F%E6%88%90"><span class="nav-number">1.7.5.</span> <span class="nav-text">第五阶段：Draw Call 生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%85%AD%E9%98%B6%E6%AE%B5%EF%BC%9ARDG"><span class="nav-number">1.7.6.</span> <span class="nav-text">第六阶段：RDG</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%B8%B8%E7%94%A8%E8%B0%83%E8%AF%95%E5%85%A5%E5%8F%A3"><span class="nav-number">1.8.</span> <span class="nav-text">8. 常用调试入口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E5%AD%A6%E4%B9%A0%E6%97%B6%E7%9A%84%E6%8A%93%E6%89%8B"><span class="nav-number">1.9.</span> <span class="nav-text">9. 学习时的抓手</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E6%9C%80%E7%AE%80%E5%BF%83%E6%99%BA%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.10.</span> <span class="nav-text">10. 最简心智模型</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
