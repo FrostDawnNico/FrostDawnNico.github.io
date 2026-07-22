@@ -1175,7 +1175,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-07-22 23:42:56" itemprop="dateModified" datetime="2026-07-22T23:42:56+08:00">2026-07-22</time>
+                <time title="Modified: 2026-07-22 23:43:43" itemprop="dateModified" datetime="2026-07-22T23:43:43+08:00">2026-07-22</time>
               </span>
 
           
@@ -1189,104 +1189,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <span id="more"></span>
-<h1 id="如何在延迟渲染管线中渲染半透明物体"><a href="#如何在延迟渲染管线中渲染半透明物体" class="headerlink" title="如何在延迟渲染管线中渲染半透明物体"></a>如何在延迟渲染管线中渲染半透明物体</h1><p>延迟渲染（Deferred Shading）的天性跟半透明是矛盾的——GBuffer 每个像素只存<strong>最前面那一个</strong>表面的几何&#x2F;材质，而半透明需要”光线穿透多层”并逐层 α 混合，所以标准延迟管线没法直接吞半透明。工业界的解法本质是<strong>绕开或扩充</strong>这两点，下面按”为什么难 → 主流怎么做 → 进阶 OIT → 怎么选”讲。</p>
-<hr>
-<h2 id="根因：GBuffer-和-α-混合的三重冲突"><a href="#根因：GBuffer-和-α-混合的三重冲突" class="headerlink" title="根因：GBuffer 和 α 混合的三重冲突"></a>根因：GBuffer 和 α 混合的三重冲突</h2><ol>
-<li><strong>单深度</strong>：深度测试只留最近片段，半透明要 N 层叠加，单层 GBuffer 存不下</li>
-<li><strong>单材质</strong>：位置&#x2F;法线&#x2F;反照率每像素一套，多层半透明各有各的 BRDF，混不了</li>
-<li><strong>混合顺序</strong>：α 混合要求从后往前（back-to-front），延迟光照是逐像素并行一次性出结果，没有”层”的概念</li>
-</ol>
-<p>所以结论先给：<strong>标准延迟着色阶段只管不透明，半透明必须另开通道</strong>。</p>
-<hr>
-<h2 id="方案一（工程主流）：延迟不透明-前向半透明"><a href="#方案一（工程主流）：延迟不透明-前向半透明" class="headerlink" title="方案一（工程主流）：延迟不透明 + 前向半透明"></a>方案一（工程主流）：延迟不透明 + 前向半透明</h2><p>这是 Unity Deferred、UE 的默认路径，也叫 <strong>Hybrid &#x2F; Deferred-Forward</strong>。</p>
-<p>流程：</p>
-<ol>
-<li><strong>Geometry Pass</strong>：不透明物体写 GBuffer（含深度）</li>
-<li><strong>Lighting Pass</strong>：屏幕空间算完所有不透明光照，出一张 <code>opaqueColor</code></li>
-<li><strong>Transparent Pass</strong>（切前向）：<ul>
-<li>复用第 1 步的<strong>不透明深度缓冲</strong>做深度测试（透明不能穿到不透明后面）</li>
-<li><strong>关深度写入</strong>，开 <code>GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA</code></li>
-<li>CPU 侧对半透明按<strong>从后往前</strong>粗略排序，逐个物体前向绘制</li>
-<li>着色器自己算光照（因为 GBuffer 里没它的数据）</li>
-</ul>
-</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">不透明(Deferred) ──→ 光照 ──→ 半透明(Forward, α混合) ──→ 后处理</span><br></pre></td></tr></table></figure>
-
-<p><strong>优点</strong>：简单、所有引擎都能用、效果可控<br><strong>代价</strong>：</p>
-<ul>
-<li>半透明那段要<strong>重算光照</strong>，光源多就亏（Deferred+ 的做法是把透明那段也改成 Forward+，用 tile&#x2F;clustered 光列表补）</li>
-<li>CPU 排序只是近似，物体交错&#x2F;自遮挡仍有穿帮</li>
-</ul>
-<blockquote>
-<p>💡 UE 里”半透明 &#x3D; 自动走前向”就是这套；URP 的 Deferred 模式同理，透明物体强制 fallback 到 Forward。</p>
-</blockquote>
-<hr>
-<h2 id="方案二：OIT-系（想要精确、不想排序）"><a href="#方案二：OIT-系（想要精确、不想排序）" class="headerlink" title="方案二：OIT 系（想要精确、不想排序）"></a>方案二：OIT 系（想要精确、不想排序）</h2><p>混合管线的”从后往前排序”在物体交错、粒子密集时会崩，于是有了<strong>顺序无关透明度（OIT）</strong>，常见几个变种：</p>
-<h3 id="Depth-Peeling（剥洋葱）"><a href="#Depth-Peeling（剥洋葱）" class="headerlink" title="Depth Peeling（剥洋葱）"></a>Depth Peeling（剥洋葱）</h3><p>多次渲染同一场景，每次用上一次的深度做测试，”剥”出第 1 层、第 2 层…第 N 层，最后从里往外混合。</p>
-<ul>
-<li>质量好，<strong>N 层 &#x3D; N 个全屏 Pass</strong>，开销爆炸，基本只做研究用</li>
-<li>Dual Depth Peeling 优化到 N&#x2F;2+1 个 Pass，仍重</li>
-</ul>
-<h3 id="Weighted-Blended-OIT（McGuire-Bavoil-2013）⭐-实用派"><a href="#Weighted-Blended-OIT（McGuire-Bavoil-2013）⭐-实用派" class="headerlink" title="Weighted Blended OIT（McGuire &amp; Bavoil 2013）⭐ 实用派"></a>Weighted Blended OIT（McGuire &amp; Bavoil 2013）⭐ 实用派</h3><p>不改硬件、不改排序，<strong>改混合算子让它变成顺序无关</strong>，近似解。</p>
-<p>做法：</p>
-<ol>
-<li>开两个 RT：<code>accum</code>（累颜色）和 <code>reveal</code>（累”可见度”）</li>
-<li>每个透明 fragment 算一个权重 <code>w(a, z)</code>（跟 α 和 view-space 深度有关），<code>accum += Ci * ai * w</code>，<code>reveal += ai * w</code></li>
-<li>全屏归一化：<code>Cfinal = accum / (reveal + eps)</code>，再跟不透明结果合成</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">不透明(Deferred) → GBuffer+光照 → Transparent 写 accum/reveal → 全屏 composite → 输出</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>✅ 不用排序、不用存 fragment 链表、移动端&#x2F;主机都能跑</li>
-<li>❌ 是近似，两层靠很近时分不清；权重函数要按项目深度范围调参</li>
-<li>❌ <strong>不支持折射</strong>（玻璃那种偏 SceneColor 的做不到）</li>
-<li>粒子、头发、烟雾首选</li>
-</ul>
-<h3 id="PPLL-A-buffer（精确-OIT）"><a href="#PPLL-A-buffer（精确-OIT）" class="headerlink" title="PPLL &#x2F; A-buffer（精确 OIT）"></a>PPLL &#x2F; A-buffer（精确 OIT）</h3><p>每个像素挂一个链表存所有 fragment，最后逐像素排序混合——精确但<strong>内存无上限</strong>，要 DX11+ 的 UAV&#x2F;原子操作，Intel 有 Pixel Sync 方案。CAD、DCC 工具用得多，游戏少见。</p>
-<hr>
-<h2 id="方案三：取巧路线"><a href="#方案三：取巧路线" class="headerlink" title="方案三：取巧路线"></a>方案三：取巧路线</h2><h3 id="DitherMask（抖动遮罩，UE-常用）"><a href="#DitherMask（抖动遮罩，UE-常用）" class="headerlink" title="DitherMask（抖动遮罩，UE 常用）"></a>DitherMask（抖动遮罩，UE 常用）</h3><p>本质还是 <strong>Masked&#x2F;Opaque</strong>，用蓝噪抖动做”假半透明”——</p>
-<ul>
-<li>✅ 能走完整延迟管线，光照&#x2F;阴影&#x2F;Nanite 全吃得到，无排序问题，无 overdraw</li>
-<li>❌ 有颗粒感（靠 TAA 抹），<strong>做不到真折射</strong></li>
-</ul>
-<p>适合：树叶、栏杆、纱网、便宜的”玻璃感”——很多游戏其实大量用这个代替真半透明。</p>
-<h3 id="ShaderX7-交错-GBuffer-老法"><a href="#ShaderX7-交错-GBuffer-老法" class="headerlink" title="ShaderX7 交错 GBuffer 老法"></a>ShaderX7 交错 GBuffer 老法</h3><p>几何阶段不透明+透明一起写 GBuffer，光照后解交错再混合，省掉前向重算光照但实现重、现在提的人少了。</p>
-<hr>
-<h2 id="怎么选"><a href="#怎么选" class="headerlink" title="怎么选"></a>怎么选</h2><table>
-<thead>
-<tr>
-<th>场景</th>
-<th>推荐</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>通用游戏（玻璃、水、角色dissolve）</td>
-<td>延迟不透明 + 前向半透明（混合管线）</td>
-</tr>
-<tr>
-<td>粒子&#x2F;烟雾&#x2F;头发，多层交错</td>
-<td>WBOIT 叠加在前向那段上</td>
-</tr>
-<tr>
-<td>CAD &#x2F; 需要像素级精确</td>
-<td>Depth Peeling 或 PPLL</td>
-</tr>
-<tr>
-<td>植被、栅栏、”假透”</td>
-<td>DitherMask，当不透明走延迟</td>
-</tr>
-<tr>
-<td>大量动态光 + 透明</td>
-<td>Deferred+ 不透明 &#x2F; Forward+ 透明</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>⚠️ 一个常被忽略的点：半透明+<strong>折射</strong>是另一个坑。WBOIT &#x2F; 普通前向都搞不定物理折射（要抓 Screen Color 做偏移），真玻璃一般还是得单独一个折射 Pass 或者靠 GrabPass&#x2F;SceneColor 采样，这块延迟管线帮不上什么。</p>
-</blockquote>
-<p>如果你是在搭自己的渲染器，想聊具体哪一段（比如 WBOIT 的权重函数怎么调、Deferred+ 的 light culling 怎么复用给透明），可以再往下钻。</p>
-
+          <p>1</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2026/07/04/CG4/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

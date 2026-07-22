@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="如何在延迟渲染管线中渲染半透明物体延迟渲染（Deferred Shading）的天性跟半透明是矛盾的——GBuffer 每个像素只存最前面那一个表面的几何&#x2F;材质，而半透明需要”光线穿透多层”并逐层 α 混合，所以标准延迟管线没法直接吞半透明。工业界的解法本质是绕开或扩充这两点，下面按”为什么难 → 主流怎么做 → 进阶 OIT → 怎么选”讲。  根因：GBuffer 和 α 混合的三">
+  <meta name="description" content="1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CG4">
 <meta property="og:url" content="https://frostdawnnico.github.io/2026/07/04/CG4/index.html">
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
-<meta property="og:description" content="如何在延迟渲染管线中渲染半透明物体延迟渲染（Deferred Shading）的天性跟半透明是矛盾的——GBuffer 每个像素只存最前面那一个表面的几何&#x2F;材质，而半透明需要”光线穿透多层”并逐层 α 混合，所以标准延迟管线没法直接吞半透明。工业界的解法本质是绕开或扩充这两点，下面按”为什么难 → 主流怎么做 → 进阶 OIT → 怎么选”讲。  根因：GBuffer 和 α 混合的三">
+<meta property="og:description" content="1">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-04T04:52:56.000Z">
-<meta property="article:modified_time" content="2026-07-22T15:42:56.006Z">
+<meta property="article:modified_time" content="2026-07-22T15:43:43.538Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-07-22 23:42:56" itemprop="dateModified" datetime="2026-07-22T23:42:56+08:00">2026-07-22</time>
+                <time title="Modified: 2026-07-22 23:43:43" itemprop="dateModified" datetime="2026-07-22T23:43:43+08:00">2026-07-22</time>
               </span>
 
           
@@ -195,7 +195,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <span id="more"></span>
+        <p>1</p>
+<span id="more"></span>
 <h1 id="如何在延迟渲染管线中渲染半透明物体"><a href="#如何在延迟渲染管线中渲染半透明物体" class="headerlink" title="如何在延迟渲染管线中渲染半透明物体"></a>如何在延迟渲染管线中渲染半透明物体</h1><p>延迟渲染（Deferred Shading）的天性跟半透明是矛盾的——GBuffer 每个像素只存<strong>最前面那一个</strong>表面的几何&#x2F;材质，而半透明需要”光线穿透多层”并逐层 α 混合，所以标准延迟管线没法直接吞半透明。工业界的解法本质是<strong>绕开或扩充</strong>这两点，下面按”为什么难 → 主流怎么做 → 进阶 OIT → 怎么选”讲。</p>
 <hr>
 <h2 id="根因：GBuffer-和-α-混合的三重冲突"><a href="#根因：GBuffer-和-α-混合的三重冲突" class="headerlink" title="根因：GBuffer 和 α 混合的三重冲突"></a>根因：GBuffer 和 α 混合的三重冲突</h2><ol>
