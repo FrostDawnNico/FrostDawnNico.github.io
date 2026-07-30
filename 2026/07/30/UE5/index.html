@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="代码实战">
+  <meta name="description" content="平行光染色  ·  全屏后处理  ·  几何描边  ·  插件后处理">
 <meta property="og:type" content="article">
-<meta property="og:title" content="UE5">
+<meta property="og:title" content="渲染管线自定义 Pass 实战">
 <meta property="og:url" content="https://frostdawnnico.github.io/2026/07/30/UE5/index.html">
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
-<meta property="og:description" content="代码实战">
+<meta property="og:description" content="平行光染色  ·  全屏后处理  ·  几何描边  ·  插件后处理">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-30T07:17:43.000Z">
-<meta property="article:modified_time" content="2026-07-30T07:18:05.090Z">
+<meta property="article:modified_time" content="2026-07-30T10:16:36.318Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>UE5 | FrostDawn's Blog</title>
+  <title>渲染管线自定义 Pass 实战 | FrostDawn's Blog</title>
   
 
 
@@ -164,7 +164,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          UE5
+          渲染管线自定义 Pass 实战
         </h1>
 
         <div class="post-meta">
@@ -175,7 +175,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-07-30 15:17:43 / Modified: 15:18:05" itemprop="dateCreated datePublished" datetime="2026-07-30T15:17:43+08:00">2026-07-30</time>
+              <time title="Created: 2026-07-30 15:17:43 / Modified: 18:16:36" itemprop="dateCreated datePublished" datetime="2026-07-30T15:17:43+08:00">2026-07-30</time>
             </span>
 
           
@@ -189,8 +189,37 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>代码实战</p>
+        <p>平行光染色  ·  全屏后处理  ·  几何描边  ·  插件后处理</p>
 <span id="more"></span>
+<h1 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h1><ol>
+<li><p>DirectionLight<br>▸ 本质 · 平行光染色<br>▸ 改引擎 &#x2F; 最小数据闭环<br>▸ UPROPERTY -&gt; Proxy -&gt; Shader<br>▸ 直射不透明面强制染红<br>▸ 扁平访问 Uniforms 大坑<br>▸ 仅 PC Deferred 直接光</p>
+</li>
+<li><p>SobelEdge<br>▸ 本质 · 全屏 Sobel 描边<br>▸ 引擎级 &#x2F; 后处理 Pass<br>▸ PostProcessing 前注入<br>▸ 临时 RT + 拷回场景色<br>▸ 不碰 ViewFamilyTexture<br>▸ 2 个 r.SobelEdge* CVar</p>
+</li>
+<li><p>OutlinePass<br>▸ 本质 · 两遍几何描边<br>▸ 引擎级 &#x2F; 新增网格 Pass<br>▸ 非 Nanite: 法线外扩外壳<br>▸ Nanite: 屏幕空间深度边<br>▸ 融合: 几何壳 OR 深度边<br>▸ 4 个 r.Outline.* CVar</p>
+</li>
+<li><p>Vignette<br>▸ 本质 · 暗角后处理<br>▸ 插件路线 B &#x2F; 零引擎改动<br>▸ Plugin + ViewExtension<br>▸ 订阅 AfterDOF 节点<br>▸ 可随工程带走 &#x2F; 易维护<br>▸ 4 个 r.Vignette* CVar</p>
+</li>
+</ol>
+<p>共同覆盖: UE 5.7.4 的 RDG 全屏 &#x2F; 网格 Pass 注入范式, 与统一的真实实现坑集。</p>
+<h1 id="平行光染色-改引擎-·-数据闭环"><a href="#平行光染色-改引擎-·-数据闭环" class="headerlink" title="平行光染色  (改引擎 · 数据闭环)"></a>平行光染色  (改引擎 · 数据闭环)</h1><h2 id="数据通路-5-跳"><a href="#数据通路-5-跳" class="headerlink" title="数据通路 (5 跳)"></a>数据通路 (5 跳)</h2><p>▸ UPROPERTY: bUseYumiColorfulLight<br>▸ FDirectionalLightSceneProxy (bool)<br>▸ FLightRenderParameters (uint32)<br>▸ FLightShaderParameters (uint32)<br>▸ DeferredLightUniforms<br>▸   -&gt; DeferredLightPixelShaders.usf<br><strong>▸ 完整闭环: 属性直达像素着色器</strong></p>
+<h2 id="实现-关键坑"><a href="#实现-关键坑" class="headerlink" title="实现 &amp; 关键坑"></a>实现 &amp; 关键坑</h2><p>▸ ApplyYumiColorfulLight helper<br>▸ standard &#x2F; Substrate &#x2F; hair 三处<br>▸ 染红: (Luminance,0,0) 保亮度<br><strong>▸ 扁平访问: DeferredLightUniforms.bXxx</strong><br>▸ 仅 PC Deferred 直接光生效<br>▸ 不改 Lumen&#x2F;体积雾&#x2F;天空&#x2F;半透明<br>▸ patch: YumiColorfulLight_DirectionalLight.patch</p>
+<h1 id="全屏-Sobel-后处理-引擎级"><a href="#全屏-Sobel-后处理-引擎级" class="headerlink" title="全屏 Sobel 后处理  (引擎级)"></a>全屏 Sobel 后处理  (引擎级)</h1><h2 id="文件结构-4-新-1-注入"><a href="#文件结构-4-新-1-注入" class="headerlink" title="文件结构 (4 新 + 1 注入)"></a>文件结构 (4 新 + 1 注入)</h2><p>▸ SobelEdgePS.usf<br>▸   3x3 Sobel 梯度 (感知亮度)<br>▸ SobelEdgePass.h &#x2F; .cpp<br>▸   FSobelEdgePS + AddSobelEdgePass<br>▸ DeferredShadingRenderer.cpp<br>▸   顶部 include + PostProcessing 前调用<br>▸ 自建 LogSobelEdge 日志类别</p>
+<h2 id="流程-关键坑"><a href="#流程-关键坑" class="headerlink" title="流程 &amp; 关键坑"></a>流程 &amp; 关键坑</h2><p>▸ 读场景色 -&gt; 全屏 Sobel<br>▸   -&gt; 临时 RT -&gt; 拷回场景色<br>▸ CVar: r.SobelEdge (0)<br>▸ CVar: r.SobelEdgeDebug (0&#x2F;1&#x2F;2)<br><strong>▸ 不碰 ViewFamilyTexture &#x3D; backbuffer<br>▸ UV &#x3D; SV_Position.xy * TexelSize 反算<br>▸ 清除用 FClearValueBinding::Transparent</strong></p>
+<h1 id="几何两遍描边-引擎级"><a href="#几何两遍描边-引擎级" class="headerlink" title="几何两遍描边  (引擎级)"></a>几何两遍描边  (引擎级)</h1><h2 id="本质-目标"><a href="#本质-目标" class="headerlink" title="本质 &amp; 目标"></a>本质 &amp; 目标</h2><p>▸ 卡通风格两遍描边<br>▸ 非 Nanite 网格: 几何外壳<br>▸   · 顶点沿法线外扩<br>▸   · 正面剔除 CM_CW<br>▸   · 纯黑写入独立轮廓贴图<br>▸ Nanite 网格: 融合阶段<br>▸   · 屏幕空间深度边缘补描</p>
+<h2 id="执行流程-4-步"><a href="#执行流程-4-步" class="headerlink" title="执行流程 (4 步)"></a>执行流程 (4 步)</h2><p>▸ 1 · 新增 EMeshPass::OutlinePass<br>▸ 2 · FOutlinePassMeshProcessor<br>▸     法线外扩 VS + 纯黑 PS<br>▸ 3 · RenderOutlinePass<br>▸     写 OutlineTexture (共享场景深度做遮挡)<br>▸ 4 · RenderOutlineBlendPass<br>▸     几何壳 OR 深度边 -&gt; 写回 SceneColor</p>
+<h1 id="注入点与踩坑清单"><a href="#注入点与踩坑清单" class="headerlink" title="注入点与踩坑清单"></a>注入点与踩坑清单</h1><h2 id="注入点-DeferredShadingRenderer-cpp"><a href="#注入点-DeferredShadingRenderer-cpp" class="headerlink" title="注入点 (DeferredShadingRenderer.cpp)"></a>注入点 (DeferredShadingRenderer.cpp)</h2><p>▸ RenderBasePass 之后<br>▸   -&gt; RenderOutlinePass<br>▸     只读共享场景深度, 写轮廓贴图<br>▸ RenderLights 之后<br>▸   -&gt; RenderOutlineBlendPass<br>▸     融合结果写回 SceneColor<br>▸ 注册: REGISTER_MESHPASSPROCESSOR_AND_PSOCOLLECTOR</p>
+<h2 id="关键坑-4-个-CVar"><a href="#关键坑-4-个-CVar" class="headerlink" title="关键坑 &amp; 4 个 CVar"></a>关键坑 &amp; 4 个 CVar</h2><p>▸ CVar: r.Outline.Enabled (0)<br>▸ CVar: r.Outline.Thickness (0.05)<br>▸ CVar: r.Outline.Intensity (1.0)<br>▸ CVar: r.Outline.EdgeThreshold<br><strong>▸ 纹理每次必须 Clear (否则 RDG 报未写入)<br>▸ Nanite 不进 AddMeshBatch<br>▸ 半透明用 IsTranslucentBlendMode 判断</strong></p>
+<h1 id="暗角后处理-插件路线-B"><a href="#暗角后处理-插件路线-B" class="headerlink" title="暗角后处理  (插件路线 B)"></a>暗角后处理  (插件路线 B)</h1><h2 id="插件结构-路线-B"><a href="#插件结构-路线-B" class="headerlink" title="插件结构 (路线 B)"></a>插件结构 (路线 B)</h2><p>▸ VignettePostProcess.uplugin<br>▸   LoadingPhase &#x3D; PostConfigInit<br>▸ Source&#x2F;…&#x2F;VignettePostProcessModule.cpp<br>▸   注册 &#x2F;VignettePostProcess 着色器目录<br>▸ VignetteViewExtension.h&#x2F;.cpp<br>▸   订阅 AfterDOF 节点回调<br>▸ VignettePass + Vignette.usf</p>
+<h2 id="暗角公式-4-CVar"><a href="#暗角公式-4-CVar" class="headerlink" title="暗角公式 &amp; 4 CVar"></a>暗角公式 &amp; 4 CVar</h2><p>▸ Factor &#x3D; 1 - Intensity *<br>▸   smoothstep(R, R+S, Dist)<br>▸ Dist &#x3D; length(UV-0.5)*2<br>▸ CVar: *.Enable &#x2F; Intensity (0.35)<br>▸ CVar: *.Radius (0.7) &#x2F; Smoothness (0.45)<br><strong>▸ 零引擎改动 · 随工程带走</strong></p>
+<h1 id="八条共同经验"><a href="#八条共同经验" class="headerlink" title="八条共同经验"></a>八条共同经验</h1><h2 id="SV-Position-反算-UV"><a href="#SV-Position-反算-UV" class="headerlink" title="SV_Position 反算 UV"></a>SV_Position 反算 UV</h2><p>全屏 PS 的 VS 只输出 SV_Position, 必须 .xy*TexelSize 反算, 不能声明 TEXCOORD0</p>
+<h2 id="临时-RT-拷贝回写"><a href="#临时-RT-拷贝回写" class="headerlink" title="临时 RT + 拷贝回写"></a>临时 RT + 拷贝回写</h2><p>同纹理采样又写 &#x3D; 反馈危险; 走临时 RT + AddCopyTexturePass 拷回</p>
+<h2 id="Transparent-清除"><a href="#Transparent-清除" class="headerlink" title="Transparent 清除"></a>Transparent 清除</h2><p>临时 RT 用 FClearValueBinding::Transparent, 而非 None</p>
+<h2 id="不碰-backbuffer"><a href="#不碰-backbuffer" class="headerlink" title="不碰 backbuffer"></a>不碰 backbuffer</h2><p>ViewFamilyTexture 即呈现目标, 重定向只会把画面引向屏外</p>
+<h2 id="PostConfigInit"><a href="#PostConfigInit" class="headerlink" title="PostConfigInit"></a>PostConfigInit</h2><p>插件着色器须在该阶段注册, NewExtension 推迟到 OnPostEngineInit</p>
+<h2 id="绝对虚拟路径"><a href="#绝对虚拟路径" class="headerlink" title="绝对虚拟路径"></a>绝对虚拟路径</h2><p>着色器 include 用 &#x2F;Engine&#x2F;Private&#x2F;Common.ush, 不依赖相对路径</p>
+<h2 id="属性-Shader-通路"><a href="#属性-Shader-通路" class="headerlink" title="属性 -&gt; Shader 通路"></a>属性 -&gt; Shader 通路</h2><p>UPROPERTY 经 Proxy-&gt;FLightRenderParameters-&gt;FLightShaderParameters-&gt;usf 透传</p>
+<h2 id="扁平访问-Uniforms"><a href="#扁平访问-Uniforms" class="headerlink" title="扁平访问 Uniforms"></a>扁平访问 Uniforms</h2><p>SHADER_PARAMETER_STRUCT_INCLUDE 后在 HLSL 扁平读 DeferredLightUniforms.bXxx</p>
 
     </div>
 
@@ -268,6 +297,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E8%A7%88"><span class="nav-number">1.</span> <span class="nav-text">总览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B3%E8%A1%8C%E5%85%89%E6%9F%93%E8%89%B2-%E6%94%B9%E5%BC%95%E6%93%8E-%C2%B7-%E6%95%B0%E6%8D%AE%E9%97%AD%E7%8E%AF"><span class="nav-number">2.</span> <span class="nav-text">平行光染色  (改引擎 · 数据闭环)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%80%9A%E8%B7%AF-5-%E8%B7%B3"><span class="nav-number">2.1.</span> <span class="nav-text">数据通路 (5 跳)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0-%E5%85%B3%E9%94%AE%E5%9D%91"><span class="nav-number">2.2.</span> <span class="nav-text">实现 &amp; 关键坑</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%A8%E5%B1%8F-Sobel-%E5%90%8E%E5%A4%84%E7%90%86-%E5%BC%95%E6%93%8E%E7%BA%A7"><span class="nav-number">3.</span> <span class="nav-text">全屏 Sobel 后处理  (引擎级)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84-4-%E6%96%B0-1-%E6%B3%A8%E5%85%A5"><span class="nav-number">3.1.</span> <span class="nav-text">文件结构 (4 新 + 1 注入)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B-%E5%85%B3%E9%94%AE%E5%9D%91"><span class="nav-number">3.2.</span> <span class="nav-text">流程 &amp; 关键坑</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%BD%95%E4%B8%A4%E9%81%8D%E6%8F%8F%E8%BE%B9-%E5%BC%95%E6%93%8E%E7%BA%A7"><span class="nav-number">4.</span> <span class="nav-text">几何两遍描边  (引擎级)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E8%B4%A8-%E7%9B%AE%E6%A0%87"><span class="nav-number">4.1.</span> <span class="nav-text">本质 &amp; 目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B-4-%E6%AD%A5"><span class="nav-number">4.2.</span> <span class="nav-text">执行流程 (4 步)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E7%82%B9%E4%B8%8E%E8%B8%A9%E5%9D%91%E6%B8%85%E5%8D%95"><span class="nav-number">5.</span> <span class="nav-text">注入点与踩坑清单</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E7%82%B9-DeferredShadingRenderer-cpp"><span class="nav-number">5.1.</span> <span class="nav-text">注入点 (DeferredShadingRenderer.cpp)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%9D%91-4-%E4%B8%AA-CVar"><span class="nav-number">5.2.</span> <span class="nav-text">关键坑 &amp; 4 个 CVar</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9A%97%E8%A7%92%E5%90%8E%E5%A4%84%E7%90%86-%E6%8F%92%E4%BB%B6%E8%B7%AF%E7%BA%BF-B"><span class="nav-number">6.</span> <span class="nav-text">暗角后处理  (插件路线 B)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E4%BB%B6%E7%BB%93%E6%9E%84-%E8%B7%AF%E7%BA%BF-B"><span class="nav-number">6.1.</span> <span class="nav-text">插件结构 (路线 B)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9A%97%E8%A7%92%E5%85%AC%E5%BC%8F-4-CVar"><span class="nav-number">6.2.</span> <span class="nav-text">暗角公式 &amp; 4 CVar</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AB%E6%9D%A1%E5%85%B1%E5%90%8C%E7%BB%8F%E9%AA%8C"><span class="nav-number">7.</span> <span class="nav-text">八条共同经验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SV-Position-%E5%8F%8D%E7%AE%97-UV"><span class="nav-number">7.1.</span> <span class="nav-text">SV_Position 反算 UV</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%B4%E6%97%B6-RT-%E6%8B%B7%E8%B4%9D%E5%9B%9E%E5%86%99"><span class="nav-number">7.2.</span> <span class="nav-text">临时 RT + 拷贝回写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Transparent-%E6%B8%85%E9%99%A4"><span class="nav-number">7.3.</span> <span class="nav-text">Transparent 清除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E7%A2%B0-backbuffer"><span class="nav-number">7.4.</span> <span class="nav-text">不碰 backbuffer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PostConfigInit"><span class="nav-number">7.5.</span> <span class="nav-text">PostConfigInit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%9D%E5%AF%B9%E8%99%9A%E6%8B%9F%E8%B7%AF%E5%BE%84"><span class="nav-number">7.6.</span> <span class="nav-text">绝对虚拟路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%9E%E6%80%A7-Shader-%E9%80%9A%E8%B7%AF"><span class="nav-number">7.7.</span> <span class="nav-text">属性 -&gt; Shader 通路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%81%E5%B9%B3%E8%AE%BF%E9%97%AE-Uniforms"><span class="nav-number">7.8.</span> <span class="nav-text">扁平访问 Uniforms</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
