@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="one step per day | each effort counts">
+  <meta name="description" content="代码逐行解析">
 <meta property="og:type" content="article">
-<meta property="og:title" content="UE7">
+<meta property="og:title" content="千人千面代码解析">
 <meta property="og:url" content="https://frostdawnnico.github.io/2026/08/03/UE7/index.html">
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
-<meta property="og:description" content="one step per day | each effort counts">
+<meta property="og:description" content="代码逐行解析">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-08-03T14:43:17.000Z">
-<meta property="article:modified_time" content="2026-08-03T14:43:17.762Z">
+<meta property="article:modified_time" content="2026-08-28T09:00:53.452Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>UE7 | FrostDawn's Blog</title>
+  <title>千人千面代码解析 | FrostDawn's Blog</title>
   
 
 
@@ -164,7 +164,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          UE7
+          千人千面代码解析
         </h1>
 
         <div class="post-meta">
@@ -176,6 +176,13 @@
 
               <time title="Created: 2026-08-03 22:43:17" itemprop="dateCreated datePublished" datetime="2026-08-03T22:43:17+08:00">2026-08-03</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-08-28 17:00:53" itemprop="dateModified" datetime="2026-08-28T17:00:53+08:00">2026-08-28</time>
+              </span>
 
           
 
@@ -188,7 +195,53 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <p>代码逐行解析</p>
+<span id="more"></span>
+
+<h1 id="ACharacter-cpp"><a href="#ACharacter-cpp" class="headerlink" title="ACharacter.cpp"></a>ACharacter.cpp</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">   <span class="comment">// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) </span></span><br><span class="line"><span class="comment">// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)</span></span><br><span class="line"></span><br><span class="line">AppearanceComponent = <span class="built_in">CreateDefaultSubobject</span>&lt;UCharacterAppearanceComponent&gt;(<span class="built_in">TEXT</span>(<span class="string">&quot;AppearanceComponent&quot;</span>));</span><br><span class="line">AppearanceComponent-&gt;BodyComponent = <span class="built_in">GetMesh</span>();</span><br><span class="line">AppearanceComponent-&gt;bApplyOnBeginPlay = <span class="literal">false</span>;</span><br><span class="line">AppearanceComponent-&gt;InitialSpec = <span class="built_in">MakeMannequinSpec</span>(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">AppearanceReplicationComponent =</span><br><span class="line">	<span class="built_in">CreateDefaultSubobject</span>&lt;UCharacterAppearanceReplicationComponent&gt;(<span class="built_in">TEXT</span>(<span class="string">&quot;AppearanceReplicationComponent&quot;</span>));</span><br><span class="line">AppearanceReplicationComponent-&gt;AppearanceComponent = AppearanceComponent;</span><br></pre></td></tr></table></figure>
+<p>主要目的是<strong>初始化角色的外观（Appearance）系统，并设置其在网络环境下的复制（Replication）功能</strong>。</p>
+<p>下面逐行详细解释：</p>
+<h3 id="1-创建外观组件"><a href="#1-创建外观组件" class="headerlink" title="1. 创建外观组件"></a>1. 创建外观组件</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AppearanceComponent = <span class="built_in">CreateDefaultSubobject</span>&lt;UCharacterAppearanceComponent&gt;(<span class="built_in">TEXT</span>(<span class="string">&quot;AppearanceComponent&quot;</span>));</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>CreateDefaultSubobject</code>：这是 UE 中用于在构造函数里安全地创建组件（或 UObject 对象）的标准方法。</li>
+<li>这里创建了一个类型为 <code>UCharacterAppearanceComponent</code> 的组件，并命名为 <code>&quot;AppearanceComponent&quot;</code>。</li>
+<li>这个组件专门负责管理角色的外观（比如更换皮肤、装备、材质等）。</li>
+</ul>
+<h3 id="2-绑定角色的骨骼网格体"><a href="#2-绑定角色的骨骼网格体" class="headerlink" title="2. 绑定角色的骨骼网格体"></a>2. 绑定角色的骨骼网格体</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AppearanceComponent-&gt;BodyComponent = <span class="built_in">GetMesh</span>();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>GetMesh()</code> 是 <code>ACharacter</code> 类自带的方法，返回角色的主骨骼网格体组件（<code>SkeletalMeshComponent</code>）。</li>
+<li>这行代码告诉外观组件：“请把角色的默认网格体作为身体（Body）来应用外观变化”。</li>
+</ul>
+<h3 id="3-控制外观的应用时机"><a href="#3-控制外观的应用时机" class="headerlink" title="3. 控制外观的应用时机"></a>3. 控制外观的应用时机</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AppearanceComponent-&gt;bApplyOnBeginPlay = <span class="literal">false</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>bApplyOnBeginPlay</code> 是一个布尔值变量，从命名来看，它控制着组件是否在游戏开始（<code>BeginPlay</code>）时自动应用外观。</li>
+<li>这里设为 <code>false</code>，意味着<strong>不在游戏开始时自动应用</strong>。通常这样做是为了等待网络复制完成，或者等待外部逻辑（比如从存档&#x2F;服务器加载数据后）手动触发外观更新。</li>
+</ul>
+<h3 id="4-设置初始外观规格"><a href="#4-设置初始外观规格" class="headerlink" title="4. 设置初始外观规格"></a>4. 设置初始外观规格</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AppearanceComponent-&gt;InitialSpec = <span class="built_in">MakeMannequinSpec</span>(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>InitialSpec</code> 应该是外观组件里的一个属性，用来存储“初始外观配置&#x2F;规格”（Specification）。</li>
+<li><code>MakeMannequinSpec(false)</code> 是一个自定义函数，用于生成一个基于 UE 经典小白人（Mannequin）的默认外观配置。<code>false</code> 参数可能代表性别（男）、是否使用某个特定套装等。</li>
+<li>这样即使没有外部数据，角色也有一个默认的兜底外观。</li>
+</ul>
+<h3 id="5-创建外观复制组件（网络同步）"><a href="#5-创建外观复制组件（网络同步）" class="headerlink" title="5. 创建外观复制组件（网络同步）"></a>5. 创建外观复制组件（网络同步）</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AppearanceReplicationComponent =</span><br><span class="line">    <span class="built_in">CreateDefaultSubobject</span>&lt;UCharacterAppearanceReplicationComponent&gt;(<span class="built_in">TEXT</span>(<span class="string">&quot;AppearanceReplicationComponent&quot;</span>));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建了一个名为 <code>&quot;AppearanceReplicationComponent&quot;</code> 的组件，类型是 <code>UCharacterAppearanceReplicationComponent</code>。</li>
+<li>从名字可以看出，这个组件专门负责<strong>网络复制</strong>。在多人游戏中，如果一个玩家换了外观，需要把这个变化同步给其他玩家，这个组件就是干这个的。</li>
+</ul>
+<h3 id="6-关联外观组件与复制组件"><a href="#6-关联外观组件与复制组件" class="headerlink" title="6. 关联外观组件与复制组件"></a>6. 关联外观组件与复制组件</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AppearanceReplicationComponent-&gt;AppearanceComponent = AppearanceComponent;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将复制组件的 <code>AppearanceComponent</code> 指针指向刚才创建的外观组件。</li>
+<li>这样复制组件就知道自己需要监听和同步哪个外观组件的数据了。</li>
+</ul>
+<hr>
+<h3 id="总结：整体设计意图"><a href="#总结：整体设计意图" class="headerlink" title="总结：整体设计意图"></a>总结：整体设计意图</h3><p>这段代码构建了一个<strong>解耦的角色外观系统</strong>：</p>
+<ol>
+<li><strong><code>UCharacterAppearanceComponent</code></strong> 负责“做什么”——具体如何把外观（材质、模型等）应用到角色的网格上。</li>
+<li><strong><code>UCharacterAppearanceReplicationComponent</code></strong> 负责“同步”——处理多人游戏下的网络数据传输。</li>
+<li>通过把 <code>bApplyOnBeginPlay</code> 设为 <code>false</code>，代码将控制权交给了外部或复制组件，确保在合适的时机（比如数据从服务器同步到位后）再渲染外观，避免出现穿帮或闪烁。</li>
+</ol>
+<p>注释里还提到，骨骼网格体和动画蓝图是在蓝图（Blueprint）里设置的，这是为了遵循 UE 的最佳实践：<strong>C++ 只写逻辑，不硬编码引用具体资源</strong>，方便美术和策划在编辑器里灵活调整。</p>
+
     </div>
 
     
@@ -265,6 +318,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ACharacter-cpp"><span class="nav-number">1.</span> <span class="nav-text">ACharacter.cpp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA%E5%A4%96%E8%A7%82%E7%BB%84%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">1. 创建外观组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%BB%91%E5%AE%9A%E8%A7%92%E8%89%B2%E7%9A%84%E9%AA%A8%E9%AA%BC%E7%BD%91%E6%A0%BC%E4%BD%93"><span class="nav-number">1.2.</span> <span class="nav-text">2. 绑定角色的骨骼网格体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%8E%A7%E5%88%B6%E5%A4%96%E8%A7%82%E7%9A%84%E5%BA%94%E7%94%A8%E6%97%B6%E6%9C%BA"><span class="nav-number">1.3.</span> <span class="nav-text">3. 控制外观的应用时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%AE%BE%E7%BD%AE%E5%88%9D%E5%A7%8B%E5%A4%96%E8%A7%82%E8%A7%84%E6%A0%BC"><span class="nav-number">1.4.</span> <span class="nav-text">4. 设置初始外观规格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%88%9B%E5%BB%BA%E5%A4%96%E8%A7%82%E5%A4%8D%E5%88%B6%E7%BB%84%E4%BB%B6%EF%BC%88%E7%BD%91%E7%BB%9C%E5%90%8C%E6%AD%A5%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">5. 创建外观复制组件（网络同步）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%85%B3%E8%81%94%E5%A4%96%E8%A7%82%E7%BB%84%E4%BB%B6%E4%B8%8E%E5%A4%8D%E5%88%B6%E7%BB%84%E4%BB%B6"><span class="nav-number">1.6.</span> <span class="nav-text">6. 关联外观组件与复制组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A%E6%95%B4%E4%BD%93%E8%AE%BE%E8%AE%A1%E6%84%8F%E5%9B%BE"><span class="nav-number">1.7.</span> <span class="nav-text">总结：整体设计意图</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
