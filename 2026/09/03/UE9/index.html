@@ -28,7 +28,7 @@
 <meta property="og:description" content="分槽换装">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-09-03T06:39:54.000Z">
-<meta property="article:modified_time" content="2026-09-03T06:40:55.526Z">
+<meta property="article:modified_time" content="2026-09-08T04:07:47.988Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -173,10 +173,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2026-09-03 14:39:54 / Modified: 14:40:55" itemprop="dateCreated datePublished" datetime="2026-09-03T14:39:54+08:00">2026-09-03</time>
+              <time title="Created: 2026-09-03 14:39:54" itemprop="dateCreated datePublished" datetime="2026-09-03T14:39:54+08:00">2026-09-03</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-09-08 12:07:47" itemprop="dateModified" datetime="2026-09-08T12:07:47+08:00">2026-09-08</time>
+              </span>
 
           
 
@@ -202,7 +208,21 @@
 <p>Python脚本</p>
 <p>强约束</p>
 <p>关键修复（OFF不进Spec）</p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h2 id="改造"><a href="#改造" class="headerlink" title="改造"></a>改造</h2>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h2 id="改造"><a href="#改造" class="headerlink" title="改造"></a>改造</h2><h1 id="python脚本"><a href="#python脚本" class="headerlink" title="python脚本"></a>python脚本</h1><p>不用cpp，避免crush直接崩溃（指针崩溃直接crush）</p>
+<p>使用python插件</p>
+<p>将slate那套注册</p>
+<p>button相关用cpp包装进行暴露</p>
+<p>python拿到就可以去调用相应的ui了</p>
+<h2 id="源码重点"><a href="#源码重点" class="headerlink" title="源码重点"></a>源码重点</h2><p>import unreal</p>
+<p>去ue官网查看api</p>
+<p>判断资产是否存在</p>
+<p>如果为空 raise RuntimeError</p>
+<p>cpp则会直接报错退出</p>
+<p>好处很明显</p>
+<p>ue暴露CharacterAppearanceCatalog类</p>
+<p>受保护的数据通过反射的方式获取</p>
+<p>catalog.set_editor_property(“属性名”, 值)</p>
+
     </div>
 
     
@@ -282,7 +302,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E9%80%A0"><span class="nav-number">2.</span> <span class="nav-text">改造</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E9%80%A0"><span class="nav-number">2.</span> <span class="nav-text">改造</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#python%E8%84%9A%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">python脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E9%87%8D%E7%82%B9"><span class="nav-number">3.1.</span> <span class="nav-text">源码重点</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
