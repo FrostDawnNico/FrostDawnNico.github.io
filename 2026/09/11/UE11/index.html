@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="收集必须熟练的知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UE基础知识巩固">
+<meta property="og:url" content="https://frostdawnnico.github.io/2026/09/11/UE11/index.html">
+<meta property="og:site_name" content="FrostDawn&#39;s Blog">
+<meta property="og:description" content="收集必须熟练的知识">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-09-11T06:05:09.000Z">
+<meta property="article:modified_time" content="2026-09-11T06:08:52.726Z">
+<meta property="article:author" content="Nico Zhong">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://frostdawnnico.github.io/2026/09/11/UE11/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>UE基础知识巩固 | FrostDawn's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">FrostDawn's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Nico's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/09/11/UE11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Nico Zhong">
+      <meta itemprop="description" content="one step per day | each effort counts">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FrostDawn's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          UE基础知识巩固
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2026-09-11 14:05:09 / Modified: 14:08:52" itemprop="dateCreated datePublished" datetime="2026-09-11T14:05:09+08:00">2026-09-11</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>收集必须熟练的知识</p>
+<span id="more"></span>
+<h1 id="U…等等变量名"><a href="#U…等等变量名" class="headerlink" title="U…等等变量名"></a>U…等等变量名</h1><p>这是 Unreal Engine（虚幻引擎）自创立以来一直严格遵守的<strong>强制编码规范和命名约定</strong>（由 Epic Games 制定）。</p>
+<p>简单来说：<strong>前缀字母代表了该类型的“内存管理方式”和“继承体系”</strong>，让程序员一眼就能看出这个变量或类型在引擎中是如何运作的。</p>
+<p>下面是详细的拆解，并结合你提供的代码进行说明：</p>
+<h3 id="1-常见前缀及其含义"><a href="#1-常见前缀及其含义" class="headerlink" title="1. 常见前缀及其含义"></a>1. 常见前缀及其含义</h3><h4 id="U-——-UObject-体系（Unreal-Object）"><a href="#U-——-UObject-体系（Unreal-Object）" class="headerlink" title="U —— UObject 体系（Unreal Object）"></a><code>U</code> —— UObject 体系（Unreal Object）</h4><ul>
+<li><strong>含义</strong>：代表这个类<strong>继承自 <code>UObject</code></strong>。</li>
+<li><strong>特点</strong>：受引擎**垃圾回收（GC）**管理，支持反射、序列化、蓝图交互等核心功能。</li>
+<li><strong>你的代码中的例子</strong>：<ul>
+<li><code>UCharacterAppearanceComponent</code>（继承自 <code>UActorComponent</code> -&gt; <code>UObject</code>）</li>
+<li><code>UCharacterAppearanceCatalog</code></li>
+<li><code>USkeletalMeshComponent</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="A-——-Actor-体系（Actor）"><a href="#A-——-Actor-体系（Actor）" class="headerlink" title="A —— Actor 体系（Actor）"></a><code>A</code> —— Actor 体系（Actor）</h4><ul>
+<li><strong>含义</strong>：代表这个类<strong>继承自 <code>AActor</code></strong>。</li>
+<li><strong>特点</strong>：Actor 本质上也是 <code>UObject</code>（所以也是 <code>U</code> 体系），但因为 Actor 是可以被直接放入关卡中的“实体”，所以特地用 <code>A</code> 来区分。</li>
+<li><strong>例子</strong>：<code>ACharacter</code>, <code>APawn</code>（你的代码里没直接用，但 <code>BodyComponent</code> 挂的通常是 Actor 上的组件）。</li>
+</ul>
+<h4 id="F-——-基础-框架类型（Framework-Plain-Old-Data）"><a href="#F-——-基础-框架类型（Framework-Plain-Old-Data）" class="headerlink" title="F —— 基础&#x2F;框架类型（Framework &#x2F; Plain Old Data）"></a><code>F</code> —— 基础&#x2F;框架类型（Framework &#x2F; Plain Old Data）</h4><ul>
+<li><strong>含义</strong>：代表<strong>非 <code>UObject</code> 的普通 C++ 类或结构体</strong>。它不受垃圾回收管理，通常作为数据容器、工具类或参数结构体存在。</li>
+<li><strong>特点</strong>：轻量级，需要自己管理内存（或借助智能指针&#x2F;容器）。</li>
+<li><strong>你的代码中的例子</strong>：<ul>
+<li><code>FCharacterMeshSlotBinding</code>（这是一个 <code>struct</code>，用 <code>F</code> 开头）</li>
+<li><code>FCharacterAppearanceSpec</code>（从名字看是一个数据规格结构体）</li>
+<li><code>FResolvedCharacterAppearance</code>（解析后的外观数据）</li>
+<li><code>FStreamableHandle</code>（资源加载句柄）</li>
+<li><code>FName</code>, <code>FString</code>（引擎最基础的类型也是 <code>F</code> 开头）</li>
+</ul>
+</li>
+</ul>
+<h4 id="E-——-枚举（Enumeration）"><a href="#E-——-枚举（Enumeration）" class="headerlink" title="E —— 枚举（Enumeration）"></a><code>E</code> —— 枚举（Enumeration）</h4><ul>
+<li><strong>含义</strong>：代表<strong>枚举类型</strong>。</li>
+<li><strong>你的代码中的例子</strong>：<ul>
+<li><code>ECharacterAppearanceAssemblyState</code>（外观装配状态枚举）</li>
+</ul>
+</li>
+</ul>
+<h4 id="I-——-接口（Interface）"><a href="#I-——-接口（Interface）" class="headerlink" title="I —— 接口（Interface）"></a><code>I</code> —— 接口（Interface）</h4><ul>
+<li><strong>含义</strong>：代表<strong>抽象接口类</strong>（通常配合 <code>UINTERFACE</code> 宏使用）。</li>
+<li><strong>例子</strong>：<code>IAssetRegistry</code>, <code>IAnimClassInterface</code>。</li>
+</ul>
+<h4 id="T-——-模板（Template）"><a href="#T-——-模板（Template）" class="headerlink" title="T —— 模板（Template）"></a><code>T</code> —— 模板（Template）</h4><ul>
+<li><strong>含义</strong>：代表<strong>模板类</strong>。</li>
+<li><strong>你的代码中的例子</strong>：<ul>
+<li><code>TObjectPtr&lt;USkeletalMeshComponent&gt;</code>（UE5 推荐使用的带 GC 感知的指针容器）</li>
+<li><code>TSharedPtr&lt;FStreamableHandle&gt;</code></li>
+<li><code>TMap&lt;TWeakObjectPtr&lt;USkeletalMeshComponent&gt;, ...&gt;</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="b-——-布尔变量（boolean）"><a href="#b-——-布尔变量（boolean）" class="headerlink" title="b —— 布尔变量（boolean）"></a><code>b</code> —— 布尔变量（boolean）</h4><ul>
+<li><strong>含义</strong>：所有 <code>bool</code> 类型的变量，前缀必须是 <code>b</code>。</li>
+<li><strong>你的代码中的例子</strong>：<ul>
+<li><code>bApplyOnBeginPlay</code></li>
+<li><code>bMorphTargetsEnabled</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-为什么-Epic-要强制这样做？"><a href="#2-为什么-Epic-要强制这样做？" class="headerlink" title="2. 为什么 Epic 要强制这样做？"></a>2. 为什么 Epic 要强制这样做？</h3><ol>
+<li><strong>一眼识别内存管理</strong>：看到 <code>U</code> 就知道它归垃圾回收器管，不用担心手动 <code>delete</code>；看到 <code>F</code> 就知道它是普通 C++ 对象，需要留意它的生命周期（是在栈上、还是被 <code>TSharedPtr</code> 管理，或者是作为 <code>UObject</code> 的成员变量由 <code>UPROPERTY</code> 标记追踪）。</li>
+<li><strong>避免命名冲突</strong>：Windows API 或其他第三方库经常用常见的类名。加上 <code>U</code> 或 <code>F</code> 可以彻底避免冲突（比如你自己写一个 <code>class Object</code> 会跟 <code>UObject</code> 冲突，但写成 <code>FMyObject</code> 就完全没问题）。</li>
+<li><strong>UHT 代码生成的配合</strong>：虽然 UHT 主要通过宏（<code>UCLASS</code>, <code>USTRUCT</code>）来识别类型，但统一的前缀让生成的代码和手写代码在风格上高度一致，减少了混乱。</li>
+<li><strong>可读性</strong>：当你看到一行代码 <code>FCharacterAppearanceSpec Spec;</code> 时，你立刻知道这是一个轻量级的数据结构，不涉及蓝图或网络复制；而 <code>UCharacterAppearanceCatalog* Catalog;</code> 则是一个可以被蓝图引用、会被 GC 追踪的资源。</li>
+</ol>
+<h3 id="3-总结你代码里的“字母表”"><a href="#3-总结你代码里的“字母表”" class="headerlink" title="3. 总结你代码里的“字母表”"></a>3. 总结你代码里的“字母表”</h3><table>
+<thead>
+<tr>
+<th align="left">前缀</th>
+<th align="left">类型</th>
+<th align="left">你的代码实例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>U</strong></td>
+<td align="left">UObject 派生类</td>
+<td align="left"><code>UCharacterAppearanceComponent</code>, <code>UCatalog</code></td>
+</tr>
+<tr>
+<td align="left"><strong>F</strong></td>
+<td align="left">结构体 &#x2F; 普通类</td>
+<td align="left"><code>FCharacterMeshSlotBinding</code>, <code>FResolvedCharacterMorph</code></td>
+</tr>
+<tr>
+<td align="left"><strong>E</strong></td>
+<td align="left">枚举</td>
+<td align="left"><code>ECharacterAppearanceAssemblyState</code></td>
+</tr>
+<tr>
+<td align="left"><strong>T</strong></td>
+<td align="left">模板容器</td>
+<td align="left"><code>TObjectPtr</code>, <code>TArray</code>, <code>TMap</code></td>
+</tr>
+<tr>
+<td align="left"><strong>b</strong></td>
+<td align="left">布尔变量</td>
+<td align="left"><code>bApplyOnBeginPlay</code>, <code>bMorphTargetsEnabled</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="TObjectPtr-和传统的-UPROPERTY-裸指针的区别"><a href="#TObjectPtr-和传统的-UPROPERTY-裸指针的区别" class="headerlink" title="TObjectPtr 和传统的 UPROPERTY() 裸指针的区别"></a>TObjectPtr 和传统的 UPROPERTY() 裸指针的区别</h1><p>在 Unreal Engine 5 中，<code>TObjectPtr</code> 是 Epic 官方<strong>推荐用来替代传统 <code>UObject*</code> 裸指针</strong>的新方案（你的代码中 <code>BodyComponent</code> 和 <code>Catalog</code> 都已经用上了）。</p>
+<p>简单来说：<strong><code>TObjectPtr</code> 是一个具有“间接寻址”能力的智能指针包装器，它在保持和裸指针几乎相同性能的同时，提供了更好的安全性、资源重定向支持和异步加载兼容性。</strong></p>
+<p>下面是它们的核心区别和 <code>TObjectPtr</code> 的设计初衷：</p>
+<h3 id="1-内存存储方式：直接-vs-间接"><a href="#1-内存存储方式：直接-vs-间接" class="headerlink" title="1. 内存存储方式：直接 vs 间接"></a>1. 内存存储方式：直接 vs 间接</h3><ul>
+<li><strong>传统裸指针 (<code>UObject*</code>)</strong>：<br>它直接存储对象在内存中的真实地址。如果对象因为某种原因（比如资源重定向、热重载、未来的 GC 压缩）在内存中移动了，所有指向它的裸指针都会变成“野指针”（除非引擎手动去遍历修改所有引用，这非常昂贵）。</li>
+<li><strong><code>TObjectPtr</code></strong>：<br>它内部并不直接存内存地址，而是存一个<strong>句柄（Handle）或间接引用</strong>（在 UE5 中通常是 <code>FObjectHandle</code>）。这个句柄就像是一个“指针的指针”或者“对象 ID”。当对象在内存中移动或尚未加载时，句柄可以保持有效，并在需要访问时（通过 <code>-&gt;</code> 或 <code>*</code> 运算符）自动解析出最新的真实地址。</li>
+</ul>
+<h3 id="2-资源重定向与异步加载"><a href="#2-资源重定向与异步加载" class="headerlink" title="2. 资源重定向与异步加载"></a>2. 资源重定向与异步加载</h3><ul>
+<li><strong>传统裸指针</strong>：<br>如果一个资源被移动到另一个文件夹，或者依赖的资源是异步加载的，裸指针在对象还没就绪时只能是个 <code>nullptr</code>，并且在重定向发生时可能丢失引用。</li>
+<li><strong><code>TObjectPtr</code></strong>：<br>它天生支持 Unreal 的**对象重定向（Redirector）**系统。即使资源在硬盘上移动了，或者对象还在异步加载中，<code>TObjectPtr</code> 也能通过内部的 <code>FObjectRef</code>（包含包 ID 和对象路径）保持正确的关联，等对象加载完毕后自动“连上”。这对于你代码中使用的 <code>Catalog</code> 和异步加载资源（<code>FStreamableHandle</code>）非常关键。</li>
+</ul>
+<h3 id="3-垃圾回收（GC）与编辑器稳定性"><a href="#3-垃圾回收（GC）与编辑器稳定性" class="headerlink" title="3. 垃圾回收（GC）与编辑器稳定性"></a>3. 垃圾回收（GC）与编辑器稳定性</h3><ul>
+<li><strong>传统裸指针</strong>：<br>GC 扫描时需要反射系统找到 <code>UPROPERTY</code> 标记的指针，然后去读它指向的地址来判断对象是否存活。</li>
+<li><strong><code>TObjectPtr</code></strong>：<br>提供了更明确的 GC 追踪接口。在编辑器环境下，它可以有效避免由于加载顺序问题或垃圾回收过程中对象被移动而导致的崩溃，提高了编辑器的稳定性。</li>
+</ul>
+<h3 id="4-性能差异"><a href="#4-性能差异" class="headerlink" title="4. 性能差异"></a>4. 性能差异</h3><ul>
+<li><strong>传统裸指针</strong>：访问速度极快，就是一次内存解引用。</li>
+<li><strong><code>TObjectPtr</code></strong>：<ul>
+<li>在**编辑器（Editor）<strong>和</strong>开发版本（Development）**中，由于要做句柄解析和有效性检查，会有极其微小的开销（通常可以忽略不计）。</li>
+<li>在**打包后的发布版本（Shipping）**中，如果对象已经加载，<code>TObjectPtr</code> 会被优化（解析）成和裸指针几乎完全一样的直接解引用，性能损失基本为零。</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-使用场景规范（UE5-标准）"><a href="#5-使用场景规范（UE5-标准）" class="headerlink" title="5. 使用场景规范（UE5 标准）"></a>5. 使用场景规范（UE5 标准）</h3><p>为了代码的一致性和未来兼容性，Epic 制定了以下规范：</p>
+<ul>
+<li><strong>类的成员变量（UPROPERTY）</strong>：<strong>一律使用 <code>TObjectPtr</code></strong>。<br>比如你的代码：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UPROPERTY</span>(EditAnywhere, BlueprintReadWrite)</span><br><span class="line">TObjectPtr&lt;USkeletalMeshComponent&gt; BodyComponent = <span class="literal">nullptr</span>; <span class="comment">// ✅ UE5 推荐</span></span><br></pre></td></tr></table></figure></li>
+<li><strong>函数参数和局部变量</strong>：<strong>仍然使用传统裸指针 <code>UObject*</code></strong>。<br>因为函数参数只是临时使用，不需要承受 <code>TObjectPtr</code> 在编辑器下的间接解析开销，也没必要进行重定向追踪。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">MyFunction</span><span class="params">(USkeletalMeshComponent* Mesh)</span></span>; <span class="comment">// ✅ 正确</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="总结对比表"><a href="#总结对比表" class="headerlink" title="总结对比表"></a>总结对比表</h3><table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left">传统裸指针 (<code>UObject*</code>)</th>
+<th align="left"><code>TObjectPtr&lt;UObject&gt;</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>存储方式</strong></td>
+<td align="left">直接内存地址</td>
+<td align="left">间接句柄&#x2F;引用（支持重定向）</td>
+</tr>
+<tr>
+<td align="left"><strong>资源移动&#x2F;重定向</strong></td>
+<td align="left">容易丢失引用或需要手动修复</td>
+<td align="left">自动处理，稳定可靠</td>
+</tr>
+<tr>
+<td align="left"><strong>异步加载支持</strong></td>
+<td align="left">弱，对象未加载时为空</td>
+<td align="left">强，内部持有对象 ID，加载后自动解析</td>
+</tr>
+<tr>
+<td align="left"><strong>GC 安全性</strong></td>
+<td align="left">依赖 <code>UPROPERTY</code> 标记</td>
+<td align="left">更健壮，编辑器下更安全</td>
+</tr>
+<tr>
+<td align="left"><strong>运行时性能</strong></td>
+<td align="left">极速</td>
+<td align="left">Shipping 版极速，Editor 版略有开销</td>
+</tr>
+<tr>
+<td align="left"><strong>UE5 规范</strong></td>
+<td align="left">用于函数参数、局部变量</td>
+<td align="left"><strong>用于所有 <code>UPROPERTY</code> 成员变量</strong></td>
+</tr>
+</tbody></table>
+<h3 id="结合你的代码来看"><a href="#结合你的代码来看" class="headerlink" title="结合你的代码来看"></a>结合你的代码来看</h3><p>你的 <code>UCharacterAppearanceComponent</code> 完全遵循了 UE5 的最佳实践：</p>
+<ol>
+<li><strong>成员变量</strong>全部用了 <code>TObjectPtr</code>（如 <code>Catalog</code>, <code>BodyComponent</code>, <code>MeshComponent</code>），确保了在异步加载外观资源（<code>FStreamableHandle</code>）和切换外观时，引用不会因为对象被 GC 或重定向而崩溃。</li>
+<li>在 <code>ColorMaterialCache</code> 这个私有 Map 里，Key 用了 <code>TWeakObjectPtr</code>（弱引用，不影响 GC），Value 用了 <code>TObjectPtr</code> 数组，既保证了灵活性又遵循了规范。</li>
+</ol>
+<hr>
+<p>拓展： <code>TWeakObjectPtr</code>（弱指针，不阻止 GC）和 <code>TSharedPtr</code>（共享指针，非 UObject 专用）的区别，或者 <code>FStreamableHandle</code> 异步加载的具体机制</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/09/08/Sparkles/" rel="prev" title="Sparkles">
+      <i class="fa fa-chevron-left"></i> Sparkles
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2026/09/11/GEA1/" rel="next" title="GEA1">
+      GEA1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#U%E2%80%A6%E7%AD%89%E7%AD%89%E5%8F%98%E9%87%8F%E5%90%8D"><span class="nav-number">1.</span> <span class="nav-text">U…等等变量名</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%B8%B8%E8%A7%81%E5%89%8D%E7%BC%80%E5%8F%8A%E5%85%B6%E5%90%AB%E4%B9%89"><span class="nav-number">1.1.</span> <span class="nav-text">1. 常见前缀及其含义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#U-%E2%80%94%E2%80%94-UObject-%E4%BD%93%E7%B3%BB%EF%BC%88Unreal-Object%EF%BC%89"><span class="nav-number">1.1.1.</span> <span class="nav-text">U —— UObject 体系（Unreal Object）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#A-%E2%80%94%E2%80%94-Actor-%E4%BD%93%E7%B3%BB%EF%BC%88Actor%EF%BC%89"><span class="nav-number">1.1.2.</span> <span class="nav-text">A —— Actor 体系（Actor）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#F-%E2%80%94%E2%80%94-%E5%9F%BA%E7%A1%80-%E6%A1%86%E6%9E%B6%E7%B1%BB%E5%9E%8B%EF%BC%88Framework-Plain-Old-Data%EF%BC%89"><span class="nav-number">1.1.3.</span> <span class="nav-text">F —— 基础&#x2F;框架类型（Framework &#x2F; Plain Old Data）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#E-%E2%80%94%E2%80%94-%E6%9E%9A%E4%B8%BE%EF%BC%88Enumeration%EF%BC%89"><span class="nav-number">1.1.4.</span> <span class="nav-text">E —— 枚举（Enumeration）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#I-%E2%80%94%E2%80%94-%E6%8E%A5%E5%8F%A3%EF%BC%88Interface%EF%BC%89"><span class="nav-number">1.1.5.</span> <span class="nav-text">I —— 接口（Interface）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#T-%E2%80%94%E2%80%94-%E6%A8%A1%E6%9D%BF%EF%BC%88Template%EF%BC%89"><span class="nav-number">1.1.6.</span> <span class="nav-text">T —— 模板（Template）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-%E2%80%94%E2%80%94-%E5%B8%83%E5%B0%94%E5%8F%98%E9%87%8F%EF%BC%88boolean%EF%BC%89"><span class="nav-number">1.1.7.</span> <span class="nav-text">b —— 布尔变量（boolean）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%B8%BA%E4%BB%80%E4%B9%88-Epic-%E8%A6%81%E5%BC%BA%E5%88%B6%E8%BF%99%E6%A0%B7%E5%81%9A%EF%BC%9F"><span class="nav-number">1.2.</span> <span class="nav-text">2. 为什么 Epic 要强制这样做？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%80%BB%E7%BB%93%E4%BD%A0%E4%BB%A3%E7%A0%81%E9%87%8C%E7%9A%84%E2%80%9C%E5%AD%97%E6%AF%8D%E8%A1%A8%E2%80%9D"><span class="nav-number">1.3.</span> <span class="nav-text">3. 总结你代码里的“字母表”</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TObjectPtr-%E5%92%8C%E4%BC%A0%E7%BB%9F%E7%9A%84-UPROPERTY-%E8%A3%B8%E6%8C%87%E9%92%88%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">TObjectPtr 和传统的 UPROPERTY() 裸指针的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%86%85%E5%AD%98%E5%AD%98%E5%82%A8%E6%96%B9%E5%BC%8F%EF%BC%9A%E7%9B%B4%E6%8E%A5-vs-%E9%97%B4%E6%8E%A5"><span class="nav-number">2.1.</span> <span class="nav-text">1. 内存存储方式：直接 vs 间接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%B5%84%E6%BA%90%E9%87%8D%E5%AE%9A%E5%90%91%E4%B8%8E%E5%BC%82%E6%AD%A5%E5%8A%A0%E8%BD%BD"><span class="nav-number">2.2.</span> <span class="nav-text">2. 资源重定向与异步加载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%EF%BC%88GC%EF%BC%89%E4%B8%8E%E7%BC%96%E8%BE%91%E5%99%A8%E7%A8%B3%E5%AE%9A%E6%80%A7"><span class="nav-number">2.3.</span> <span class="nav-text">3. 垃圾回收（GC）与编辑器稳定性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%80%A7%E8%83%BD%E5%B7%AE%E5%BC%82"><span class="nav-number">2.4.</span> <span class="nav-text">4. 性能差异</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E8%A7%84%E8%8C%83%EF%BC%88UE5-%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-number">2.5.</span> <span class="nav-text">5. 使用场景规范（UE5 标准）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%AF%B9%E6%AF%94%E8%A1%A8"><span class="nav-number">2.6.</span> <span class="nav-text">总结对比表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E5%90%88%E4%BD%A0%E7%9A%84%E4%BB%A3%E7%A0%81%E6%9D%A5%E7%9C%8B"><span class="nav-number">2.7.</span> <span class="nav-text">结合你的代码来看</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Nico Zhong</p>
+  <div class="site-description" itemprop="description">one step per day | each effort counts</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Nico Zhong</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
