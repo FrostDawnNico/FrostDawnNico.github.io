@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="one step per day | each effort counts">
+  <meta name="description" content="《游戏引擎架构（第二版）》读书笔记 导论Intellivision 第一款16bit 电子游戏机 Quake Doom UE Source Unity 了解现代游戏引擎的各个组件 将学习：  how to archetect a game engine for industry how a game dev tema org and run which subsystems constantly">
 <meta property="og:type" content="article">
-<meta property="og:title" content="GEA1">
+<meta property="og:title" content="游戏引擎架构">
 <meta property="og:url" content="https://frostdawnnico.github.io/2026/09/11/GEA1/index.html">
 <meta property="og:site_name" content="FrostDawn&#39;s Blog">
-<meta property="og:description" content="one step per day | each effort counts">
+<meta property="og:description" content="《游戏引擎架构（第二版）》读书笔记 导论Intellivision 第一款16bit 电子游戏机 Quake Doom UE Source Unity 了解现代游戏引擎的各个组件 将学习：  how to archetect a game engine for industry how a game dev tema org and run which subsystems constantly">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-09-11T06:15:16.000Z">
-<meta property="article:modified_time" content="2026-09-11T06:15:16.173Z">
+<meta property="article:modified_time" content="2026-09-11T06:48:21.132Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>GEA1 | FrostDawn's Blog</title>
+  <title>游戏引擎架构 | FrostDawn's Blog</title>
   
 
 
@@ -164,7 +164,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          GEA1
+          游戏引擎架构
         </h1>
 
         <div class="post-meta">
@@ -173,8 +173,9 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2026-09-11 14:15:16" itemprop="dateCreated datePublished" datetime="2026-09-11T14:15:16+08:00">2026-09-11</time>
+              <time title="Created: 2026-09-11 14:15:16 / Modified: 14:48:21" itemprop="dateCreated datePublished" datetime="2026-09-11T14:15:16+08:00">2026-09-11</time>
             </span>
 
           
@@ -188,7 +189,55 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <p>《游戏引擎架构（第二版）》读书笔记</p>
+<h1 id="导论"><a href="#导论" class="headerlink" title="导论"></a>导论</h1><p>Intellivision 第一款16bit 电子游戏机</p>
+<p>Quake Doom UE Source Unity</p>
+<p>了解现代游戏引擎的各个组件</p>
+<p>将学习：</p>
+<ol>
+<li>how to archetect a game engine for industry</li>
+<li>how a game dev tema org and run</li>
+<li>which subsystems constantly appear in almost all engine</li>
+<li>typical requirements of each</li>
+<li>some related to specific game mode or type, and some not</li>
+<li>boundary between engine and game</li>
+</ol>
+<p>popular engine -&gt; middleware : Havok&#x2F;OGRE&#x2F;Granny</p>
+<p>begin with bg:</p>
+<ol>
+<li>difference between logic soft arch and physical soft arch</li>
+<li>configuration management\revision control\build system</li>
+<li>VS skills</li>
+</ol>
+<p>basic:CPP\algebra\vector\matrix\Trigonometry</p>
+<h2 id="classic-game-team-structure"><a href="#classic-game-team-structure" class="headerlink" title="classic game team structure"></a>classic game team structure</h2><p>5basic:engineer\artist\gamedesigner\producer\other managers or supporters</p>
+<h3 id="engineer"><a href="#engineer" class="headerlink" title="engineer"></a>engineer</h3><p>runtime programmer and tool programmer</p>
+<p>run: engine and game</p>
+<p>tool: offline tools -&gt; develop efficiency</p>
+<p>single system: render\ai\sound\physics</p>
+<p>gameplay\scripting</p>
+<p>system</p>
+<p>generalist</p>
+<p>lead engineer design and write\manage\decide direction</p>
+<p>technical director(TD) -&gt; CTO</p>
+<h3 id="artisan"><a href="#artisan" class="headerlink" title="artisan"></a>artisan</h3><p>content is king</p>
+<p>concept artist: draw -&gt; concept art</p>
+<p>3D modeler: foreground modeler and background modeler</p>
+<p>texture artist: texture</p>
+<p>lighting artist</p>
+<p>animator</p>
+<p>motion capture actor</p>
+<p>sound designer</p>
+<p>voice actor</p>
+<p>composer</p>
+<p>leader: art director</p>
+<h3 id="game-designer"><a href="#game-designer" class="headerlink" title="game designer"></a>game designer</h3><p>story\level\target, single level\map, gameplay</p>
+<p>writer: story and lines</p>
+<p>gd-&gt; producer</p>
+<h3 id="producer"><a href="#producer" class="headerlink" title="producer"></a>producer</h3><p>progress management and hr</p>
+<h3 id="others"><a href="#others" class="headerlink" title="others"></a>others</h3><p>Administrative Management\market planning\IT</p>
+<h3 id="publisher"><a href="#publisher" class="headerlink" title="publisher"></a>publisher</h3><p>first-party developer: naughty dog to sony</p>
+<h2 id="what-is-game"><a href="#what-is-game" class="headerlink" title="what is game?"></a>what is game?</h2>
     </div>
 
     
@@ -265,6 +314,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%BC%E8%AE%BA"><span class="nav-number">1.</span> <span class="nav-text">导论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#classic-game-team-structure"><span class="nav-number">1.1.</span> <span class="nav-text">classic game team structure</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#engineer"><span class="nav-number">1.1.1.</span> <span class="nav-text">engineer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#artisan"><span class="nav-number">1.1.2.</span> <span class="nav-text">artisan</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#game-designer"><span class="nav-number">1.1.3.</span> <span class="nav-text">game designer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#producer"><span class="nav-number">1.1.4.</span> <span class="nav-text">producer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#others"><span class="nav-number">1.1.5.</span> <span class="nav-text">others</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#publisher"><span class="nav-number">1.1.6.</span> <span class="nav-text">publisher</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#what-is-game"><span class="nav-number">1.2.</span> <span class="nav-text">what is game?</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
