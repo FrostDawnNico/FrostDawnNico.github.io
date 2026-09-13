@@ -148,6 +148,84 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/09/13/AS1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Nico Zhong">
+      <meta itemprop="description" content="one step per day | each effort counts">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FrostDawn's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2026/09/13/AS1/" class="post-title-link" itemprop="url">大气系统 Atmospheric system 1</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2026-09-13 12:51:30 / Modified: 13:50:50" itemprop="dateCreated datePublished" datetime="2026-09-13T12:51:30+08:00">2026-09-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="renderer"><a href="#renderer" class="headerlink" title="renderer"></a>renderer</h1><p>atmosphere render feature</p>
+<p>rendering function</p>
+<p>base renderer</p>
+<p>transparent rendering</p>
+<p>post</p>
+<p>atmosphere pass</p>
+<h1 id="大气渲染课程指南"><a href="#大气渲染课程指南" class="headerlink" title="大气渲染课程指南"></a>大气渲染课程指南</h1><p>把“看起来像大气效果”的感觉，变成可以解释、可以操作、可以验证的结论</p>
+<p>森林工程</p>
+<p>European Forest Environment 从简单到复杂</p>
+<p>先在灰盒中排除材质和植被干扰</p>
+<p>再把已经理解的参数带入森林坡地</p>
+<p>最后在真实树冠、道路、云影和远景中检查效果是否成立</p>
+<h1 id="学习路线"><a href="#学习路线" class="headerlink" title="学习路线"></a>学习路线</h1><p>L1 先把变量锁住</p>
+<p>L2 搬进森林</p>
+<p>L3 加入云和风格</p>
+<p>L4 测量成本</p>
+<p>L5 做可回退的优化</p>
+<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><p>近处树干，中间树群，远处山坡，轮廓与背景的区分越来越弱，地面的雾带</p>
+<p>树的材质没有变，为什么远处更淡？地面雾带和远景变淡是否是同一个控制项？</p>
+<p>树梢的太阳、明亮的天空、较暗的建筑近景，形成层次</p>
+<h1 id="大气是如何改变画面的？"><a href="#大气是如何改变画面的？" class="headerlink" title="大气是如何改变画面的？"></a>大气是如何改变画面的？</h1>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/09/11/GEA1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -179,7 +257,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-09-13 11:47:08" itemprop="dateModified" datetime="2026-09-13T11:47:08+08:00">2026-09-13</time>
+                <time title="Modified: 2026-09-13 12:02:49" itemprop="dateModified" datetime="2026-09-13T12:02:49+08:00">2026-09-13</time>
               </span>
 
           
@@ -243,7 +321,18 @@
 <h3 id="publisher"><a href="#publisher" class="headerlink" title="publisher"></a>publisher</h3><p>first-party developer: naughty dog to sony</p>
 <h2 id="what-is-game"><a href="#what-is-game" class="headerlink" title="what is game?"></a>what is game?</h2><p>game</p>
 <p>game theory</p>
-
+<p>interaction+ series of challenges+learning and talented skills-&gt;fun</p>
+<p>virtual world+ a few players</p>
+<h2 id="soft-realtime-simulation"><a href="#soft-realtime-simulation" class="headerlink" title="soft realtime simulation"></a>soft realtime simulation</h2><p>soft real-time interactive agent-based computer simulation</p>
+<p>model simplify -&gt;approximation and simplification (the strongest tools</p>
+<p>based on agent-&gt; object-oriented</p>
+<p>temporal simulation&#x2F;dynamic-&gt;interactive temporal simulation-&gt;interactive real-time simulation(exp:Turn-based-&gt; GUI)</p>
+<p>deadline screen&gt;24FPS physics-&gt;120&#x2F;s ai&gt;1&#x2F;s sound-&gt;60&#x2F;s</p>
+<p>soft-&gt;not enough don’t lead to death of real man(hard:airplane\nuclear control rod)</p>
+<p>math model-&gt; analytic\numerical ; closed form; independent variable</p>
+<p>game unexpected-&gt;X totally analytic-&gt;constantly repeating compute-&gt;time step state</p>
+<p>game loop-&gt;update next sime step state-&gt;graphic\sound etc(force feedback)</p>
+<h2 id="what-is-game-engine"><a href="#what-is-game-engine" class="headerlink" title="what is game engine?"></a>what is game engine?</h2>
       
     </div>
 
@@ -816,78 +905,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/07/23/UE4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Nico Zhong">
-      <meta itemprop="description" content="one step per day | each effort counts">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="FrostDawn's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2026/07/23/UE4/" class="post-title-link" itemprop="url">虚幻引擎源码基础知识</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2026-07-23 23:59:44" itemprop="dateCreated datePublished" datetime="2026-07-23T23:59:44+08:00">2026-07-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-07-24 15:48:13" itemprop="dateModified" datetime="2026-07-24T15:48:13+08:00">2026-07-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>整理基本知识</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2026/07/23/UE4/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -957,7 +974,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
