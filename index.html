@@ -173,7 +173,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-09-13 12:51:30 / Modified: 13:50:50" itemprop="dateCreated datePublished" datetime="2026-09-13T12:51:30+08:00">2026-09-13</time>
+              <time title="Created: 2026-09-13 12:51:30 / Modified: 14:08:17" itemprop="dateCreated datePublished" datetime="2026-09-13T12:51:30+08:00">2026-09-13</time>
             </span>
 
           
@@ -207,7 +207,24 @@
 <h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><p>近处树干，中间树群，远处山坡，轮廓与背景的区分越来越弱，地面的雾带</p>
 <p>树的材质没有变，为什么远处更淡？地面雾带和远景变淡是否是同一个控制项？</p>
 <p>树梢的太阳、明亮的天空、较暗的建筑近景，形成层次</p>
-<h1 id="大气是如何改变画面的？"><a href="#大气是如何改变画面的？" class="headerlink" title="大气是如何改变画面的？"></a>大气是如何改变画面的？</h1>
+<h1 id="大气是如何改变画面的？"><a href="#大气是如何改变画面的？" class="headerlink" title="大气是如何改变画面的？"></a>大气是如何改变画面的？</h1><p>完整光路：太阳发出光-光穿过空气照到物体-物体反射的光再次穿过空气-到达相机</p>
+<p>大气渲染</p>
+<p>sky atmosphere</p>
+<p>吸收+散射，随距离累积</p>
+<h2 id="相机看见两部分"><a href="#相机看见两部分" class="headerlink" title="相机看见两部分"></a>相机看见两部分</h2><p>原来的光变少，消光</p>
+<p>沿途有光进入视线</p>
+<p>距离增加时，原来物体的光保留得更少，沿途空气贡献也会改变</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>rayleigh散射</p>
+<p>mie散射</p>
+<p>吸收</p>
+<p>多次散射</p>
+<h2 id="对应组件"><a href="#对应组件" class="headerlink" title="对应组件"></a>对应组件</h2><p>太阳光 Directional Light</p>
+<p>大气介质 Sky Atmosphere</p>
+<p>天空环境照明 Skylight</p>
+<p>相机显示 </p>
+<p>近地雾层</p>
+<p>太阳负责发光、大气负责改变传播中的光、Skylight负责天空环境照明、曝光负责把结果显示</p>
+<h1 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h1>
       
     </div>
 
@@ -796,7 +813,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-09-11 13:58:38" itemprop="dateModified" datetime="2026-09-11T13:58:38+08:00">2026-09-11</time>
+                <time title="Modified: 2026-09-14 22:15:51" itemprop="dateModified" datetime="2026-09-14T22:15:51+08:00">2026-09-14</time>
               </span>
 
           
