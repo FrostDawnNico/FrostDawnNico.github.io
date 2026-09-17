@@ -28,7 +28,7 @@
 <meta property="og:description" content="实现多人物同屏">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-31T15:32:10.000Z">
-<meta property="article:modified_time" content="2026-09-17T16:13:20.981Z">
+<meta property="article:modified_time" content="2026-09-17T16:15:55.555Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-09-18 00:13:20" itemprop="dateModified" datetime="2026-09-18T00:13:20+08:00">2026-09-18</time>
+                <time title="Modified: 2026-09-18 00:15:55" itemprop="dateModified" datetime="2026-09-18T00:15:55+08:00">2026-09-18</time>
               </span>
 
           
@@ -287,7 +287,9 @@
 <h3 id="catalog"><a href="#catalog" class="headerlink" title="catalog"></a>catalog</h3><p>传入 字符串&#x2F;id</p>
 <p>表格信息相互依赖</p>
 <p>name - 索引 - 各个属性- 索引 - 各个具体的选择</p>
-<h4 id="生成catalog的python脚本"><a href="#生成catalog的python脚本" class="headerlink" title="生成catalog的python脚本"></a>生成catalog的python脚本</h4><h1 id="成果与下一步"><a href="#成果与下一步" class="headerlink" title="成果与下一步"></a>成果与下一步</h1><p>本阶段成果</p>
+<h4 id="生成catalog的python脚本"><a href="#生成catalog的python脚本" class="headerlink" title="生成catalog的python脚本"></a>生成catalog的python脚本</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    unreal.log(<span class="string">&quot;[CatalogGenerator] Generating DA_CharacterApperanceCatalog ...&quot;</span>)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        catalog = build_catalog()</span><br><span class="line">        verify_catalog(catalog)</span><br><span class="line">        unreal.log(<span class="string">&quot;[CatalogGenerator] Done&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> exc:</span><br><span class="line">        unreal.log_error(<span class="string">&quot;[CatalogGenerator] FAILED: &#123;0&#125;&quot;</span>.<span class="built_in">format</span>(exc))</span><br><span class="line">        <span class="keyword">raise</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="成果与下一步"><a href="#成果与下一步" class="headerlink" title="成果与下一步"></a>成果与下一步</h1><p>本阶段成果</p>
 <p>L0整身Archetype切换<br>L1</p>
 
     </div>
