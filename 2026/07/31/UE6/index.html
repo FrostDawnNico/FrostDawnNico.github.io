@@ -28,7 +28,7 @@
 <meta property="og:description" content="实现多人物同屏">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-31T15:32:10.000Z">
-<meta property="article:modified_time" content="2026-09-17T17:30:08.805Z">
+<meta property="article:modified_time" content="2026-09-18T06:54:25.405Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-09-18 01:30:08" itemprop="dateModified" datetime="2026-09-18T01:30:08+08:00">2026-09-18</time>
+                <time title="Modified: 2026-09-18 14:54:25" itemprop="dateModified" datetime="2026-09-18T14:54:25+08:00">2026-09-18</time>
               </span>
 
           
@@ -297,7 +297,7 @@
 <p>component有详细的外观信息</p>
 <p>appearance声明的Spec是插件中的设计的——CharacterAppearanceCatalog.h</p>
 <p>CharacterAppearanceCatalog.h中声明了数据结构</p>
-<h1 id="UPrimaryDataAsset——UE中的资产类型"><a href="#UPrimaryDataAsset——UE中的资产类型" class="headerlink" title="UPrimaryDataAsset——UE中的资产类型"></a>UPrimaryDataAsset——UE中的资产类型</h1><p>UE 里的“资产类型”可以按用途分成几层：渲染&#x2F;音频&#x2F;模型这类资源、数据配置类、蓝图&#x2F;类、世界&#x2F;关卡，以及 AssetManager 用来做按需加载和打包的“主&#x2F;次资产”。你问的 <code>UPrimaryDataAsset</code> 属于数据配置里偏“可被集中管理”的那一类。</p>
+<h1 id="UPrimaryDataAsset——UE中的资产类型"><a href="#UPrimaryDataAsset——UE中的资产类型" class="headerlink" title="UPrimaryDataAsset——UE中的资产类型"></a>UPrimaryDataAsset——UE中的资产类型</h1><p>UE 里的“资产类型”可以按用途分成几层：渲染&#x2F;音频&#x2F;模型这类资源、数据配置类、蓝图&#x2F;类、世界&#x2F;关卡，以及 AssetManager 用来做按需加载和打包的“主&#x2F;次资产”。 <code>UPrimaryDataAsset</code> 属于数据配置里偏“可被集中管理”的那一类。</p>
 <h2 id="一、整体分类（常用）"><a href="#一、整体分类（常用）" class="headerlink" title="一、整体分类（常用）"></a>一、整体分类（常用）</h2><p><strong>1）基础资源资产（美术&#x2F;音频&#x2F;动画）</strong></p>
 <ul>
 <li><code>UStaticMesh</code>、<code>USkeletalMesh</code>、<code>UTexture2D</code>、<code>UMaterial/UMaterialInstance</code></li>
