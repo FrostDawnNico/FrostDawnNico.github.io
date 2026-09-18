@@ -28,7 +28,7 @@
 <meta property="og:description" content="实现多人物同屏">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-31T15:32:10.000Z">
-<meta property="article:modified_time" content="2026-09-17T17:19:58.737Z">
+<meta property="article:modified_time" content="2026-09-17T17:30:08.805Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-09-18 01:19:58" itemprop="dateModified" datetime="2026-09-18T01:19:58+08:00">2026-09-18</time>
+                <time title="Modified: 2026-09-18 01:30:08" itemprop="dateModified" datetime="2026-09-18T01:30:08+08:00">2026-09-18</time>
               </span>
 
           
@@ -296,8 +296,116 @@
 <h2 id="外观信息"><a href="#外观信息" class="headerlink" title="外观信息"></a>外观信息</h2><p>catalog存储的信息</p>
 <p>component有详细的外观信息</p>
 <p>appearance声明的Spec是插件中的设计的——CharacterAppearanceCatalog.h</p>
+<p>CharacterAppearanceCatalog.h中声明了数据结构</p>
+<h1 id="UPrimaryDataAsset——UE中的资产类型"><a href="#UPrimaryDataAsset——UE中的资产类型" class="headerlink" title="UPrimaryDataAsset——UE中的资产类型"></a>UPrimaryDataAsset——UE中的资产类型</h1><p>UE 里的“资产类型”可以按用途分成几层：渲染&#x2F;音频&#x2F;模型这类资源、数据配置类、蓝图&#x2F;类、世界&#x2F;关卡，以及 AssetManager 用来做按需加载和打包的“主&#x2F;次资产”。你问的 <code>UPrimaryDataAsset</code> 属于数据配置里偏“可被集中管理”的那一类。</p>
+<h2 id="一、整体分类（常用）"><a href="#一、整体分类（常用）" class="headerlink" title="一、整体分类（常用）"></a>一、整体分类（常用）</h2><p><strong>1）基础资源资产（美术&#x2F;音频&#x2F;动画）</strong></p>
+<ul>
+<li><code>UStaticMesh</code>、<code>USkeletalMesh</code>、<code>UTexture2D</code>、<code>UMaterial/UMaterialInstance</code></li>
+<li><code>USoundWave</code>、<code>USoundCue</code>、<code>UMetaSoundSource</code></li>
+<li><code>UAnimSequence</code>、<code>UAnimMontage</code>、<code>UBlendSpace</code>、<code>UAnimBlueprint</code></li>
+<li><code>UNiagaraSystem</code>、<code>UParticleSystem</code>（旧）<br>特点：通常被动硬引用加载，或通过软引用+异步加载；不直接用于“配数值”。</li>
+</ul>
+<p><strong>2）数据配置资产</strong></p>
+<ul>
+<li><code>UDataAsset</code>（普通数据资产）</li>
+<li><code>UPrimaryDataAsset</code>（主数据资产，接 AssetManager）</li>
+<li><code>UDataTable</code>（行结构表格）</li>
+<li><code>UCurveTable</code>、<code>UCurveFloat</code>、<code>UCurveVector</code>、<code>URichCurve</code> 相关</li>
+<li><code>UPrimaryAssetLabel</code>（打包&#x2F;分块用标签，不是业务数据）<br>特点：用来做数据驱动，减少硬编码。</li>
+</ul>
+<p><strong>3）蓝图&#x2F;类资产</strong></p>
+<ul>
+<li><code>UBlueprint</code>（含 Actor&#x2F;Widget&#x2F;Object 蓝图）</li>
+<li><code>UUserDefinedStruct</code>、<code>UUserDefinedEnum</code></li>
+<li><code>UDataAsset</code> 派生蓝图、Primary DataAsset 派生蓝图<br>特点：蓝图既是“类”也是资产；Primary 蓝图类还可作为主资产被 AssetManager 按类型发现。</li>
+</ul>
+<p><strong>4）世界&#x2F;关卡&#x2F;流式</strong></p>
+<ul>
+<li><code>UWorld</code>（地图，默认是主资产）</li>
+<li><code>ULandscape</code>、<code>UHLODLayer</code> 相关</li>
+<li>World Partition 下的 <code>UDataLayerAsset</code> &#x2F; <code>UDataLayerInstance</code></li>
+<li><code>ULevelStreamingDynamic</code> 相关配置<br>注意：Data Layer 不是“数值配置”，是 World Partition 里按运行时开关组织 Actor、做流式加载的。</li>
+</ul>
+<p><strong>5）配置&#x2F;元数据类</strong></p>
+<ul>
+<li><code>UDataTable</code>、<code>UGameplayTags</code> 设置、Ini 配置、<code>UDeveloperSettings</code> 派生类</li>
+<li><code>UPrimaryDataAsset</code> 也可当“全局配置实例”用，但和普通 Ini 配置定位不同。</li>
+</ul>
+<hr>
+<h2 id="二、UDataAsset-vs-UPrimaryDataAsset"><a href="#二、UDataAsset-vs-UPrimaryDataAsset" class="headerlink" title="二、UDataAsset vs UPrimaryDataAsset"></a>二、UDataAsset vs UPrimaryDataAsset</h2><p><strong>UDataAsset（普通）</strong></p>
+<ul>
+<li>继承 <code>UDataAsset</code>，在内容浏览器新建“Data Asset”，选你的子类。</li>
+<li>就是个带 <code>UPROPERTY</code> 的 UObject 实例，可放数值、软&#x2F;硬引用、数组、结构体。</li>
+<li>加载方式：被别的资产硬引用时跟着加载；或自己用软引用+StreamableManager&#x2F;AssetManager 手动加载。</li>
+<li>没有“全局ID”概念，AssetManager 不会主动按类型扫描它（除非你把它做成 Primary）。<br>适合：单个规则配置、项目全局设置、始终随某蓝图加载的小数据。</li>
+</ul>
+<p><strong>UPrimaryDataAsset（主数据资产）</strong></p>
+<ul>
+<li>继承 <code>UPrimaryDataAsset</code>，重写&#x2F;利用 <code>GetPrimaryAssetId()</code>，返回 <code>FPrimaryAssetId(Type, Name)</code>。</li>
+<li>在 Project Settings → Game → Asset Manager → Primary Asset Types To Scan 注册扫描目录和基类。</li>
+<li>AssetManager 启动时可发现、建立索引，运行时可按 ID 异步加载&#x2F;卸载。</li>
+<li>支持 Asset Bundle（比如 UI 包只加载图标，Gameplay 包加载网格&#x2F;音效）、Cook 规则、Chunk 分包。</li>
+<li>关卡 <code>UWorld</code> 默认就是主资产，其它普通资产相对它是“次要资产&#x2F;次级资产”。</li>
+</ul>
+<p>简单判断：</p>
+<ul>
+<li>永远跟着某角色&#x2F;某蓝图硬引用加载 → 普通 <code>UDataAsset</code> 够用。</li>
+<li>要通过“物品ID&#x2F;角色ID”动态加载、做背包&#x2F;商店&#x2F;英雄池&#x2F;DLC&#x2F;分包 → <code>UPrimaryDataAsset</code>。</li>
+</ul>
+<hr>
+<h2 id="三、UPrimaryDataAsset-的核心特点"><a href="#三、UPrimaryDataAsset-的核心特点" class="headerlink" title="三、UPrimaryDataAsset 的核心特点"></a>三、UPrimaryDataAsset 的核心特点</h2><p>1）唯一标识<br><code>FPrimaryAssetId</code> &#x3D; 资产类型（比如 <code>Weapon</code>）+ 资产名（内容浏览器文件名）。可通过 ID 定位，不依赖硬指针。</p>
+<p>2）AssetManager 集中发现<br>配置扫描目录后，编辑器&#x2F;打包阶段会索引该类资产；运行时可列出某类型全部ID、按ID加载、按类型批量加载。</p>
+<p>3）异步加载与引用管理<br>C++ 用 <code>UAssetManager::LoadPrimaryAsset / LoadPrimaryAssetsWithType / GetStreamableManager()</code>；蓝图用 <code>Async Load Primary Asset / Load Primary Asset</code> 等节点。避免构造函数硬引用大资产。</p>
+<p>4）Asset Bundle 按需加载部分资源<br>属性上加 <code>meta=(AssetBundles=&quot;UI&quot;)</code>、<code>&quot;Gameplay&quot;</code> 等，加载资产时可只加载某些 bundle：比如打开商店只加载图标，进战斗再加载网格&#x2F;特效。</p>
+<p>5）Cook &#x2F; AlwaysCook &#x2F; Chunk 分包<br>主资产规则可设 Priority、CookRule、ChunkID。动态ID加载的东西如果不被地图硬引用，可能不会自动打包；用 Primary 规则设 AlwaysCook 或指定 Chunk，做 DLC&#x2F;补丁&#x2F;首包瘦身。</p>
+<p>6）强类型、可继承、可蓝图化<br>比 DataTable 更适合“每个对象结构不同&#x2F;要嵌套&#x2F;要引用其他主资产&#x2F;要蓝图子类”的情况。</p>
+<hr>
+<h2 id="四、和-DataTable-CurveTable-的取舍"><a href="#四、和-DataTable-CurveTable-的取舍" class="headerlink" title="四、和 DataTable &#x2F; CurveTable 的取舍"></a>四、和 DataTable &#x2F; CurveTable 的取舍</h2><p><strong>DataTable</strong></p>
+<ul>
+<li>行结构继承 <code>FTableRowBase</code>，所有行同构。</li>
+<li>适合：武器数值表、道具表、经验表、掉落表、对话表等“很多行同字段”。</li>
+<li>支持 CSV&#x2F;JSON 导入；运行时 <code>FindRow&lt;FRow&gt;(RowName)</code>。</li>
+<li>缺点：行结构改了要改结构体并重新导入；不适合每个实例挂大量异质逻辑&#x2F;多态。</li>
+</ul>
+<p><strong>CurveTable &#x2F; Curve</strong></p>
+<ul>
+<li>按行或单曲线存浮点&#x2F;向量&#x2F;颜色随变量变化。</li>
+<li>适合：伤害衰减、等级缩放、经济曲线、动画权重、成长曲线。</li>
+</ul>
+<p><strong>DataAsset &#x2F; PrimaryDataAsset</strong></p>
+<ul>
+<li>单实例对象，字段自由，可放软引用、嵌套结构体、数组、其它主资产ID。</li>
+<li>适合：单个武器定义、单个角色定义、技能定义、活动配置、复杂物品（含多网格&#x2F;多图标&#x2F;多规则）。</li>
+<li>如果还要按ID动态管理 → Primary；如果只是被某蓝图写死引用 → 普通 DataAsset 也行。</li>
+</ul>
+<p>经验法则：</p>
+<ul>
+<li>同构多行、策划用表格批量改 → DataTable</li>
+<li>单对象、字段复杂、要引用资源&#x2F;要继承 → DataAsset</li>
+<li>单对象且要按ID异步、分包、审计、DLC → PrimaryDataAsset</li>
+</ul>
+<hr>
+<h2 id="五、一个最小-Primary-示例思路"><a href="#五、一个最小-Primary-示例思路" class="headerlink" title="五、一个最小 Primary 示例思路"></a>五、一个最小 Primary 示例思路</h2><p>C++ 定义：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UCLASS</span>(BlueprintType)</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UItemDefinition</span> : <span class="keyword">public</span> UPrimaryDataAsset</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">GENERATED_BODY</span>()</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> FPrimaryAssetId <span class="title">GetPrimaryAssetId</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">override</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">FPrimaryAssetId</span>(<span class="string">&quot;Item&quot;</span>, <span class="built_in">GetFName</span>());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UPROPERTY</span>(EditDefaultsOnly, BlueprintReadOnly)</span><br><span class="line">    FText DisplayName;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UPROPERTY</span>(EditDefaultsOnly, BlueprintReadOnly, meta=(AssetBundles=<span class="string">&quot;UI&quot;</span>))</span><br><span class="line">    TSoftObjectPtr&lt;UTexture2D&gt; Icon;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UPROPERTY</span>(EditDefaultsOnly, BlueprintReadOnly, meta=(AssetBundles=<span class="string">&quot;Gameplay&quot;</span>))</span><br><span class="line">    TSoftObjectPtr&lt;UStaticMesh&gt; WorldMesh;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UPROPERTY</span>(EditDefaultsOnly, BlueprintReadOnly)</span><br><span class="line">    int32 MaxStack = <span class="number">1</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>AssetManager 注册（DefaultGame.ini 或项目设置）：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[/Script/Engine.AssetManagerSettings]</span></span><br><span class="line">+<span class="attr">PrimaryAssetTypesToScan</span>=(PrimaryAssetType=<span class="string">&quot;Item&quot;</span>,AssetBaseClass=/Script/YourModule.ItemDefinition,bHasBlueprintClasses=<span class="literal">False</span>,bIsEditorOnly=<span class="literal">False</span>,Directories=((Path=<span class="string">&quot;/Game/Data/Items&quot;</span>)),Rules=(Priority=<span class="number">1</span>,CookRule=AlwaysCook))</span><br></pre></td></tr></table></figure>
+
+<p>运行时按ID异步加载，只先要UI包：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">UAssetManager::<span class="built_in">Get</span>().<span class="built_in">LoadPrimaryAsset</span>(</span><br><span class="line">    <span class="built_in">FPrimaryAssetId</span>(<span class="string">&quot;Item&quot;</span>,<span class="string">&quot;Sword_Iron&quot;</span>),</span><br><span class="line">    &#123;<span class="string">&quot;UI&quot;</span>&#125;,</span><br><span class="line">    FStreamableDelegate::<span class="built_in">CreateUObject</span>(<span class="keyword">this</span>, &amp;UMyInventory::OnItemLoaded)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>蓝图对应用“Async Load Primary Asset”节点，传入 PrimaryAssetId 和 Bundles。</p>
+<hr>
+<h2 id="六、常见误区"><a href="#六、常见误区" class="headerlink" title="六、常见误区"></a>六、常见误区</h2><ul>
+<li>把 PrimaryDataAsset 当“更高级的DataTable”用：如果只是300行同构数值，DataTable 更省事。</li>
+<li>Primary 注册了但硬引用到角色蓝图：会失去按需加载意义，重资产要用 <code>TSoftObjectPtr</code>&#x2F;PrimaryID。</li>
+<li>只设了类没设扫描目录：AssetManager 发现不到，按ID加载会找不到。</li>
+<li>动态加载的主资产没设 Cook&#x2F;AlwaysCook：开发模式能跑，打包后可能没 cook 进去。</li>
+<li>Data Layer 和 DataAsset 名字都带 Data，但完全两件事：前者管关卡Actor流式，后者管业务数据。</li>
+</ul>
+<p>实际开发中可以按“物品&#x2F;角色&#x2F;技能&#x2F;任务”分别给一套 PrimaryDataAsset 字段设计和 AssetManager 注册。</p>
 <h1 id="成果与下一步"><a href="#成果与下一步" class="headerlink" title="成果与下一步"></a>成果与下一步</h1><p>本阶段成果</p>
-<p>L0整身Archetype切换<br>L1</p>
+<p>L0整身Archetype切换<br>L1调色Palette循环</p>
 
     </div>
 
@@ -378,7 +486,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%83%E4%BA%BA%E5%8D%83%E9%9D%A2CharacterPersonalization"><span class="nav-number">2.</span> <span class="nav-text">千人千面CharacterPersonalization</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.1.</span> <span class="nav-text">是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E5%92%8C%E7%9B%AE%E6%A0%87"><span class="nav-number">2.2.</span> <span class="nav-text">背景和目标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E8%80%8C%E9%9D%9E%E5%A4%8D%E5%88%B6"><span class="nav-number">2.2.1.</span> <span class="nav-text">组合而非复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E5%AD%98%E6%A1%A3%E3%80%81%E5%8F%AF%E5%90%8C%E6%AD%A5"><span class="nav-number">2.2.2.</span> <span class="nav-text">可存档、可同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%B7%A5%E7%A8%8B%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.2.3.</span> <span class="nav-text">本工程定位</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84%EF%BC%9A%E4%B8%80%E6%9D%A1%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">3.</span> <span class="nav-text">核心架构：一条流水线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A8%E8%BF%9B%E8%B7%AF%E7%BA%BF%EF%BC%9AL0-L5"><span class="nav-number">4.</span> <span class="nav-text">推进路线：L0-L5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%8C%87%E5%8D%97"><span class="nav-number">5.</span> <span class="nav-text">操作指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L0%C2%B7%E6%95%B4%E8%BA%ABArchetype%E5%88%87%E6%8D%A2"><span class="nav-number">6.</span> <span class="nav-text">L0·整身Archetype切换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86%E9%97%AE%E9%A2%98"><span class="nav-number">6.1.</span> <span class="nav-text">补充：版本管理问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E5%B7%A5%E7%A8%8B%E4%B8%8E%E6%8F%92%E4%BB%B6%E5%AF%BC%E5%85%A5"><span class="nav-number">6.2.</span> <span class="nav-text">项目工程与插件导入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#project1Character-h"><span class="nav-number">6.2.1.</span> <span class="nav-text">project1Character.h</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#project1Character-cpp"><span class="nav-number">6.2.2.</span> <span class="nav-text">project1Character.cpp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CDO"><span class="nav-number">6.2.2.1.</span> <span class="nav-text">CDO</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#catalog"><span class="nav-number">6.2.3.</span> <span class="nav-text">catalog</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90catalog%E7%9A%84python%E8%84%9A%E6%9C%AC"><span class="nav-number">6.2.3.1.</span> <span class="nav-text">生成catalog的python脚本</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1-%E8%B0%83%E8%89%B2"><span class="nav-number">7.</span> <span class="nav-text">L1 调色</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OnCyclePalette"><span class="nav-number">7.1.</span> <span class="nav-text">OnCyclePalette</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ToggleAppearance"><span class="nav-number">7.2.</span> <span class="nav-text">ToggleAppearance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SubmitAppearance"><span class="nav-number">7.3.</span> <span class="nav-text">SubmitAppearance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E9%94%AE%E9%80%BB%E8%BE%91"><span class="nav-number">7.4.</span> <span class="nav-text">按键逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E8%A7%82%E4%BF%A1%E6%81%AF"><span class="nav-number">7.5.</span> <span class="nav-text">外观信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%90%E6%9E%9C%E4%B8%8E%E4%B8%8B%E4%B8%80%E6%AD%A5"><span class="nav-number">8.</span> <span class="nav-text">成果与下一步</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%83%E4%BA%BA%E5%8D%83%E9%9D%A2CharacterPersonalization"><span class="nav-number">2.</span> <span class="nav-text">千人千面CharacterPersonalization</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.1.</span> <span class="nav-text">是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E5%92%8C%E7%9B%AE%E6%A0%87"><span class="nav-number">2.2.</span> <span class="nav-text">背景和目标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E8%80%8C%E9%9D%9E%E5%A4%8D%E5%88%B6"><span class="nav-number">2.2.1.</span> <span class="nav-text">组合而非复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E5%AD%98%E6%A1%A3%E3%80%81%E5%8F%AF%E5%90%8C%E6%AD%A5"><span class="nav-number">2.2.2.</span> <span class="nav-text">可存档、可同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%B7%A5%E7%A8%8B%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.2.3.</span> <span class="nav-text">本工程定位</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84%EF%BC%9A%E4%B8%80%E6%9D%A1%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">3.</span> <span class="nav-text">核心架构：一条流水线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A8%E8%BF%9B%E8%B7%AF%E7%BA%BF%EF%BC%9AL0-L5"><span class="nav-number">4.</span> <span class="nav-text">推进路线：L0-L5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%8C%87%E5%8D%97"><span class="nav-number">5.</span> <span class="nav-text">操作指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L0%C2%B7%E6%95%B4%E8%BA%ABArchetype%E5%88%87%E6%8D%A2"><span class="nav-number">6.</span> <span class="nav-text">L0·整身Archetype切换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86%E9%97%AE%E9%A2%98"><span class="nav-number">6.1.</span> <span class="nav-text">补充：版本管理问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E5%B7%A5%E7%A8%8B%E4%B8%8E%E6%8F%92%E4%BB%B6%E5%AF%BC%E5%85%A5"><span class="nav-number">6.2.</span> <span class="nav-text">项目工程与插件导入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#project1Character-h"><span class="nav-number">6.2.1.</span> <span class="nav-text">project1Character.h</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#project1Character-cpp"><span class="nav-number">6.2.2.</span> <span class="nav-text">project1Character.cpp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CDO"><span class="nav-number">6.2.2.1.</span> <span class="nav-text">CDO</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#catalog"><span class="nav-number">6.2.3.</span> <span class="nav-text">catalog</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90catalog%E7%9A%84python%E8%84%9A%E6%9C%AC"><span class="nav-number">6.2.3.1.</span> <span class="nav-text">生成catalog的python脚本</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1-%E8%B0%83%E8%89%B2"><span class="nav-number">7.</span> <span class="nav-text">L1 调色</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OnCyclePalette"><span class="nav-number">7.1.</span> <span class="nav-text">OnCyclePalette</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ToggleAppearance"><span class="nav-number">7.2.</span> <span class="nav-text">ToggleAppearance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SubmitAppearance"><span class="nav-number">7.3.</span> <span class="nav-text">SubmitAppearance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E9%94%AE%E9%80%BB%E8%BE%91"><span class="nav-number">7.4.</span> <span class="nav-text">按键逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E8%A7%82%E4%BF%A1%E6%81%AF"><span class="nav-number">7.5.</span> <span class="nav-text">外观信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UPrimaryDataAsset%E2%80%94%E2%80%94UE%E4%B8%AD%E7%9A%84%E8%B5%84%E4%BA%A7%E7%B1%BB%E5%9E%8B"><span class="nav-number">8.</span> <span class="nav-text">UPrimaryDataAsset——UE中的资产类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%95%B4%E4%BD%93%E5%88%86%E7%B1%BB%EF%BC%88%E5%B8%B8%E7%94%A8%EF%BC%89"><span class="nav-number">8.1.</span> <span class="nav-text">一、整体分类（常用）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81UDataAsset-vs-UPrimaryDataAsset"><span class="nav-number">8.2.</span> <span class="nav-text">二、UDataAsset vs UPrimaryDataAsset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81UPrimaryDataAsset-%E7%9A%84%E6%A0%B8%E5%BF%83%E7%89%B9%E7%82%B9"><span class="nav-number">8.3.</span> <span class="nav-text">三、UPrimaryDataAsset 的核心特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%92%8C-DataTable-CurveTable-%E7%9A%84%E5%8F%96%E8%88%8D"><span class="nav-number">8.4.</span> <span class="nav-text">四、和 DataTable &#x2F; CurveTable 的取舍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E4%B8%80%E4%B8%AA%E6%9C%80%E5%B0%8F-Primary-%E7%A4%BA%E4%BE%8B%E6%80%9D%E8%B7%AF"><span class="nav-number">8.5.</span> <span class="nav-text">五、一个最小 Primary 示例思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA"><span class="nav-number">8.6.</span> <span class="nav-text">六、常见误区</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%90%E6%9E%9C%E4%B8%8E%E4%B8%8B%E4%B8%80%E6%AD%A5"><span class="nav-number">9.</span> <span class="nav-text">成果与下一步</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
