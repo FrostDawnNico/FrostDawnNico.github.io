@@ -28,7 +28,7 @@
 <meta property="og:description" content="大气系统学习大纲">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-09-13T04:51:30.000Z">
-<meta property="article:modified_time" content="2026-09-28T15:22:16.492Z">
+<meta property="article:modified_time" content="2026-09-28T15:40:29.094Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-09-28 23:22:16" itemprop="dateModified" datetime="2026-09-28T23:22:16+08:00">2026-09-28</time>
+                <time title="Modified: 2026-09-28 23:40:29" itemprop="dateModified" datetime="2026-09-28T23:40:29+08:00">2026-09-28</time>
               </span>
 
           
@@ -238,15 +238,23 @@
 <p>每次只修改一个控制箱，完成后恢复基线</p>
 <h2 id="预先准备"><a href="#预先准备" class="headerlink" title="预先准备"></a>预先准备</h2><p>判断单个系统，带进森林</p>
 <h1 id="目标-1"><a href="#目标-1" class="headerlink" title="目标"></a>目标</h1><p>知道空气、太阳、天空光和曝光各自带来的变化——清楚改了什么、哪里变了、为什么变，以及怎样恢复</p>
+<p>体积雾、高度雾、树干、草地、山坡</p>
 <p>近处树干，中间树群，远处山坡，轮廓与背景的区分越来越弱，地面的雾带</p>
 <p>树的材质没有变，为什么远处更淡？地面雾带和远景变淡是否是同一个控制项？</p>
 <p>树梢的太阳、明亮的天空、较暗的建筑近景，形成层次</p>
-<h1 id="大气是如何改变画面的？"><a href="#大气是如何改变画面的？" class="headerlink" title="大气是如何改变画面的？"></a>大气是如何改变画面的？</h1><p>完整光路：太阳发出光-光穿过空气照到物体-物体反射的光再次穿过空气-到达相机</p>
+<p>如果需要调整应该从什么方向入手？</p>
+<h1 id="大气是如何改变画面的？"><a href="#大气是如何改变画面的？" class="headerlink" title="大气是如何改变画面的？"></a>大气是如何改变画面的？</h1><p>刨除相机和环境物体</p>
+<p>完整光路：太阳发出光-光穿过空气照到物体-物体反射的光再次穿过空气-到达相机</p>
 <p>大气渲染</p>
 <p>sky atmosphere</p>
 <p>吸收+散射，随距离累积</p>
-<h2 id="相机看见两部分"><a href="#相机看见两部分" class="headerlink" title="相机看见两部分"></a>相机看见两部分</h2><p>原来的光变少，消光</p>
-<p>沿途有光进入视线</p>
+<p>看到的光 &#x3D; 保留的光+散射光</p>
+<p>太阳：方向光&#x2F;直射光-光线照射到物体：材质反射&#x2F;发出的光-消光：一部分光被吸收或散射出视线-物体光穿过空气到相机：距离越远背景光可能越弱</p>
+<p>空气把部分太阳光散射进视线</p>
+<p>相机：最终像素</p>
+<h2 id="相机看见两部分"><a href="#相机看见两部分" class="headerlink" title="相机看见两部分"></a>相机看见两部分</h2><p>1.原来的光变少，消光</p>
+<p>2.沿途有光进入视线</p>
+<p>看到的光 &#x3D; 穿过空气后剩下的物体光 + 沿途散射进来的光</p>
 <p>距离增加时，原来物体的光保留得更少，沿途空气贡献也会改变</p>
 <h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>rayleigh散射</p>
 <p>mie散射</p>
