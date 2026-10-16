@@ -28,7 +28,7 @@
 <meta property="og:description" content="大气系统学习大纲">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-09-13T04:51:30.000Z">
-<meta property="article:modified_time" content="2026-10-16T10:29:50.736Z">
+<meta property="article:modified_time" content="2026-10-16T15:25:06.208Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-16 18:29:50" itemprop="dateModified" datetime="2026-10-16T18:29:50+08:00">2026-10-16</time>
+                <time title="Modified: 2026-10-16 23:25:06" itemprop="dateModified" datetime="2026-10-16T23:25:06+08:00">2026-10-16</time>
               </span>
 
           
@@ -206,8 +206,9 @@
 <p>atmosphere pass</p>
 <h1 id="大气渲染课程指南"><a href="#大气渲染课程指南" class="headerlink" title="大气渲染课程指南"></a>大气渲染课程指南</h1><p>把“看起来像大气效果”的感觉，变成可以解释、可以操作、可以验证的结论</p>
 <p>森林工程</p>
-<p>AI 出一个原画原图 模拟地编美术同学提供的设计</p>
 <p>European Forest Environment 从简单到复杂</p>
+<p>AI 出一个原画原图 模拟地编美术同学提供的设计</p>
+<p>美术资产不通过git管理，是通过p4进行管理的，p4可以将大文件传输加快（分片太大会爆内存）</p>
 <p>先在灰盒中排除材质和植被干扰</p>
 <p>再把已经理解的参数带入森林坡地</p>
 <p>最后在真实树冠、道路、云影和远景中检查效果是否成立</p>
@@ -245,6 +246,7 @@
 <p>树的材质没有变，为什么远处更淡？地面雾带和远景变淡是否是同一个控制项？</p>
 <p>树梢的太阳、明亮的天空、较暗的建筑近景，形成层次</p>
 <p>如果需要调整应该从什么方向入手？</p>
+<p>调了参数以后，能知道画面为什么变化？</p>
 <h1 id="大气是如何改变画面的？"><a href="#大气是如何改变画面的？" class="headerlink" title="大气是如何改变画面的？"></a>大气是如何改变画面的？</h1><p>刨除相机和环境物体</p>
 <p>完整光路：太阳发出光-光穿过空气照到物体-物体反射的光再次穿过空气-到达相机</p>
 <p>大气渲染</p>
@@ -252,18 +254,18 @@
 <p>吸收+散射，随距离累积</p>
 <p>看到的光 &#x3D; 保留的光+散射光</p>
 <p>太阳：方向光&#x2F;直射光-光线照射到物体：材质反射&#x2F;发出的光-消光：一部分光被吸收或散射出视线-物体光穿过空气到相机：距离越远背景光可能越弱</p>
-<p>空气把部分太阳光散射进视线</p>
+<p>空气把部分太阳光散射进视线，距离越远越少-远景的色差越来越大</p>
 <p>相机：最终像素</p>
 <h2 id="相机看见两部分"><a href="#相机看见两部分" class="headerlink" title="相机看见两部分"></a>相机看见两部分</h2><p>1.原来的光变少，消光</p>
 <p>2.沿途有光进入视线</p>
 <p>看到的光 &#x3D; 穿过空气后剩下的物体光 + 沿途散射进来的光</p>
 <p>距离增加时，原来物体的光保留得更少，沿途空气贡献也会改变，远景出现对比度下降和偏色</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>rayleigh散射</p>
-<p>mie散射</p>
-<p>吸收</p>
-<p>多次散射</p>
-<h2 id="对应组件"><a href="#对应组件" class="headerlink" title="对应组件"></a>对应组件</h2><p>太阳光 Directional Light</p>
-<p>大气介质 Sky Atmosphere</p>
+<h2 id="各种散射"><a href="#各种散射" class="headerlink" title="各种散射"></a>各种散射</h2><p>rayleigh散射-空气分子对短波长光的散射通常更强-蓝天、天空渐变；低太阳经过更长路径后出现暖色趋势</p>
+<p>mie散射：气溶胶等较大粒子产生更集中、更偏前向的散射-朦胧、能见度变化、太阳附近亮晕</p>
+<p>吸收：部分光能量在传播中被介质吸收-特定波段减少、改变透过光和天空颜色</p>
+<p>多次散射：光在进入相机前经历不止一次散射-改变天空整体能量、并为部分背光和阴影区域补充亮度</p>
+<h2 id="对应组件"><a href="#对应组件" class="headerlink" title="对应组件"></a>对应组件</h2><p>太阳光 Directional Light-平行光</p>
+<p>大气介质 Sky Atmosphere-计算天空颜色、散射、吸收和表面空气透视</p>
 <p>天空环境照明 Skylight</p>
 <p>相机显示 </p>
 <p>近地雾层</p>
@@ -348,7 +350,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Renderer"><span class="nav-number">1.</span> <span class="nav-text">Renderer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%B8%B2%E6%9F%93%E8%AF%BE%E7%A8%8B%E6%8C%87%E5%8D%97"><span class="nav-number">2.</span> <span class="nav-text">大气渲染课程指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">学习成果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E6%87%82%E7%8E%B0%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">看懂现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">建立实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E4%B8%AD%E7%9A%84%E5%A4%A7%E6%B0%94"><span class="nav-number">3.3.</span> <span class="nav-text">UE中的大气</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E8%88%8D"><span class="nav-number">3.4.</span> <span class="nav-text">取舍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">学习路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1%EF%BC%9A%E5%A4%A7%E6%B0%94%E5%9F%BA%E7%BA%BF"><span class="nav-number">5.</span> <span class="nav-text">L1：大气基线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">5.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">5.2.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.3.</span> <span class="nav-text">工程实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%85%88%E5%87%86%E5%A4%87"><span class="nav-number">5.4.</span> <span class="nav-text">预先准备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87-1"><span class="nav-number">6.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%98%AF%E5%A6%82%E4%BD%95%E6%94%B9%E5%8F%98%E7%94%BB%E9%9D%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">大气是如何改变画面的？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E6%9C%BA%E7%9C%8B%E8%A7%81%E4%B8%A4%E9%83%A8%E5%88%86"><span class="nav-number">7.1.</span> <span class="nav-text">相机看见两部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">7.2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E7%BB%84%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">对应组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">8.</span> <span class="nav-text">搭建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%956"><span class="nav-number">9.</span> <span class="nav-text">测试6</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Renderer"><span class="nav-number">1.</span> <span class="nav-text">Renderer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%B8%B2%E6%9F%93%E8%AF%BE%E7%A8%8B%E6%8C%87%E5%8D%97"><span class="nav-number">2.</span> <span class="nav-text">大气渲染课程指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">学习成果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E6%87%82%E7%8E%B0%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">看懂现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">建立实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E4%B8%AD%E7%9A%84%E5%A4%A7%E6%B0%94"><span class="nav-number">3.3.</span> <span class="nav-text">UE中的大气</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E8%88%8D"><span class="nav-number">3.4.</span> <span class="nav-text">取舍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">学习路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1%EF%BC%9A%E5%A4%A7%E6%B0%94%E5%9F%BA%E7%BA%BF"><span class="nav-number">5.</span> <span class="nav-text">L1：大气基线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">5.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">5.2.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.3.</span> <span class="nav-text">工程实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%85%88%E5%87%86%E5%A4%87"><span class="nav-number">5.4.</span> <span class="nav-text">预先准备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87-1"><span class="nav-number">6.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%98%AF%E5%A6%82%E4%BD%95%E6%94%B9%E5%8F%98%E7%94%BB%E9%9D%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">大气是如何改变画面的？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E6%9C%BA%E7%9C%8B%E8%A7%81%E4%B8%A4%E9%83%A8%E5%88%86"><span class="nav-number">7.1.</span> <span class="nav-text">相机看见两部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E6%95%A3%E5%B0%84"><span class="nav-number">7.2.</span> <span class="nav-text">各种散射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E7%BB%84%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">对应组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">8.</span> <span class="nav-text">搭建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%956"><span class="nav-number">9.</span> <span class="nav-text">测试6</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
