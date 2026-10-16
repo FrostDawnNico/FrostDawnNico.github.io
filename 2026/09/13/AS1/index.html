@@ -28,7 +28,7 @@
 <meta property="og:description" content="大气系统学习大纲">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-09-13T04:51:30.000Z">
-<meta property="article:modified_time" content="2026-10-16T15:25:06.208Z">
+<meta property="article:modified_time" content="2026-10-16T17:58:13.357Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-16 23:25:06" itemprop="dateModified" datetime="2026-10-16T23:25:06+08:00">2026-10-16</time>
+                <time title="Modified: 2026-10-17 01:58:13" itemprop="dateModified" datetime="2026-10-17T01:58:13+08:00">2026-10-17</time>
               </span>
 
           
@@ -266,11 +266,15 @@
 <p>多次散射：光在进入相机前经历不止一次散射-改变天空整体能量、并为部分背光和阴影区域补充亮度</p>
 <h2 id="对应组件"><a href="#对应组件" class="headerlink" title="对应组件"></a>对应组件</h2><p>太阳光 Directional Light-平行光</p>
 <p>大气介质 Sky Atmosphere-计算天空颜色、散射、吸收和表面空气透视</p>
-<p>天空环境照明 Skylight</p>
-<p>相机显示 </p>
-<p>近地雾层</p>
+<p>天空环境照明 Skylight-将天空环境用于物体照明和反射，使背光面仍有环境贡献</p>
+<p>相机显示 Post Process-控制曝光和最终显示亮度；不等于真实光照强度</p>
+<p>近地雾层 Exponential Height Fog-用于贴地雾和体积雾</p>
 <p>太阳负责发光、大气负责改变传播中的光、Skylight负责天空环境照明、曝光负责把结果显示</p>
-<h1 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h1><h1 id="测试6"><a href="#测试6" class="headerlink" title="测试6"></a>测试6</h1>
+<p>每个组件对应光路中的职责</p>
+<h1 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h1><p>观察物体：近景、中景、远景</p>
+<p>将所有大气系统的元素继承于同一个rig</p>
+<p>自定义游戏模式，继承自原设计增加更多的操作选项和面板</p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1>
     </div>
 
     
@@ -350,7 +354,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Renderer"><span class="nav-number">1.</span> <span class="nav-text">Renderer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%B8%B2%E6%9F%93%E8%AF%BE%E7%A8%8B%E6%8C%87%E5%8D%97"><span class="nav-number">2.</span> <span class="nav-text">大气渲染课程指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">学习成果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E6%87%82%E7%8E%B0%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">看懂现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">建立实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E4%B8%AD%E7%9A%84%E5%A4%A7%E6%B0%94"><span class="nav-number">3.3.</span> <span class="nav-text">UE中的大气</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E8%88%8D"><span class="nav-number">3.4.</span> <span class="nav-text">取舍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">学习路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1%EF%BC%9A%E5%A4%A7%E6%B0%94%E5%9F%BA%E7%BA%BF"><span class="nav-number">5.</span> <span class="nav-text">L1：大气基线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">5.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">5.2.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.3.</span> <span class="nav-text">工程实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%85%88%E5%87%86%E5%A4%87"><span class="nav-number">5.4.</span> <span class="nav-text">预先准备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87-1"><span class="nav-number">6.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%98%AF%E5%A6%82%E4%BD%95%E6%94%B9%E5%8F%98%E7%94%BB%E9%9D%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">大气是如何改变画面的？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E6%9C%BA%E7%9C%8B%E8%A7%81%E4%B8%A4%E9%83%A8%E5%88%86"><span class="nav-number">7.1.</span> <span class="nav-text">相机看见两部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E6%95%A3%E5%B0%84"><span class="nav-number">7.2.</span> <span class="nav-text">各种散射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E7%BB%84%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">对应组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">8.</span> <span class="nav-text">搭建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%956"><span class="nav-number">9.</span> <span class="nav-text">测试6</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Renderer"><span class="nav-number">1.</span> <span class="nav-text">Renderer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%B8%B2%E6%9F%93%E8%AF%BE%E7%A8%8B%E6%8C%87%E5%8D%97"><span class="nav-number">2.</span> <span class="nav-text">大气渲染课程指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">学习成果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E6%87%82%E7%8E%B0%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">看懂现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">建立实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E4%B8%AD%E7%9A%84%E5%A4%A7%E6%B0%94"><span class="nav-number">3.3.</span> <span class="nav-text">UE中的大气</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E8%88%8D"><span class="nav-number">3.4.</span> <span class="nav-text">取舍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">学习路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1%EF%BC%9A%E5%A4%A7%E6%B0%94%E5%9F%BA%E7%BA%BF"><span class="nav-number">5.</span> <span class="nav-text">L1：大气基线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">5.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">5.2.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.3.</span> <span class="nav-text">工程实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%85%88%E5%87%86%E5%A4%87"><span class="nav-number">5.4.</span> <span class="nav-text">预先准备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87-1"><span class="nav-number">6.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%98%AF%E5%A6%82%E4%BD%95%E6%94%B9%E5%8F%98%E7%94%BB%E9%9D%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">大气是如何改变画面的？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E6%9C%BA%E7%9C%8B%E8%A7%81%E4%B8%A4%E9%83%A8%E5%88%86"><span class="nav-number">7.1.</span> <span class="nav-text">相机看见两部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E6%95%A3%E5%B0%84"><span class="nav-number">7.2.</span> <span class="nav-text">各种散射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E7%BB%84%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">对应组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">8.</span> <span class="nav-text">搭建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">9.</span> <span class="nav-text">测试</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
