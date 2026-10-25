@@ -28,7 +28,7 @@
 <meta property="og:description" content="大气系统学习大纲">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-09-13T04:51:30.000Z">
-<meta property="article:modified_time" content="2026-10-24T17:52:08.672Z">
+<meta property="article:modified_time" content="2026-10-25T13:10:22.328Z">
 <meta property="article:author" content="Nico Zhong">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-25 01:52:08" itemprop="dateModified" datetime="2026-10-25T01:52:08+08:00">2026-10-25</time>
+                <time title="Modified: 2026-10-25 21:10:22" itemprop="dateModified" datetime="2026-10-25T21:10:22+08:00">2026-10-25</time>
               </span>
 
           
@@ -329,7 +329,191 @@
 </li>
 </ul>
 <p>一句话记牢：.generated.h 是 UHT 给你文件“封口”的那行，封口之后再塞东西，既违反契约，也会让生成代码找不到该有的上下文。</p>
+<h2 id="UFUNCTION-Exec-是什么"><a href="#UFUNCTION-Exec-是什么" class="headerlink" title="UFUNCTION(Exec)是什么"></a>UFUNCTION(Exec)是什么</h2><p>UFUNCTION(Exec) 是 Unreal Engine（虚幻引擎） 中一个非常实用的 函数说明符（Specifier）。它的作用是：将 C++ 函数暴露给 UE 的控制台（Console），使其可以通过输入命令直接调用。</p>
+<p>简单来说，它就是给你的函数开了一个“控制台后门”，方便你随时在游戏运行时执行特定逻辑（常用于调试、GM 指令、快速测试等）。</p>
+<ol>
+<li>基本用法</li>
+</ol>
+<p>声明（.h 文件）</p>
+<p>#pragma once</p>
+<p>#include “CoreMinimal.h”<br>#include “GameFramework&#x2F;PlayerController.h”<br>#include “MyPlayerController.generated.h”</p>
+<p>UCLASS()<br>class AMyPlayerController : public APlayerController<br>{<br>GENERATED_BODY()</p>
+<pre><code>// 标记 Exec，使其能在控制台调用
+UFUNCTION(Exec)
+void FlyToLocation(float X, float Y, float Z);
 
+UFUNCTION(Exec)
+void HealPlayer(int32 Amount);
+</code></pre>
+<p>};</p>
+<p>实现（.cpp 文件）</p>
+<p>#include “MyPlayerController.h”<br>#include “Kismet&#x2F;GameplayStatics.h”</p>
+<p>void AMyPlayerController::FlyToLocation(float X, float Y, float Z)<br>{<br>if (GetPawn())<br>{<br>GetPawn()-&gt;SetActorLocation(FVector(X, Y, Z));<br>UE_LOG(LogTemp, Warning, TEXT(“飞到了: %f, %f, %f”), X, Y, Z);<br>}<br>}</p>
+<p>void AMyPlayerController::HealPlayer(int32 Amount)<br>{<br>&#x2F;&#x2F; 假设你的角色有受伤害&#x2F;回血逻辑<br>UE_LOG(LogTemp, Warning, TEXT(“回血: %d”), Amount);<br>}</p>
+<p>在控制台中调用</p>
+<p>在编辑器或打包游戏的窗口中，按 ~ 键（波浪号） 打开控制台，直接输入：</p>
+<p>FlyToLocation 1000 2000 300<br>HealPlayer 50</p>
+<p>函数就会立刻执行，参数之间用空格隔开。</p>
+<ol start="2">
+<li>核心机制：Exec 函数的查找链（非常重要！）</li>
+</ol>
+<p>并不是随便在哪个类里写 UFUNCTION(Exec) 都能被控制台找到。UE 有一套严格的查找顺序（查找链）：</p>
+<ol>
+<li>PlayerController（最优先）</li>
+<li>Controlled Pawn（PlayerController 当前控制的 Pawn）</li>
+<li>CheatManager（如果设置了）</li>
+<li>GameMode（仅限在服务器&#x2F;PIE 中）</li>
+</ol>
+<p>⚠️ 常见坑点：<br>如果你把 Exec 函数写在一个普通的 AActor 或 UActorComponent 里，默认是调不到的，因为控制台不知道去那里找。<br>•   解决办法 1：把函数写在 APlayerController 或 APawn 里。</p>
+<p>•   解决办法 2：通过 PlayerController 转发调用。</p>
+<p>•   解决办法 3：使用 CheatManager（见下文）。</p>
+<ol start="3">
+<li>参数与返回值限制</li>
+</ol>
+<p>•   参数类型：支持绝大多数基础类型和 UE 常用类型，如 int32, float, bool, FString, FVector, FName 等。</p>
+<p>•   返回值：Exec 函数通常声明为 void。控制台命令不直接处理返回值，如果你想看结果，用 UE_LOG 打印到屏幕或输出日志。</p>
+<p>•   参数数量：可以有 0 到多个参数，控制台输入时用空格分隔。</p>
+<ol start="4">
+<li>网络与权限（多人游戏&#x2F;防作弊）</li>
+</ol>
+<p>Exec 函数默认是在调用者本地客户端执行的。<br>•   如果你在多人游戏中希望 Exec 命令在服务器端执行（比如 GM 刷道具），你需要：</p>
+<pre><code>1. 在 Exec 函数内部调用一个 Server RPC（可靠服务器远程调用）。
+2. 或者在 GameMode 里写 Exec 函数（GameMode 只存在于服务器）。
+</code></pre>
+<p>•   权限检查：正式项目中，一定要检查调用者是否有权限（比如 HasAuthority() 或判断是否是管理员），否则玩家随便开个控制台就能输入命令作弊。</p>
+<ol start="5">
+<li>进阶：配合 CheatManager 使用</li>
+</ol>
+<p>UE 提供了一个专门管理调试&#x2F;作弊命令的类：UCheatManager。<br>你可以继承它，把大量的 Exec 函数写在 CheatManager 里，然后在 PlayerController 中指定：<br>&#x2F;&#x2F; 在 PlayerController 里<br>PlayerController-&gt;CheatManagerClass &#x3D; UMyCheatManager::StaticClass();</p>
+<p>这样既能保持代码整洁，又能让所有命令都通过控制台调用。</p>
+<p>总结</p>
+<p>UFUNCTION(Exec) 是 UE 开发者调试和测试的神器。如果你正在写 SetupInputComponent 处理玩家输入，同时需要一些快速测试角色状态、传送、刷物品的功能，Exec 函数是最快的实现方式——不需要绑定任何按键，打开控制台敲一行命令就搞定。</p>
+<h2 id="IE-Pressed是什么KeyEvent，还有哪些常用的keyevent"><a href="#IE-Pressed是什么KeyEvent，还有哪些常用的keyevent" class="headerlink" title="IE_Pressed是什么KeyEvent，还有哪些常用的keyevent"></a>IE_Pressed是什么KeyEvent，还有哪些常用的keyevent</h2><p>IE_Pressed 是 UE 传统输入系统里的按键事件枚举 EInputEvent 的一个值，意思是“按键按下的那一瞬间触发一次”，不是按住持续触发。</p>
+<p>一、IE_Pressed 到底是什么</p>
+<p>&#x2F;&#x2F; 传统输入系统里的写法<br>PlayerInputComponent-&gt;BindAction(<br>“Jump”,          &#x2F;&#x2F; Action Mapping 名字（在项目设置里配）<br>IE_Pressed,      &#x2F;&#x2F; 按键事件类型<br>this,            &#x2F;&#x2F; 回调对象<br>&amp;AMyChar::StartJump  &#x2F;&#x2F; 触发的函数<br>);</p>
+<p>• IE_Pressed：手指&#x2F;鼠标刚按下去的那一帧调用一次</p>
+<p>• 适合“开火”“跳跃起跳”“交互”这种单次触发的逻辑</p>
+<p>二、EInputEvent 全部枚举值</p>
+<p>定义在 Engine&#x2F;EngineBaseTypes.h：<br>enum EInputEvent<br>{<br>IE_Pressed     &#x3D; 0,  &#x2F;&#x2F; 按下瞬间<br>IE_Released    &#x3D; 1,  &#x2F;&#x2F; 松开瞬间<br>IE_Repeat      &#x3D; 2,  &#x2F;&#x2F; 按住时每帧重复触发<br>IE_DoubleClick &#x3D; 3,  &#x2F;&#x2F; 双击<br>IE_Axis        &#x3D; 4,  &#x2F;&#x2F; 轴输入激活（内部用，BindAxis 相关）<br>IE_MAX         &#x3D; 5   &#x2F;&#x2F; 枚举边界，别用<br>};</p>
+<p>常用几个的含义</p>
+<p>枚举 触发时机 典型用途</p>
+<p>IE_Pressed 按下瞬间（一次） 开火、跳跃、交互、切换武器</p>
+<p>IE_Released 松开瞬间（一次） 停跳、蓄力结束、松手射击</p>
+<p>IE_Repeat 按住时每帧都触发 连续开火、按住加速、持续旋转</p>
+<p>IE_DoubleClick 双击时 鼠标双击拾取、锁定目标</p>
+<p>三、经典搭配：Pressed + Released 成对写</p>
+<p>void AMyChar::SetupPlayerInputComponent(UInputComponent* PC)<br>{<br>Super::SetupPlayerInputComponent(PC);</p>
+<pre><code>// 跳跃：按下起跳，松开停止
+PC-&gt;BindAction(&quot;Jump&quot;, IE_Pressed,  this, &amp;AMyChar::OnJumpStart);
+PC-&gt;BindAction(&quot;Jump&quot;, IE_Released, this, &amp;AMyChar::OnJumpEnd);
+
+// 开火：点一下打一发
+PC-&gt;BindAction(&quot;Fire&quot;, IE_Pressed, this, &amp;AMyChar::OnFire);
+
+// 持续技能：按住一直放
+PC-&gt;BindAction(&quot;Charge&quot;, IE_Repeat, this, &amp;AMyChar::OnCharging);
+</code></pre>
+<p>}</p>
+<p>⚠️ 注意：BindAction 是“动作型”输入（离散事件），BindAxis 是“轴型”输入（连续数值，比如移动、视角），轴映射不用 IE_Pressed 这套枚举，它每帧都跑，带一个 float 值。</p>
+<p>四、容易混淆的点</p>
+<ol>
+<li>IE_Repeat ≠ 自己写计时器</li>
+</ol>
+<p>按住一个键，系统默认会按系统按键重复频率不断发 IE_Repeat。如果你想做“每 0.2 秒开一发”，要么用 IE_Repeat 自己在函数里计时，要么用增强输入的 Hold 触发器。</p>
+<ol start="2">
+<li>触屏也能用同一套</li>
+</ol>
+<p>PlayerInputComponent-&gt;BindTouch(IE_Pressed,  this, &amp;AMyChar::TouchStart);<br>PlayerInputComponent-&gt;BindTouch(IE_Released, this, &amp;AMyChar::TouchEnd);</p>
+<p>BindTouch 同样吃 EInputEvent。</p>
+<ol start="3">
+<li>增强输入（Enhanced Input）里的对应概念</li>
+</ol>
+<p>如果你用的是 UE5 新版 Enhanced Input 系统，旧枚举被换成了 Trigger 类型：</p>
+<p>旧系统 EInputEvent 增强输入 Trigger</p>
+<p>IE_Pressed Started &#x2F; Triggered（首帧）</p>
+<p>IE_Released Completed</p>
+<p>IE_Repeat Triggered（持续）</p>
+<p>IE_DoubleClick Combo &#x2F; 自定义 Trigger</p>
+<p>老项目里看到 IE_Pressed 很正常，新项目推荐迁移到 Enhanced Input。</p>
+<p>五、一句话总结</p>
+<p>• IE_Pressed &#x3D; 按下瞬间触发一次</p>
+<p>• 同族常用兄弟：IE_Released（松开）、IE_Repeat（按住连发）、IE_DoubleClick（双击）</p>
+<p>• 它属于 EInputEvent，只用在 BindAction &#x2F; BindKey &#x2F; BindTouch 里</p>
+<p>• 连续移动&#x2F;视角用 BindAxis，别用这套枚举</p>
+<h2 id="APawn和APlayerController有什么区别"><a href="#APawn和APlayerController有什么区别" class="headerlink" title="APawn和APlayerController有什么区别"></a>APawn和APlayerController有什么区别</h2><p>这是 UE 里最基础也最容易混淆的一组关系。理解了它，你对 UE 的整个架构就通了一半。</p>
+<p>一句话区分</p>
+<p>APawn &#x3D; 身体（能被控制的对象）</p>
+<p>APlayerController &#x3D; 大脑（发出指令的控制器）</p>
+<p>一个玩家 &#x3D; 一个 Controller（大脑）+ 一个 Pawn（身体）。大脑可以换身体，身体也可以被不同的人控制。</p>
+<p>一、本质定位</p>
+<p>APawn APlayerController</p>
+<p>是什么 世界中的一个实体，能被”占有” 玩家和游戏世界之间的”中介”</p>
+<p>类比 身体 &#x2F; 木偶 大脑 &#x2F; 提线木偶的人</p>
+<p>存在于世界 ✅ 有 Transform、有位置、能被看到 ❌ 没有物理位置，是”隐形”的逻辑对象</p>
+<p>数量关系 一个 Controller 同一时刻只能控制一个 Pawn 一个 Pawn 同一时刻只能被一个 Controller 控制</p>
+<p>网络角色 每个客户端都有一份拷贝（复制） 只在拥有它的客户端和服务器上存在</p>
+<p>二、各自管什么？</p>
+<p>APawn 负责的事（身体的事）</p>
+<p>✅ 物理表现：Mesh、碰撞体、在世界中的位置和旋转<br>✅ 移动能力：CharacterMovementComponent 挂在 Pawn 上<br>✅ 被看到：渲染、动画、粒子<br>✅ 被碰撞：被子弹打到的是 Pawn<br>✅ 被拥有：被 Controller Possess &#x2F; Unpossess</p>
+<p>APlayerController 负责的事（大脑的事）</p>
+<p>✅ 接收输入：键盘、鼠标、手柄（SetupInputComponent 在这里）<br>✅ 相机管理：PlayerCameraManager，控制视角<br>✅ HUD &#x2F; UI：HUDClass、UMG Widget 的显示控制<br>✅ 网络同步：客户端和服务器之间的 RPC 通道<br>✅ 游戏逻辑：菜单开关、暂停、作弊命令（Exec）<br>✅ 控制切换：Possess 不同的 Pawn（换角色、载具）</p>
+<p>三、生命周期：它们怎么配合</p>
+<p>游戏启动<br>↓<br>GameMode 生成 PlayerController（Spawn PlayerController）<br>↓<br>PlayerController 请求生成 Pawn（Spawn Default Pawn）<br>↓<br>PlayerController 调用 Possess(Pawn)  ← 大脑接管身体<br>↓<br>玩家按 W → Controller 收到输入 → Controller 告诉 Pawn 往前走 → Pawn 移动</p>
+<p>关键 API</p>
+<p>&#x2F;&#x2F; Controller 控制 Pawn<br>PlayerController-&gt;Possess(MyPawn);      &#x2F;&#x2F; 接管<br>PlayerController-&gt;UnPossess();           &#x2F;&#x2F; 放手</p>
+<p>&#x2F;&#x2F; Pawn 查询自己的 Controller<br>APlayerController* PC &#x3D; GetController<APlayerController>();</p>
+<p>四、用你的 AtmosphereLab 项目举例</p>
+<p>你之前的代码：<br>&#x2F;&#x2F; GameMode 里<br>DefaultPawnClass &#x3D; AAtmosphereLabCharacter::StaticClass();        &#x2F;&#x2F; 身体<br>PlayerControllerClass &#x3D; AAtmosphereLabPlayerController::StaticClass(); &#x2F;&#x2F; 大脑</p>
+<p>&#x2F;&#x2F; PlayerController 里<br>void AAtmosphereLabPlayerController::SetupInputComponent()<br>{<br>Super::SetupInputComponent();<br>InputComponent-&gt;BindKey(EKeys::One, IE_Pressed, this, &amp;AAtmosphereLabPlayerController::MainCamera);<br>&#x2F;&#x2F; ↑ 大脑接收按键 → 大脑决定切哪个相机<br>}</p>
+<p>这里的设计思路是：<br>• 按 1&#x2F;2&#x2F;3&#x2F;4 切相机 → 这是”决策”，放 Controller 里 ✅</p>
+<p>• 角色移动、跳跃 → 这是”身体动作”，放 Pawn&#x2F;Character 里</p>
+<p>• 天空光照、曝光参数调节 → 这是全局效果，放 Controller 里管也合理 ✅</p>
+<p>五、为什么要有这个分离？（设计意图）</p>
+<ol>
+<li>换身体（载具系统）</li>
+</ol>
+<p>&#x2F;&#x2F; 玩家走到车旁边，按 F 上车<br>PlayerController-&gt;UnPossess();<br>PlayerController-&gt;Possess(CarPawn);  &#x2F;&#x2F; 大脑换了个身体，输入和相机自动跟着走</p>
+<p>如果输入和移动都绑在 Pawn 上，换身体就得把所有逻辑搬过去，极其痛苦。</p>
+<ol start="2">
+<li>旁观者模式 &#x2F; 死亡后不销毁</li>
+</ol>
+<p>&#x2F;&#x2F; 角色死了<br>Pawn-&gt;Destroy();  &#x2F;&#x2F; 身体没了<br>&#x2F;&#x2F; 但 Controller 还在 → 可以显示死亡UI、观战、选重生点<br>&#x2F;&#x2F; 重生时 → Spawn 新 Pawn → Possess 回去</p>
+<ol start="3">
+<li>网络架构</li>
+</ol>
+<p>• 服务器 上每个玩家都有一个 PlayerController（权威）</p>
+<p>• 客户端 只有”自己的” PlayerController</p>
+<p>• Pawn 在所有客户端都有拷贝（复制同步），但 Controller 不复制给其他人</p>
+<p>这就是为什么 RPC（远程调用）要通过 Controller 走的原因。</p>
+<ol start="4">
+<li>AI 也能控制 Pawn</li>
+</ol>
+<p>APlayerController → 控制 Pawn（人类玩家）<br>AAIController     → 控制 Pawn（AI 敌人）</p>
+<p>Pawn 不关心谁在控制它，只管执行移动指令。同一套移动逻辑，人类和 AI 都能用。</p>
+<p>六、SetupInputComponent 为什么两个类都有？</p>
+<p>APawn 版本 APlayerController 版本</p>
+<p>签名 SetupPlayerInputComponent(UInputComponent*) SetupInputComponent()</p>
+<p>InputComponent 来源 参数传入 成员变量 this-&gt;InputComponent</p>
+<p>适合绑什么 角色专属操作（移动、跳跃、技能） 全局&#x2F;相机&#x2F;UI操作（切视角、暂停、作弊）</p>
+<p>谁调用 Controller Possess Pawn 后自动调用 Controller 初始化时自动调用</p>
+<p>你的 AtmosphereLab 项目里，相机切换、天空参数调节放在 Controller 的 SetupInputComponent 里，是完全正确的选择——这些是”玩家决策层面的操作”，不属于角色身体本身。</p>
+<p>七、什么时候该放哪？</p>
+<p>功能 放 Pawn 放 PlayerController</p>
+<p>WASD 移动 ✅</p>
+<p>跳跃&#x2F;蹲下 ✅</p>
+<p>动画状态 ✅</p>
+<p>鼠标控制视角 ✅（或 Pawn 里处理）</p>
+<p>切换相机预设 ✅</p>
+<p>开关 HUD&#x2F;菜单 ✅</p>
+<p>暂停游戏 ✅</p>
+<p>作弊&#x2F;调试命令 ✅</p>
+<p>血量&#x2F;死亡逻辑 ✅</p>
+<p>武器开火 看设计（通常 Pawn&#x2F;Character） 也可以 Controller</p>
+<p>八、一句话总结</p>
+<p>Pawn 是”能被操作的东西”，Controller 是”操作它的人”。</p>
+<p>输入进来先到 Controller，Controller 决定怎么指挥 Pawn。</p>
+<p>身体可以换，大脑一直在。</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2>
     </div>
 
     
@@ -409,7 +593,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Renderer"><span class="nav-number">1.</span> <span class="nav-text">Renderer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%B8%B2%E6%9F%93%E8%AF%BE%E7%A8%8B%E6%8C%87%E5%8D%97"><span class="nav-number">2.</span> <span class="nav-text">大气渲染课程指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">学习成果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E6%87%82%E7%8E%B0%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">看懂现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">建立实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E4%B8%AD%E7%9A%84%E5%A4%A7%E6%B0%94"><span class="nav-number">3.3.</span> <span class="nav-text">UE中的大气</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E8%88%8D"><span class="nav-number">3.4.</span> <span class="nav-text">取舍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">学习路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1%EF%BC%9A%E5%A4%A7%E6%B0%94%E5%9F%BA%E7%BA%BF"><span class="nav-number">5.</span> <span class="nav-text">L1：大气基线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">5.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">5.2.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.3.</span> <span class="nav-text">工程实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%85%88%E5%87%86%E5%A4%87"><span class="nav-number">5.4.</span> <span class="nav-text">预先准备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87-1"><span class="nav-number">6.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%98%AF%E5%A6%82%E4%BD%95%E6%94%B9%E5%8F%98%E7%94%BB%E9%9D%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">大气是如何改变画面的？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E6%9C%BA%E7%9C%8B%E8%A7%81%E4%B8%A4%E9%83%A8%E5%88%86"><span class="nav-number">7.1.</span> <span class="nav-text">相机看见两部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E6%95%A3%E5%B0%84"><span class="nav-number">7.2.</span> <span class="nav-text">各种散射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E7%BB%84%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">对应组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">8.</span> <span class="nav-text">搭建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#QuesColle"><span class="nav-number">9.</span> <span class="nav-text">QuesColle</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#rider%E4%B8%AD%E5%8F%B3%E9%94%AE%E6%96%B0%E5%BB%BAUnreal%E7%B1%BBGameMode%E7%B1%BB%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8Rules%E4%B8%8B%E8%80%8C%E4%B8%8D%E6%98%AFSamples%E4%B8%8B"><span class="nav-number">9.1.</span> <span class="nav-text">rider中右键新建Unreal类GameMode类会出现在Rules下而不是Samples下</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E5%A4%B4%E6%96%87%E4%BB%B6%E4%B8%AD-include%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E5%9C%A8%E2%80%9D-generated-h%E2%80%9D%E4%B9%8B%E5%90%8E%E7%9A%84%E8%A1%8C"><span class="nav-number">9.2.</span> <span class="nav-text">UE头文件中#include其他内容为什么不能在”.generated.h”之后的行</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Renderer"><span class="nav-number">1.</span> <span class="nav-text">Renderer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%B8%B2%E6%9F%93%E8%AF%BE%E7%A8%8B%E6%8C%87%E5%8D%97"><span class="nav-number">2.</span> <span class="nav-text">大气渲染课程指南</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">学习成果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E6%87%82%E7%8E%B0%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">看懂现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">建立实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E4%B8%AD%E7%9A%84%E5%A4%A7%E6%B0%94"><span class="nav-number">3.3.</span> <span class="nav-text">UE中的大气</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E8%88%8D"><span class="nav-number">3.4.</span> <span class="nav-text">取舍</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">学习路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L1%EF%BC%9A%E5%A4%A7%E6%B0%94%E5%9F%BA%E7%BA%BF"><span class="nav-number">5.</span> <span class="nav-text">L1：大气基线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">5.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">5.2.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.3.</span> <span class="nav-text">工程实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%85%88%E5%87%86%E5%A4%87"><span class="nav-number">5.4.</span> <span class="nav-text">预先准备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87-1"><span class="nav-number">6.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%B0%94%E6%98%AF%E5%A6%82%E4%BD%95%E6%94%B9%E5%8F%98%E7%94%BB%E9%9D%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">大气是如何改变画面的？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E6%9C%BA%E7%9C%8B%E8%A7%81%E4%B8%A4%E9%83%A8%E5%88%86"><span class="nav-number">7.1.</span> <span class="nav-text">相机看见两部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E6%95%A3%E5%B0%84"><span class="nav-number">7.2.</span> <span class="nav-text">各种散射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E7%BB%84%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">对应组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">8.</span> <span class="nav-text">搭建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#QuesColle"><span class="nav-number">9.</span> <span class="nav-text">QuesColle</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#rider%E4%B8%AD%E5%8F%B3%E9%94%AE%E6%96%B0%E5%BB%BAUnreal%E7%B1%BBGameMode%E7%B1%BB%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8Rules%E4%B8%8B%E8%80%8C%E4%B8%8D%E6%98%AFSamples%E4%B8%8B"><span class="nav-number">9.1.</span> <span class="nav-text">rider中右键新建Unreal类GameMode类会出现在Rules下而不是Samples下</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UE%E5%A4%B4%E6%96%87%E4%BB%B6%E4%B8%AD-include%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E5%9C%A8%E2%80%9D-generated-h%E2%80%9D%E4%B9%8B%E5%90%8E%E7%9A%84%E8%A1%8C"><span class="nav-number">9.2.</span> <span class="nav-text">UE头文件中#include其他内容为什么不能在”.generated.h”之后的行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UFUNCTION-Exec-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">9.3.</span> <span class="nav-text">UFUNCTION(Exec)是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IE-Pressed%E6%98%AF%E4%BB%80%E4%B9%88KeyEvent%EF%BC%8C%E8%BF%98%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B8%B8%E7%94%A8%E7%9A%84keyevent"><span class="nav-number">9.4.</span> <span class="nav-text">IE_Pressed是什么KeyEvent，还有哪些常用的keyevent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#APawn%E5%92%8CAPlayerController%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB"><span class="nav-number">9.5.</span> <span class="nav-text">APawn和APlayerController有什么区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">9.6.</span> <span class="nav-text"></span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
