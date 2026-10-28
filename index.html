@@ -219,7 +219,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2026/10/14/AS3/" class="post-title-link" itemprop="url">大气系统3</a>
+            <a href="/2026/10/14/AS3/" class="post-title-link" itemprop="url">大气系统 Atmospheric system 2</a>
         </h2>
 
         <div class="post-meta">
@@ -236,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-24 23:53:44" itemprop="dateModified" datetime="2026-10-24T23:53:44+08:00">2026-10-24</time>
+                <time title="Modified: 2026-10-28 21:39:37" itemprop="dateModified" datetime="2026-10-28T21:39:37+08:00">2026-10-28</time>
               </span>
 
           
@@ -250,7 +250,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>森林大气系统的优化</p>
+          <p>森林中的简单大气系统</p>
 
       
     </div>
@@ -284,7 +284,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2026/09/28/AS2/" class="post-title-link" itemprop="url">大气渲染2</a>
+            <a href="/2026/09/28/AS2/" class="post-title-link" itemprop="url">大气系统源码拆解</a>
         </h2>
 
         <div class="post-meta">
@@ -301,7 +301,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-25 01:41:15" itemprop="dateModified" datetime="2026-10-25T01:41:15+08:00">2026-10-25</time>
+                <time title="Modified: 2026-10-28 21:50:15" itemprop="dateModified" datetime="2026-10-28T21:50:15+08:00">2026-10-28</time>
               </span>
 
           
@@ -315,8 +315,86 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>森林中的简单大气系统</p>
-<h1 id=""><a href="#" class="headerlink" title=""></a></h1>
+          <p>代码实现中进展与问题汇总</p>
+<h1 id="EngineUtils-h-和-Camera-CameraActor-h-头文件作用"><a href="#EngineUtils-h-和-Camera-CameraActor-h-头文件作用" class="headerlink" title="EngineUtils.h 和 Camera&#x2F;CameraActor.h 头文件作用"></a>EngineUtils.h 和 Camera&#x2F;CameraActor.h 头文件作用</h1><p>它们分别提供了代码中两个核心要素的<strong>完整定义</strong>：</p>
+<hr>
+<h3 id="1-include-EngineUtils-h-——-为了使用-TActorIterator-模板类"><a href="#1-include-EngineUtils-h-——-为了使用-TActorIterator-模板类" class="headerlink" title="1. #include &quot;EngineUtils.h&quot; —— 为了使用 TActorIterator 模板类"></a>1. <code>#include &quot;EngineUtils.h&quot;</code> —— 为了使用 <code>TActorIterator</code> 模板类</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (TActorIterator&lt;ACameraActor&gt; <span class="built_in">It</span>(<span class="built_in">GetWorld</span>()); It; ++It)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><code>TActorIterator</code> 的定义所在</strong>：<code>TActorIterator</code> 是 Unreal Engine 提供的一个模板迭代器，专门用于遍历 <code>UWorld</code> 中的所有 <code>AActor</code>（或指定派生类的 Actor）。它的类模板定义、构造函数、运算符重载（<code>++</code>、<code>*</code>、<code>bool()</code> 等）全部写在 <code>EngineUtils.h</code> 里。</li>
+<li><strong>为什么必须包含</strong>：当你用 <code>TActorIterator&lt;ACameraActor&gt;</code> 声明变量 <code>It</code> 时，编译器需要看到模板的完整定义才能进行<strong>模板实例化</strong>。如果不包含这个头文件，编译器会直接报错，提示 <code>TActorIterator</code> 是未定义的标识符。</li>
+</ul>
+<hr>
+<h3 id="2-include-Camera-CameraActor-h-——-为了使用-ACameraActor-类"><a href="#2-include-Camera-CameraActor-h-——-为了使用-ACameraActor-类" class="headerlink" title="2. #include &quot;Camera/CameraActor.h&quot; —— 为了使用 ACameraActor 类"></a>2. <code>#include &quot;Camera/CameraActor.h&quot;</code> —— 为了使用 <code>ACameraActor</code> 类</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!It-&gt;<span class="built_in">ActorHasTag</span>(Tag)) <span class="keyword">continue</span>;</span><br><span class="line">Found = *It;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><code>ACameraActor</code> 类的定义所在</strong>：这个头文件定义了摄像机 Actor 类 <code>ACameraActor</code>（它继承自 <code>AActor</code>）。</li>
+<li><strong>作为模板参数需要完整类型</strong>：<code>TActorIterator&lt;ACameraActor&gt;</code> 中的模板参数 <code>ACameraActor</code> 不能是“前置声明”（<code>class ACameraActor;</code> 不够用）。因为迭代器内部需要将 <code>AActor*</code> 安全地转换并赋值给 <code>ACameraActor*</code>（<code>Found = *It</code> 就是这一步），编译器必须知道 <code>ACameraActor</code> 是 <code>AActor</code> 的派生类，这需要看到完整的类定义。</li>
+<li><strong>调用成员函数需要确认继承关系</strong>：<code>It-&gt;ActorHasTag(Tag)</code> 中，<code>It</code> 解引用返回的是 <code>ACameraActor*</code>。<code>ActorHasTag</code> 实际上是基类 <code>AActor</code> 的方法。编译器需要通过 <code>ACameraActor</code> 的头文件确认它确实继承自 <code>AActor</code>，从而允许你调用这个成员函数。如果只有前置声明，编译器无法确定 <code>ACameraActor</code> 有没有这个方法，会报“指向不完整类型的指针”错误。</li>
+<li><strong>变量声明</strong>：你的 <code>Found</code> 变量（从上下文看是 <code>ACameraActor*</code> 类型）也需要编译器知道 <code>ACameraActor</code> 是什么才能正确声明和处理指针。</li>
+</ul>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><table>
+<thead>
+<tr>
+<th align="left">头文件</th>
+<th align="left">提供的核心内容</th>
+<th align="left">代码中的依赖点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>EngineUtils.h</code></strong></td>
+<td align="left"><code>TActorIterator</code> 模板类</td>
+<td align="left"><code>for (TActorIterator&lt;ACameraActor&gt; It(...)</code></td>
+</tr>
+<tr>
+<td align="left"><strong><code>Camera/CameraActor.h</code></strong></td>
+<td align="left"><code>ACameraActor</code> 类定义</td>
+<td align="left"><code>&lt;ACameraActor&gt;</code> 模板参数、<code>It-&gt;ActorHasTag()</code>、<code>Found = *It</code></td>
+</tr>
+</tbody></table>
+<p>有时候其他常用的引擎头文件（比如 <code>GameFramework/Actor.h</code>）可能会间接包含它们</p>
+<h1 id="UPROPERTY的各个参数有什么作用"><a href="#UPROPERTY的各个参数有什么作用" class="headerlink" title="UPROPERTY的各个参数有什么作用"></a>UPROPERTY的各个参数有什么作用</h1><p>在 Unreal Engine 的 C++ 开发中，<code>UPROPERTY</code> 宏是用来向引擎的**反射系统（Reflection System）<strong>和</strong>垃圾回收（Garbage Collection, GC）**暴露类成员的。</p>
+<p>UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category&#x3D;”Atmosphere”)代码中的这三个参数分别控制了变量在<strong>编辑器中的显示方式</strong>、<strong>蓝图的访问权限</strong>以及<strong>编辑器的分类</strong>。下面逐一拆解：</p>
+<hr>
+<h3 id="1-VisibleAnywhere-——-编辑器中的可见性"><a href="#1-VisibleAnywhere-——-编辑器中的可见性" class="headerlink" title="1. VisibleAnywhere —— 编辑器中的可见性"></a>1. <code>VisibleAnywhere</code> —— 编辑器中的可见性</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">VisibleAnywhere</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>作用</strong>：在虚幻编辑器的<strong>细节面板（Details Panel）<strong>中，这个属性是</strong>可见的</strong>（你可以看到它当前指向了哪个对象、它的属性等），但<strong>不允许直接编辑</strong>（字段通常是灰色&#x2F;只读的）。</li>
+<li><strong>常见对比</strong>：<ul>
+<li><code>EditAnywhere</code>：允许在编辑器中任意修改（包括实例和类默认值）。</li>
+<li><code>VisibleAnywhere</code>：只能看、不能改，通常用于那些由构造函数或代码逻辑自动赋值、不希望设计师误改的组件引用。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-BlueprintReadOnly-——-蓝图的访问权限"><a href="#2-BlueprintReadOnly-——-蓝图的访问权限" class="headerlink" title="2. BlueprintReadOnly —— 蓝图的访问权限"></a>2. <code>BlueprintReadOnly</code> —— 蓝图的访问权限</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BlueprintReadOnly</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>作用</strong>：允许在**蓝图（Blueprint）<strong>中</strong>读取（Get）<strong>这个变量，但</strong>禁止设置（Set）**它。</li>
+<li><strong>实际效果</strong>：在蓝图中，你可以右键搜索 “Get Sun” 来获取这个方向光组件的引用，然后用它来调用函数（比如动态改变阳光颜色、旋转等），但你不能在蓝图里把它重新赋值给另一个对象。</li>
+<li><strong>常见对比</strong>：<ul>
+<li><code>BlueprintReadWrite</code>：蓝图既可以读也可以写（完全控制）。</li>
+<li><code>BlueprintReadOnly</code>：只读，更安全，防止蓝图逻辑意外覆盖 C++ 中设置好的引用。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="3-Category-Atmosphere-——-编辑器中的分类"><a href="#3-Category-Atmosphere-——-编辑器中的分类" class="headerlink" title="3. Category=&quot;Atmosphere&quot; —— 编辑器中的分类"></a>3. <code>Category=&quot;Atmosphere&quot;</code> —— 编辑器中的分类</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Category=<span class="string">&quot;Atmosphere&quot;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>作用</strong>：在编辑器的细节面板中，将这个属性收纳到一个名为 <strong>“Atmosphere”</strong> 的折叠分组里。</li>
+<li><strong>好处</strong>：当你的 Actor 有几十个 <code>UPROPERTY</code> 时，分类可以让细节面板变得井井有条，方便美术和策划查找。</li>
+<li><strong>进阶用法</strong>：可以用 <code>|</code> 创建子菜单，例如 <code>Category=&quot;Lighting|Atmosphere&quot;</code> 会先建一个 “Lighting” 组，里面再建一个 “Atmosphere” 子组。</li>
+</ul>
+<hr>
+<h3 id="📌-综合起来，这行代码的实际效果是："><a href="#📌-综合起来，这行代码的实际效果是：" class="headerlink" title="📌 综合起来，这行代码的实际效果是："></a>📌 综合起来，这行代码的实际效果是：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UPROPERTY</span>(VisibleAnywhere, BlueprintReadOnly, Category=<span class="string">&quot;Atmosphere&quot;</span>)</span><br><span class="line">TObjectPtr&lt;UDirectionalLightComponent&gt; Sun;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><strong>内存安全</strong>：因为标记了 <code>UPROPERTY</code>，UE 的垃圾回收器知道这个指针的存在，不会错误地回收 <code>Sun</code> 所指向的方向光组件（防止悬空指针）。</li>
+<li><strong>编辑器表现</strong>：在编辑器的 Details 面板里，你可以在 “Atmosphere” 分类下看到 <code>Sun</code> 的引用信息，但不能手动更改它。</li>
+<li><strong>蓝图交互</strong>：蓝图可以获取 <code>Sun</code> 来读取其属性或调用其方法，但不能重新赋值。</li>
+</ol>
+<hr>
+<h3 id="💡-补充：TObjectPtr-是什么？"><a href="#💡-补充：TObjectPtr-是什么？" class="headerlink" title="💡 补充：TObjectPtr 是什么？"></a>💡 补充：<code>TObjectPtr</code> 是什么？</h3><p>你用的是 <code>TObjectPtr&lt;UDirectionalLightComponent&gt;</code> 而不是传统的 <code>UDirectionalLightComponent*</code>。这是 <strong>UE5 推荐的新写法</strong>，它在编辑器下行为和原始指针一样，但在底层支持更好的资产软引用和延迟加载。对于 <code>UPROPERTY</code> 标记的 UObject 指针，官方建议都改用 <code>TObjectPtr</code>。</p>
+<hr>
+
       
     </div>
 
@@ -366,7 +444,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-25 23:41:22" itemprop="dateModified" datetime="2026-10-25T23:41:22+08:00">2026-10-25</time>
+                <time title="Modified: 2026-10-28 21:50:37" itemprop="dateModified" datetime="2026-10-28T21:50:37+08:00">2026-10-28</time>
               </span>
 
           
@@ -950,7 +1028,7 @@
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">tags</span>
       </div>
   </nav>
