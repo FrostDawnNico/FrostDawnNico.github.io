@@ -301,7 +301,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-28 21:50:15" itemprop="dateModified" datetime="2026-10-28T21:50:15+08:00">2026-10-28</time>
+                <time title="Modified: 2026-10-28 22:25:08" itemprop="dateModified" datetime="2026-10-28T22:25:08+08:00">2026-10-28</time>
               </span>
 
           
@@ -393,6 +393,321 @@
 </ol>
 <hr>
 <h3 id="💡-补充：TObjectPtr-是什么？"><a href="#💡-补充：TObjectPtr-是什么？" class="headerlink" title="💡 补充：TObjectPtr 是什么？"></a>💡 补充：<code>TObjectPtr</code> 是什么？</h3><p>你用的是 <code>TObjectPtr&lt;UDirectionalLightComponent&gt;</code> 而不是传统的 <code>UDirectionalLightComponent*</code>。这是 <strong>UE5 推荐的新写法</strong>，它在编辑器下行为和原始指针一样，但在底层支持更好的资产软引用和延迟加载。对于 <code>UPROPERTY</code> 标记的 UObject 指针，官方建议都改用 <code>TObjectPtr</code>。</p>
+<hr>
+<h1 id="TObjectPtr-作为模板类做了什么？"><a href="#TObjectPtr-作为模板类做了什么？" class="headerlink" title="TObjectPtr 作为模板类做了什么？"></a><code>TObjectPtr</code> 作为模板类做了什么？</h1><p>虽然它用起来和原始指针几乎一样（得益于运算符重载，你可以直接 <code>-&gt;</code> 或 <code>=</code>），但作为模板类，它在底层为你封装了额外的逻辑：</p>
+<ul>
+<li><strong>编辑器支持</strong>：在虚幻编辑器中更好地追踪资源引用。</li>
+<li><strong>延迟加载（Lazy Loading）</strong>：在需要时才真正加载资源（Package 加载时不一定立即加载）。</li>
+<li><strong>向前兼容</strong>：为未来可能的指针系统升级做准备（UE5 引入它的主要原因之一）。</li>
+</ul>
+<h1 id="UPROPERTY-EditAnywhere-BlueprintReadWrite-Category-”Experiment”-meta-ClampMin-”-90”-ClampMax-”90”-float-SunElevation-25-0f-这里的meta是什么意思，f是不是可以去掉"><a href="#UPROPERTY-EditAnywhere-BlueprintReadWrite-Category-”Experiment”-meta-ClampMin-”-90”-ClampMax-”90”-float-SunElevation-25-0f-这里的meta是什么意思，f是不是可以去掉" class="headerlink" title="UPROPERTY(EditAnywhere, BlueprintReadWrite, Category&#x3D;”Experiment”, meta&#x3D;(ClampMin&#x3D;”-90”, ClampMax&#x3D;”90”)) float SunElevation &#x3D; 25.0f;这里的meta是什么意思，f是不是可以去掉"></a>UPROPERTY(EditAnywhere, BlueprintReadWrite, Category&#x3D;”Experiment”, meta&#x3D;(ClampMin&#x3D;”-90”, ClampMax&#x3D;”90”)) float SunElevation &#x3D; 25.0f;这里的meta是什么意思，f是不是可以去掉</h1><p>这两个问题分别涉及 <strong>Unreal Engine 的反射系统元数据</strong> 和 <strong>C++ 的基础类型语法</strong>，下面为你详细拆解：</p>
+<hr>
+<h2 id="一、meta-是什么意思？"><a href="#一、meta-是什么意思？" class="headerlink" title="一、meta 是什么意思？"></a>一、<code>meta</code> 是什么意思？</h2><h3 id="1-meta-的本质：元数据（Metadata）说明符"><a href="#1-meta-的本质：元数据（Metadata）说明符" class="headerlink" title="1. meta 的本质：元数据（Metadata）说明符"></a>1. <code>meta</code> 的本质：元数据（Metadata）说明符</h3><p>在 <code>UPROPERTY</code> 宏中，<code>meta</code> 是一个<strong>特殊的参数</strong>，用来传递**键值对（Key-Value）**形式的额外信息。</p>
+<p>这些信息<strong>不会直接影响 C++ 代码的运行逻辑</strong>，而是提供给<strong>虚幻引擎编辑器、蓝图虚拟机或序列化系统</strong>的“指令”或“提示”。</p>
+<h3 id="2-ClampMin-和-ClampMax-的作用"><a href="#2-ClampMin-和-ClampMax-的作用" class="headerlink" title="2. ClampMin 和 ClampMax 的作用"></a>2. <code>ClampMin</code> 和 <code>ClampMax</code> 的作用</h3><p>在你这段代码中：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meta=(ClampMin=<span class="string">&quot;-90&quot;</span>, ClampMax=<span class="string">&quot;90&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>它的作用是：<strong>在虚幻编辑器的细节面板（Details Panel）中，限制这个浮点数的输入范围。</strong></p>
+<ul>
+<li>当你在编辑器里拖动滑块或手动输入 <code>SunElevation</code> 的值时，引擎会自动把它限制在 <code>-90</code> 到 <code>90</code> 之间。</li>
+<li>如果你输入 <code>100</code>，松开鼠标后它会自动弹回 <code>90</code>。</li>
+</ul>
+<h3 id="3-重要注意事项"><a href="#3-重要注意事项" class="headerlink" title="3. 重要注意事项"></a>3. 重要注意事项</h3><ul>
+<li><strong>仅限编辑器</strong>：这个限制只在<strong>编辑器内修改属性时生效</strong>。如果你在 C++ 代码里直接写 <code>SunElevation = 120.0f;</code>，它依然会被赋值为 120，不会被 Clamp（除非你自己调用 <code>FMath::Clamp</code>）。</li>
+<li><strong>与 <code>UIMin</code>&#x2F;<code>UIMax</code> 的区别</strong>：<ul>
+<li><code>UIMin</code>&#x2F;<code>UIMax</code>（也是 meta 键）只限制<strong>滑块的视觉范围</strong>，你依然可以手动输入超出范围的值。</li>
+<li><code>ClampMin</code>&#x2F;<code>ClampMax</code> 是<strong>硬性限制</strong>，连手动输入都会被拦截。</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-其他常见的-meta-用法示例"><a href="#4-其他常见的-meta-用法示例" class="headerlink" title="4. 其他常见的 meta 用法示例"></a>4. 其他常见的 <code>meta</code> 用法示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">meta=(ToolTip=<span class="string">&quot;这是提示文本&quot;</span>)           <span class="comment">// 鼠标悬停时显示的提示</span></span><br><span class="line">meta=(UIMin=<span class="string">&quot;0&quot;</span>, UIMax=<span class="string">&quot;1&quot;</span>)           <span class="comment">// 滑块的视觉范围（不限制输入）</span></span><br><span class="line">meta=(ExposeOnSpawn=<span class="string">&quot;true&quot;</span>)           <span class="comment">// 在 Spawn Actor 节点上暴露这个参数</span></span><br><span class="line">meta=(EditCondition=<span class="string">&quot;bEnabled&quot;</span>)       <span class="comment">// 只有当 bEnabled 为 true 时，这个属性才可编辑</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、25-0f-后面的-f-能不能去掉？"><a href="#二、25-0f-后面的-f-能不能去掉？" class="headerlink" title="二、25.0f 后面的 f 能不能去掉？"></a>二、<code>25.0f</code> 后面的 <code>f</code> 能不能去掉？</h2><h3 id="1-f-的含义"><a href="#1-f-的含义" class="headerlink" title="1. f 的含义"></a>1. <code>f</code> 的含义</h3><p>在 C++ 中：</p>
+<ul>
+<li><code>25</code>：是 <strong><code>int</code>（整数）</strong> 类型。</li>
+<li><code>25.0</code>：默认是 <strong><code>double</code>（双精度浮点数）</strong> 类型（64位）。</li>
+<li><code>25.0f</code>：后缀 <code>f</code> 明确告诉编译器，这是 <strong><code>float</code>（单精度浮点数）</strong> 类型（32位）。</li>
+</ul>
+<h3 id="2-能不能去掉？"><a href="#2-能不能去掉？" class="headerlink" title="2. 能不能去掉？"></a>2. 能不能去掉？</h3><p><strong>从“能不能编译通过”的角度：可以去掉。</strong><br>如果你写成：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> SunElevation = <span class="number">25.0</span>; <span class="comment">// 或者 25.0</span></span><br></pre></td></tr></table></figure>
+<p>编译器会执行<strong>隐式类型转换</strong>，把 <code>double</code> 类型的 <code>25.0</code> 截断成 <code>float</code> 赋给变量。代码可以正常运行，但<strong>编译器通常会抛出一个警告</strong>：</p>
+<blockquote>
+<p>Warning C4244: ‘initializing’: conversion from ‘double’ to ‘float’, possible loss of data.</p>
+</blockquote>
+<p><strong>从“最佳实践”的角度：强烈建议保留 <code>f</code>。</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">写法</th>
+<th align="left">类型</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>25</code></td>
+<td align="left"><code>int</code></td>
+<td align="left">赋给 <code>float</code> 会发生整型到浮点的隐式转换</td>
+</tr>
+<tr>
+<td align="left"><code>25.0</code></td>
+<td align="left"><code>double</code></td>
+<td align="left">赋给 <code>float</code> 会发生双精度到单精度的截断，编译器报警告</td>
+</tr>
+<tr>
+<td align="left"><code>25.0f</code></td>
+<td align="left"><code>float</code></td>
+<td align="left"><strong>类型完全匹配，无警告，无性能损耗，代码最清晰</strong></td>
+</tr>
+</tbody></table>
+<h3 id="3-为什么-UE-代码都带-f？"><a href="#3-为什么-UE-代码都带-f？" class="headerlink" title="3. 为什么 UE 代码都带 f？"></a>3. 为什么 UE 代码都带 <code>f</code>？</h3><ul>
+<li><strong>消除警告</strong>：保持编译日志干净，方便排查真正的错误。</li>
+<li><strong>避免精度陷阱</strong>：在复杂数学运算或函数重载中，混用 <code>double</code> 和 <code>float</code> 可能导致意料之外的结果（比如调用了 <code>double</code> 版本的函数，性能下降）。</li>
+<li><strong>Unreal 编码标准</strong>：Epic 官方要求所有 <code>float</code> 字面量必须加 <code>f</code> 后缀。</li>
+</ul>
+<hr>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><ul>
+<li><strong><code>meta</code></strong>：是给引擎编辑器看的“附加指令”，<code>ClampMin/Max</code> 用来在编辑器里限制数值范围。</li>
+<li><strong><code>f</code> 后缀</strong>：表示 <code>float</code> 类型，<strong>可以去掉但强烈不建议</strong>，保留它是专业且规范的写法。</li>
+</ul>
+<h1 id="Meta-标签速查表"><a href="#Meta-标签速查表" class="headerlink" title="Meta 标签速查表"></a>Meta 标签速查表</h1><p>这是一份 <strong>Unreal Engine <code>UPROPERTY</code> 常用 Meta 标签速查表</strong>，按功能分类整理，方便你快速查阅。</p>
+<hr>
+<h2 id="一、编辑器-UI-与交互"><a href="#一、编辑器-UI-与交互" class="headerlink" title="一、编辑器 UI 与交互"></a>一、编辑器 UI 与交互</h2><table>
+<thead>
+<tr>
+<th align="left">Meta 标签</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>DisplayName=&quot;名称&quot;</code></td>
+<td align="left">在编辑器中显示自定义名称（支持中文）</td>
+<td align="left"><code>meta=(DisplayName=&quot;太阳高度角&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>ToolTip=&quot;提示文本&quot;</code></td>
+<td align="left">鼠标悬停时显示的提示信息</td>
+<td align="left"><code>meta=(ToolTip=&quot;控制太阳的仰角，范围 -90 到 90&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>Category=&quot;分类&quot;</code></td>
+<td align="left">在细节面板中分组（也可直接写在 UPROPERTY 参数里）</td>
+<td align="left"><code>meta=(Category=&quot;Lighting&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>HideInDetailPanel</code></td>
+<td align="left">在细节面板中完全隐藏该属性</td>
+<td align="left"><code>meta=(HideInDetailPanel)</code></td>
+</tr>
+<tr>
+<td align="left"><code>EditCondition=&quot;布尔变量&quot;</code></td>
+<td align="left">仅当指定布尔变量为 <code>true</code> 时才允许编辑</td>
+<td align="left"><code>meta=(EditCondition=&quot;bEnabled&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>EditConditionHides</code></td>
+<td align="left">与 <code>EditCondition</code> 配合，条件为 false 时直接隐藏</td>
+<td align="left"><code>meta=(EditCondition=&quot;bEnabled&quot;, EditConditionHides)</code></td>
+</tr>
+<tr>
+<td align="left"><code>ShowOnlyInnerProperties</code></td>
+<td align="left">展开结构体，不显示结构体本身的折叠框</td>
+<td align="left"><code>meta=(ShowOnlyInnerProperties)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、数值与范围限制"><a href="#二、数值与范围限制" class="headerlink" title="二、数值与范围限制"></a>二、数值与范围限制</h2><table>
+<thead>
+<tr>
+<th align="left">Meta 标签</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>UIMin=&quot;值&quot;</code></td>
+<td align="left">滑块的最小值（仅影响 UI，不限制输入）</td>
+<td align="left"><code>meta=(UIMin=&quot;0&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>UIMax=&quot;值&quot;</code></td>
+<td align="left">滑块的最大值（仅影响 UI，不限制输入）</td>
+<td align="left"><code>meta=(UIMax=&quot;100&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>ClampMin=&quot;值&quot;</code></td>
+<td align="left">硬性限制最小值（输入超出会被拉回）</td>
+<td align="left"><code>meta=(ClampMin=&quot;0&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>ClampMax=&quot;值&quot;</code></td>
+<td align="left">硬性限制最大值（输入超出会被拉回）</td>
+<td align="left"><code>meta=(ClampMax=&quot;90&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>SliderExponent=&quot;值&quot;</code></td>
+<td align="left">调整滑块的响应曲线（&gt;1 偏精细，&lt;1 偏粗略）</td>
+<td align="left"><code>meta=(SliderExponent=&quot;2&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>Delta=&quot;值&quot;</code></td>
+<td align="left">拖动滑块时每次变化的步长</td>
+<td align="left"><code>meta=(Delta=&quot;0.1&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>Multiple=&quot;值&quot;</code></td>
+<td align="left">滑块拖动的倍率（用于整数类型）</td>
+<td align="left"><code>meta=(Multiple=&quot;10&quot;)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、条件显示与编辑（进阶）"><a href="#三、条件显示与编辑（进阶）" class="headerlink" title="三、条件显示与编辑（进阶）"></a>三、条件显示与编辑（进阶）</h2><table>
+<thead>
+<tr>
+<th align="left">Meta 标签</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>EditCondition=&quot;!bDisabled&quot;</code></td>
+<td align="left">支持逻辑非、比较等表达式（UE5 增强）</td>
+<td align="left"><code>meta=(EditCondition=&quot;Priority &gt; 0&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>ForceShowInDetails</code></td>
+<td align="left">即使父类隐藏，也强制在子类细节面板显示</td>
+<td align="left"><code>meta=(ForceShowInDetails)</code></td>
+</tr>
+<tr>
+<td align="left"><code>ReadOnly</code></td>
+<td align="left">在编辑器中强制只读（类似 VisibleAnywhere）</td>
+<td align="left"><code>meta=(ReadOnly)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="四、蓝图与交互"><a href="#四、蓝图与交互" class="headerlink" title="四、蓝图与交互"></a>四、蓝图与交互</h2><table>
+<thead>
+<tr>
+<th align="left">Meta 标签</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>ExposeOnSpawn=&quot;true&quot;</code></td>
+<td align="left">在 Spawn Actor &#x2F; 创建对象节点上暴露该属性</td>
+<td align="left"><code>meta=(ExposeOnSpawn=&quot;true&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>BlueprintCompilerGeneratedDefaults</code></td>
+<td align="left">标记该属性由蓝图编译器生成默认值</td>
+<td align="left">通常引擎内部使用</td>
+</tr>
+<tr>
+<td align="left"><code>MakeEditWidget</code></td>
+<td align="left">在视口中显示一个可拖动的变换控件（用于 FVector&#x2F;FTransform）</td>
+<td align="left"><code>meta=(MakeEditWidget)</code></td>
+</tr>
+<tr>
+<td align="left"><code>GetOptions=&quot;函数名&quot;</code></td>
+<td align="left">下拉框选项由指定函数动态生成（函数需返回 TArray<FString>）</td>
+<td align="left"><code>meta=(GetOptions=&quot;GetPresetNames&quot;)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、序列化与版本控制"><a href="#五、序列化与版本控制" class="headerlink" title="五、序列化与版本控制"></a>五、序列化与版本控制</h2><table>
+<thead>
+<tr>
+<th align="left">Meta 标签</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>SkipSerialization</code></td>
+<td align="left">不保存到磁盘（运行时修改不会持久化）</td>
+<td align="left"><code>meta=(SkipSerialization)</code></td>
+</tr>
+<tr>
+<td align="left"><code>Transient</code></td>
+<td align="left">标记为瞬态，不序列化（类似 SkipSerialization，但更底层）</td>
+<td align="left"><code>meta=(Transient)</code></td>
+</tr>
+<tr>
+<td align="left"><code>DeprecatedProperty</code></td>
+<td align="left">标记属性已废弃（编译时会警告）</td>
+<td align="left"><code>meta=(DeprecatedProperty)</code></td>
+</tr>
+<tr>
+<td align="left"><code>DeprecationMessage=&quot;消息&quot;</code></td>
+<td align="left">配合废弃标签，给出替代方案提示</td>
+<td align="left"><code>meta=(DeprecationMessage=&quot;请使用 NewSun instead&quot;)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、资源与引用"><a href="#六、资源与引用" class="headerlink" title="六、资源与引用"></a>六、资源与引用</h2><table>
+<thead>
+<tr>
+<th align="left">Meta 标签</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>AllowedClasses=&quot;类名1, 类名2&quot;</code></td>
+<td align="left">限制 <code>TSoftObjectPtr</code> &#x2F; <code>FSoftObjectPath</code> 只能选择指定类</td>
+<td align="left"><code>meta=(AllowedClasses=&quot;Texture2D, Material&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>DisallowedClasses=&quot;类名&quot;</code></td>
+<td align="left">禁止选择指定类</td>
+<td align="left"><code>meta=(DisallowedClasses=&quot;SkeletalMesh&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>MustImplement=&quot;接口名&quot;</code></td>
+<td align="left">限制 <code>TSubclassOf</code> 必须实现指定接口</td>
+<td align="left"><code>meta=(MustImplement=&quot;GameplayTagAssetInterface&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>NoClear</code></td>
+<td align="left">禁止在编辑器中将引用设为 None（删除按钮不可用）</td>
+<td align="left"><code>meta=(NoClear)</code></td>
+</tr>
+<tr>
+<td align="left"><code>EditInline</code></td>
+<td align="left">允许在细节面板中直接编辑子对象（用于 UObject* 属性）</td>
+<td align="left"><code>meta=(EditInline)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、特殊用途"><a href="#七、特殊用途" class="headerlink" title="七、特殊用途"></a>七、特殊用途</h2><table>
+<thead>
+<tr>
+<th align="left">Meta 标签</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>TitleProperty=&quot;属性名&quot;</code></td>
+<td align="left">在数组元素折叠时显示该属性作为标题（用于结构体&#x2F;对象数组）</td>
+<td align="left"><code>meta=(TitleProperty=&quot;Name&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>DisplayPriority=&quot;数字&quot;</code></td>
+<td align="left">控制同一分类下的显示顺序（数字越小越靠前）</td>
+<td align="left"><code>meta=(DisplayPriority=&quot;1&quot;)</code></td>
+</tr>
+<tr>
+<td align="left"><code>ScriptName=&quot;名称&quot;</code></td>
+<td align="left">在蓝图中使用的变量名（覆盖默认命名）</td>
+<td align="left"><code>meta=(ScriptName=&quot;SunAngle&quot;)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="💡-组合使用示例"><a href="#💡-组合使用示例" class="headerlink" title="💡 组合使用示例"></a>💡 组合使用示例</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UPROPERTY</span>(EditAnywhere, BlueprintReadWrite, Category=<span class="string">&quot;Sun&quot;</span>,</span><br><span class="line">    meta=(ClampMin=<span class="string">&quot;-90&quot;</span>, ClampMax=<span class="string">&quot;90&quot;</span>, UIMin=<span class="string">&quot;-90&quot;</span>, UIMax=<span class="string">&quot;90&quot;</span>,</span><br><span class="line">          SliderExponent=<span class="string">&quot;2&quot;</span>, Delta=<span class="string">&quot;0.5&quot;</span>,</span><br><span class="line">          DisplayName=<span class="string">&quot;太阳高度角&quot;</span>,</span><br><span class="line">          ToolTip=<span class="string">&quot;控制太阳在天空中的仰角，单位：度&quot;</span>))</span><br><span class="line"><span class="type">float</span> SunElevation = <span class="number">25.0f</span>;</span><br></pre></td></tr></table></figure>
+
 <hr>
 
       
