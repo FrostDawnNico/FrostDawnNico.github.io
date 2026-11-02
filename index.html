@@ -308,7 +308,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-10-30 23:14:29" itemprop="dateModified" datetime="2026-10-30T23:14:29+08:00">2026-10-30</time>
+                <time title="Modified: 2026-11-02 19:55:34" itemprop="dateModified" datetime="2026-11-02T19:55:34+08:00">2026-11-02</time>
               </span>
 
           
@@ -716,7 +716,32 @@
 <h2 id="💡-组合使用示例"><a href="#💡-组合使用示例" class="headerlink" title="💡 组合使用示例"></a>💡 组合使用示例</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UPROPERTY</span>(EditAnywhere, BlueprintReadWrite, Category=<span class="string">&quot;Sun&quot;</span>,</span><br><span class="line">    meta=(ClampMin=<span class="string">&quot;-90&quot;</span>, ClampMax=<span class="string">&quot;90&quot;</span>, UIMin=<span class="string">&quot;-90&quot;</span>, UIMax=<span class="string">&quot;90&quot;</span>,</span><br><span class="line">          SliderExponent=<span class="string">&quot;2&quot;</span>, Delta=<span class="string">&quot;0.5&quot;</span>,</span><br><span class="line">          DisplayName=<span class="string">&quot;太阳高度角&quot;</span>,</span><br><span class="line">          ToolTip=<span class="string">&quot;控制太阳在天空中的仰角，单位：度&quot;</span>))</span><br><span class="line"><span class="type">float</span> SunElevation = <span class="number">25.0f</span>;</span><br></pre></td></tr></table></figure>
 
 <hr>
-<h1 id="12"><a href="#12" class="headerlink" title="12"></a>12</h1>
+<h1 id="ASRig-大气Actor根"><a href="#ASRig-大气Actor根" class="headerlink" title="ASRig 大气Actor根"></a>ASRig 大气Actor根</h1><h2 id="UE风格cpp代码的变量名"><a href="#UE风格cpp代码的变量名" class="headerlink" title="UE风格cpp代码的变量名"></a>UE风格cpp代码的变量名</h2><p>在 <strong>UE（Unreal Engine）风格的 C++ 代码</strong>中，函数参数采用的是 <strong>PascalCase（帕斯卡命名法）</strong>，也就是你所说的<strong>第一个字母就大写的“大驼峰”命名法</strong>。</p>
+<p>它<strong>不是</strong>小驼峰（camelCase，如 <code>myParam</code>）。</p>
+<h3 id="UE-参数命名的具体规则与示例"><a href="#UE-参数命名的具体规则与示例" class="headerlink" title="UE 参数命名的具体规则与示例"></a>UE 参数命名的具体规则与示例</h3><p>在虚幻引擎的官方编码规范中，几乎所有标识符（类型、函数、变量、参数）都统一使用 <strong>PascalCase</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 函数参数示例：每个单词首字母大写</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">AMyCharacter::EquipWeapon</span><span class="params">(UWeaponComponent* NewWeapon, <span class="type">bool</span> bIsImmediate)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 参数解析：</span></span><br><span class="line"><span class="comment">// - NewWeapon：首字母大写（大驼峰）</span></span><br><span class="line"><span class="comment">// - bIsImmediate：布尔类型参数，前缀 &#x27;b&#x27; + 首字母大写</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="常见的-UE-参数前缀约定"><a href="#常见的-UE-参数前缀约定" class="headerlink" title="常见的 UE 参数前缀约定"></a>常见的 UE 参数前缀约定</h3><p>为了让代码意图更清晰，UE 对参数还有一些特定的前缀习惯：</p>
+<ol>
+<li><strong>布尔参数</strong>：加 <code>b</code> 前缀，后面跟 PascalCase<br><code>bool bIsVisible</code>, <code>bool bPlayAnimation</code></li>
+<li><strong>输出参数（Out Parameters）</strong>：加 <code>Out</code> 前缀<br><code>bool GetHitResult(FHitResult&amp; OutHitResult)</code></li>
+<li><strong>输入参数（In Parameters）</strong>：有时为了区分会加 <code>In</code> 前缀（非强制，但很常见）<br><code>void SetPlayerName(const FString&amp; InNewName)</code></li>
+<li><strong>输入输出参数（In&#x2F;Out）</strong>：加 <code>InOut</code> 前缀<br><code>void ProcessData(int32&amp; InOutDataCount)</code></li>
+</ol>
+<h3 id="对比其他引擎-语言"><a href="#对比其他引擎-语言" class="headerlink" title="对比其他引擎&#x2F;语言"></a>对比其他引擎&#x2F;语言</h3><ul>
+<li><strong>Unity (C#)</strong>：参数通常使用<strong>小驼峰（camelCase）</strong>，如 <code>void EquipWeapon(Weapon weapon, bool isImmediate)</code>。</li>
+<li><strong>UE (C++)</strong>：参数统一使用<strong>大驼峰（PascalCase）</strong>，保持与类名、函数名、变量名一致的风格。</li>
+</ul>
+<p><strong>总结</strong>：如果你在写 UE 风格的代码，函数参数请直接使用<strong>首字母大写</strong>的 PascalCase 命名，布尔值记得加 <code>b</code> 前缀即可。</p>
+<h2 id="ASRig-h"><a href="#ASRig-h" class="headerlink" title="ASRig.h"></a>ASRig.h</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="部分参数解释"><a href="#部分参数解释" class="headerlink" title="部分参数解释"></a>部分参数解释</h3><h4 id="FixedEV100"><a href="#FixedEV100" class="headerlink" title="FixedEV100"></a>FixedEV100</h4><p><code>FixedEV100</code> 通常指<strong>固定曝光值</strong>，用于控制画面的曝光亮度。</p>
+<ul>
+<li><strong>Fixed</strong>：固定，通常表示不随场景明暗自动调整曝光。</li>
+<li><strong>EV100</strong>：以 ISO 100 为基准的曝光值（Exposure Value）。</li>
+</ul>
+<p><strong>在光照等条件不变时，EV100 越大，画面越暗；越小，画面越亮。</strong> 每增加 1，曝光倍率减半；每减少 1，曝光倍率翻倍。最终显示还会受到色调映射等处理影响。<a target="_blank" rel="noopener" href="https://dev.epicgames.com/documentation/unreal-engine/auto-exposure-in-unreal-engine">UE 曝光官方文档</a></p>
+
       
     </div>
 
