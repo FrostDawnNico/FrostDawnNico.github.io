@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frostdawnnico.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="理解图形学相关原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图形学相关原理2">
+<meta property="og:url" content="https://frostdawnnico.github.io/2026/06/10/CG2/index.html">
+<meta property="og:site_name" content="FrostDawn&#39;s Blog">
+<meta property="og:description" content="理解图形学相关原理">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frostdawnnico.github.io/2026/06/10/CG2/DeferredShading.png">
+<meta property="article:published_time" content="2026-06-10T15:27:01.000Z">
+<meta property="article:modified_time" content="2026-11-03T16:55:29.110Z">
+<meta property="article:author" content="Nico Zhong">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frostdawnnico.github.io/2026/06/10/CG2/DeferredShading.png">
+
+<link rel="canonical" href="https://frostdawnnico.github.io/2026/06/10/CG2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>图形学相关原理2 | FrostDawn's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">FrostDawn's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Nico's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frostdawnnico.github.io/2026/06/10/CG2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Nico Zhong">
+      <meta itemprop="description" content="one step per day | each effort counts">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FrostDawn's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图形学相关原理2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-06-10 23:27:01" itemprop="dateCreated datePublished" datetime="2026-06-10T23:27:01+08:00">2026-06-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-11-04 00:55:29" itemprop="dateModified" datetime="2026-11-04T00:55:29+08:00">2026-11-04</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>理解图形学相关原理</p>
+<span id="more"></span>
+<h1 id="渲染顺序"><a href="#渲染顺序" class="headerlink" title="渲染顺序"></a>渲染顺序</h1><p>渲染Object顺序：</p>
+<ol>
+<li>先渲染所有不透明（Opaque）</li>
+<li>后渲染所有透明（Transparent）</li>
+<li>不透明：从前到后渲染（近→远）</li>
+<li>透明：从后到前渲染（远→近）</li>
+</ol>
+<h2 id="为什么要分顺序？"><a href="#为什么要分顺序？" class="headerlink" title="为什么要分顺序？"></a>为什么要分顺序？</h2><ol>
+<li>深度缓冲（Depth Buffer）</li>
+</ol>
+<p>Unity 有个深度图，记录屏幕上每个像素最近的物体距离。</p>
+<p>● 远处物体被近处物体挡住 → 直接不画，节省性能。</p>
+<p>● 这个机制只对不透明物体生效。</p>
+<ol start="2">
+<li>不透明（Opaque）</li>
+</ol>
+<p>● 有深度写入 ZWrite On</p>
+<p>● 有深度测试 ZTest LEqual</p>
+<p>● 规则：谁近画谁，远的直接被遮挡丢弃</p>
+<p>● 渲染队列值：Queue &#x3D; 2000</p>
+<ol start="3">
+<li>透明（Transparent）</li>
+</ol>
+<p>● 关闭深度写入 ZWrite Off（关键！）</p>
+<p>● 保留深度测试 ZTest LEqual</p>
+<p>● 规则：不能遮挡自己，必须按“远→近”混合颜色● 渲染队列值：Queue &#x3D; 3000</p>
+<h1 id="Rendering-Path"><a href="#Rendering-Path" class="headerlink" title="Rendering Path"></a>Rendering Path</h1><p>渲染路径：将场景物体渲染到渲染纹理的过程中所使用的步骤和技术。</p>
+<p>常见的Rendering Path：</p>
+<p>Forward Shading</p>
+<p>Deferred Shading</p>
+<p>Forward变种</p>
+<p>Deferred变种</p>
+<h2 id="Forward-Shading"><a href="#Forward-Shading" class="headerlink" title="Forward Shading"></a>Forward Shading</h2><p>是最简单也最广泛支持的一种渲染技术，它的实现思想是遍历场景的所有物体，每个物体调用一次绘制指令，经由渲染管线光栅化后写入渲染纹理上。</p>
+<p>优点：<br>1。实现简单<br>2。无需 MRT 的支持，硬件支持广泛<br>3。完美地支持 MSAA抗锯齿。</p>
+<p>缺点：<br>1。 无法支撑大型复杂附带大量光源的场景渲染， 冗余计算多，过绘制严重</p>
+<pre><code>for each(object in ObjectsInScene)&#123;
+    color=0;
+    for each(light in LightsInScene)&#123;
+        color += light.Shade(object);// for all lights, huge cost when the number of lights is huge
+    &#125;
+    WriteColorRenderTarget(color);
+&#125;
+</code></pre>
+<h2 id="Deferred-Shading"><a href="#Deferred-Shading" class="headerlink" title="Deferred Shading"></a>Deferred Shading</h2><p>是一种基于屏幕空间着色的技术，也是最普遍的一种渲染路径（Rendering Path）技术。它的核心思想是将场景的物体绘制分离成两个Pass：几何Pass和光照Pass，目的是将计算量大的光照Pass延后，和物体数量和光照数量解耦，以提升着色效率。在目前的主流渲染器和商业引擎中，有着广泛且充分的支持。</p>
+<img src="/2026/06/10/CG2/DeferredShading.png" class="" title="延迟渲染">
+
+<p>几何通道（Geometry Pass）将场景的物体信息光栅化到多个GBuffer中。这个阶段将场景中所有的不透明物体（Opaque）和Masked物体用无光照（Unlit）的材质执行渲染，然后将物体的几何信息写入到对应的渲染纹理（Render Target）中。</p>
+<p>其中物体的几何信息有：<br>1、位置（Position，也可以是深度，因为只要有深度和屏幕空间的uv就可以重建出位置）。<br>2、法线（Normal）。<br>3、材质参数(Diffuse Color, Emissive Color, Specular Scale, Specular Power, AO, Roughness, Shading Model, …)。</p>
+<p>注意：几何通道阶段不会执行光照计算，从而摒弃了很多冗余的光照计算逻辑，也就是避免了很多本被遮挡的物体光照计算，避免了过绘制（Overdraw）。</p>
+<pre><code>void RenderBasePass()&#123;
+    SetupBuffer();//设置集合数据缓冲区
+    //遍历场景的非半透明物体
+    for each(object in ObjectsInScene)&#123;
+        SetUnlitMaterial(Object); //设置无光照的材质
+        DrawObjectToBuffer(Object);//渲染几何信息到GBuffer，通常在GPU光栅化中完成
+    &#125;
+&#125;
+</code></pre>
+<p>光照通道（Lighting Pass）利用GBuffer的几何信息计算每个像素的光照结果，它的核心逻辑是遍历渲染分辨率数量相同的像素，根据每个像素的UV坐标从GBuffer采样获取该像素的几何信息，从而执行光照计算。</p>
+<pre><code>void RenderLightingPass()&#123;
+    BindGBuffer(); // 绑定几何数据缓冲区
+    SetupRenderTarget(); // 设置渲染纹理
+    // 遍历RT所有像素
+    for each(pixel in RenderTargetPixels)&#123;
+        // 获取GBuffer数据
+        pixelData = GetPixelDataFromGBuffer(pixel.uv);
+        // 清空累计颜色            
+        color=0;
+        // 遍历所有灯光，将光照计算记过累加到颜色中
+        for each(light in LightsInScene)&#123;
+            // 可以采用Gouraud,Lambert,Phong,Blinn-Phong,BRDF,BTDF,BSSRDF等光照模型
+            color += CalculateLightColor(light,pixelData);//for all lights
+        &#125;
+        // 写入颜色到RT
+        WriteColorRenderTarget(color);
+    &#125;
+</code></pre>
+<p>   }</p>
+<p>优点：</p>
+<p>1.光照计算跟场景物体解构，支持多光源。由于最耗时的光照计算延迟到后处理阶段，所以跟场景的物体数量解耦，只跟Render Targe尺寸相关，复杂度是O(Nlight×WRT×HRT)。延迟渲染在应对复杂的场景和光源数量的场景比较得心应手，往往能得到非常好的性能提升。</p>
+<p>2，渲染性能更优，彻底剔除过度绘制（OverDraw）</p>
+<p>缺点：</p>
+<p>1.如需多一个通道来绘制几何信息，需要多渲染纹理（MRT）的支持</p>
+<p>2.更多的CPU和GPU显存占用，更高的带宽要求，有限的材质呈现类型</p>
+<p>3.难以使用MSAA等硬件抗锯齿，存在画面较糊的情况等等</p>
+<p>4.应对简单场景时，可能反而得不到渲染性能方面的提升</p>
+<h3 id="问题1：延迟渲染不支持半透明物体"><a href="#问题1：延迟渲染不支持半透明物体" class="headerlink" title="问题1：延迟渲染不支持半透明物体"></a>问题1：延迟渲染不支持半透明物体</h3><p>延迟渲染的核心是 G-Buffer（几何缓冲区），它会将场景的深度、法线、颜色等信息存储在几张纹理中。但 G-Buffer 有一个致命的限制：每个像素只能存储最前面（离摄像机最近）那一个物体的表面信息。</p>
+<p>为了解决上述矛盾，现代游戏引擎（如 Unity URP&#x2F;HDRP、虚幻引擎）通常采用以下标准流程：</p>
+<p>● 第一步：渲染不透明物体（延迟渲染阶段）</p>
+<p>管线首先正常执行延迟渲染。将所有不透明的物体进行光栅化，把它们的几何信息写入 G-Buffer，并在屏幕空间完成所有不透明物体的光照计算，生成初步的屏幕画面。</p>
+<p>● 第二步：渲染半透明物体（前向渲染阶段）</p>
+<p>在延迟光照计算全部结束后，管线会将所有标记为半透明（Transparent）的物体单独拎出来。此时，引擎会切换回传统的前向渲染（Forward Rendering）路径。<br>这些半透明物体会按照从后往前的顺序（Painter’s Algorithm），逐物体进行光栅化和光照计算，并利用 Alpha 混合技术，直接叠加到第一步已经渲染好的屏幕画面上。</p>
+<h3 id="问题2：延迟渲染的画面比前向渲染模糊"><a href="#问题2：延迟渲染的画面比前向渲染模糊" class="headerlink" title="问题2：延迟渲染的画面比前向渲染模糊"></a>问题2：延迟渲染的画面比前向渲染模糊</h3><p>1.G-Buffer 的数据精度损失</p>
+<p>延迟渲染需要将场景的深度、法线、颜色等海量信息存储在 G-Buffer（几何缓冲区）的多张纹理中。为了节省巨大的显存和带宽开销，这些纹理往往会进行数据压缩（例如将高精度的法线信息压缩到较低的位深中）。<br>这种压缩会导致微小的几何细节和高频的法线变化丢失。当光照计算基于这些“打了折扣”的数据进行时，物体表面的光影细节（比如粗糙表面的微小凹凸感）就会变得不如前向渲染那样丰富和锐利，进一步加剧了整体画面的“柔化”感。</p>
+<p>2.由于放弃了 MSAA，延迟渲染普遍采用 TAA（时间抗锯齿）作为主流方案。TAA 的原理是将当前帧与过去几帧的画面进行混合和重投影。这种“多帧混合”虽然能极好地消除锯齿和画面闪烁，但本质上是一种对历史画面的模糊与平均。尤其是在物体快速运动或摄像机转动时，TAA 极易产生运动模糊和拖影（鬼影），导致画面看起来不够锐利。即使是 FXAA 这种快速后处理抗锯齿，也是通过识别边缘并进行模糊涂抹来实现的，同样会牺牲细节。</p>
+<h3 id="问题3：延迟渲染不支持MSAA的原因"><a href="#问题3：延迟渲染不支持MSAA的原因" class="headerlink" title="问题3：延迟渲染不支持MSAA的原因"></a>问题3：延迟渲染不支持MSAA的原因</h3><p>延迟渲染并非绝对不支持 MSAA（多重采样抗锯齿），但在实际工程应用中，它与传统 MSAA 存在着天然的“八字不合”。如果强行结合，会带来极高的性能代价和复杂的算法兼容性问题。</p>
+<ol>
+<li>显存占用与带宽的爆炸式增长</li>
+</ol>
+<p>延迟渲染的核心在于 G-Buffer（几何缓冲区），它需要将场景的深度、法线、反照率（颜色）、材质属性等信息分别存储在多张渲染目标（RT）纹理中。</p>
+<p>● 内存翻倍： 如果对 G-Buffer 开启 4倍 MSAA，意味着每一张纹理的显存占用都会变为原来的 4 倍。以 2K 分辨率为例，单张 G-Buffer 可能占用 64MB，开启 4x MSAA 后会飙升至 256MB。如果 G-Buffer 包含 3-4 张贴图，总显存占用将轻松突破 700MB 甚至更高。</p>
+<p>● 带宽压力： 这种多倍的内存增长会带来巨大的显存带宽消耗，导致渲染效率急剧下降，这在现代高分辨率游戏中是极不划算的。</p>
+<ol start="2">
+<li>光照计算与几何信息的缺失</li>
+</ol>
+<p>MSAA 的核心原理是在一个像素内对多个子样本（Sub-sample）进行采样，以判断边缘的覆盖情况。</p>
+<p>● 前向渲染： 在计算光照时，GPU 清楚地知道每个子样本属于哪个三角形，因此可以精确地将光照结果复制到对应的子样本上。</p>
+<p>● 延迟渲染： 在光照计算阶段（Lighting Pass），几何信息已经被“拍扁”并存储在了 G-Buffer 中。此时，GPU 只能拿到每个像素的最终属性（如法线、颜色），丢失了原始的几何覆盖信息。GPU 无法判断一个像素内的 4 个子样本中，哪几个属于物体 A，哪几个属于物体 B，因此无法正确地为每个子样本计算并分配光照。</p>
+<ol start="3">
+<li>极其复杂的 Resolve（解析）过程</li>
+</ol>
+<p>在常规的 MSAA 流程中，硬件可以自动将多采样的结果合并（Resolve）为最终的单采样图像。但在延迟渲染中，如果对 G-Buffer 开启 MSAA，开发者必须手动编写极其复杂的 Resolve 逻辑：不仅要解决深度缓冲区的合并，还要处理法线、颜色等多个纹理的合并。这完全放弃了硬件自动 Resolve 的高效性（即 On-Chip MSAA 优势），转而采用代价高昂的“软 Resolve”方案。</p>
+<h2 id="前向渲染的变种"><a href="#前向渲染的变种" class="headerlink" title="前向渲染的变种"></a>前向渲染的变种</h2><p>Forward+ Rendering</p>
+<p>Forward+也被称为Tiled Forward Rendering，为了提升前向渲染光源的数量，它增加了光源剔除阶段，有3个Pass：depth prepass，light culling pass，shading pass。</p>
+<p>light culling pass和瓦片的延迟渲染类似，将屏幕划分成若干个Tile，将每个Tile和光源求交，有效的光源写入到Tile的光源列表，以减少shading阶段的光源数量。</p>
+<p>Forward+存在由于街头锥体拉长后在几何边界产生误报（False positives，可以通过separating axis theorem (SAT)改善）的情况。</p>
+<p>Cluster Forward Rendering</p>
+<p>Cluster Forward Rendering和Cluster Deferred Rendering类似，将屏幕空间划分成均等Tile，深度细分成一个个簇，进而更加细粒度地裁剪光源。算法类似，这里就不累述了。</p>
+<p>Volume Tiled Forward Rendering</p>
+<p>Volume Tiled Forward Rendering在Tiled和Clusterer的前向渲染基础上扩展的一种技术，旨在提升场景的光源支持数量，论文作者认为可以达到400万个光源的场景以30FPS实时渲染。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/06/02/CG1/" rel="prev" title="图形学相关原理">
+      <i class="fa fa-chevron-left"></i> 图形学相关原理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2026/06/14/CG3/" rel="next" title="GPU渲染架构解析">
+      GPU渲染架构解析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">渲染顺序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%86%E9%A1%BA%E5%BA%8F%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要分顺序？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rendering-Path"><span class="nav-number">2.</span> <span class="nav-text">Rendering Path</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Forward-Shading"><span class="nav-number">2.1.</span> <span class="nav-text">Forward Shading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deferred-Shading"><span class="nav-number">2.2.</span> <span class="nav-text">Deferred Shading</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%981%EF%BC%9A%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93%E4%B8%8D%E6%94%AF%E6%8C%81%E5%8D%8A%E9%80%8F%E6%98%8E%E7%89%A9%E4%BD%93"><span class="nav-number">2.2.1.</span> <span class="nav-text">问题1：延迟渲染不支持半透明物体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%982%EF%BC%9A%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93%E7%9A%84%E7%94%BB%E9%9D%A2%E6%AF%94%E5%89%8D%E5%90%91%E6%B8%B2%E6%9F%93%E6%A8%A1%E7%B3%8A"><span class="nav-number">2.2.2.</span> <span class="nav-text">问题2：延迟渲染的画面比前向渲染模糊</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%983%EF%BC%9A%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93%E4%B8%8D%E6%94%AF%E6%8C%81MSAA%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.2.3.</span> <span class="nav-text">问题3：延迟渲染不支持MSAA的原因</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E5%90%91%E6%B8%B2%E6%9F%93%E7%9A%84%E5%8F%98%E7%A7%8D"><span class="nav-number">2.3.</span> <span class="nav-text">前向渲染的变种</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Nico Zhong</p>
+  <div class="site-description" itemprop="description">one step per day | each effort counts</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Nico Zhong</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
