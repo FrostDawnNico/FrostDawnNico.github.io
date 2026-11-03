@@ -28,7 +28,7 @@
 <meta property="og:description" content="整理基本知识">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-23T15:59:44.000Z">
-<meta property="article:modified_time" content="2026-11-03T16:50:00.323Z">
+<meta property="article:modified_time" content="2026-11-03T16:54:40.210Z">
 <meta property="article:author" content="Nico Zhong">
 <meta property="article:tag" content="UE">
 <meta name="twitter:card" content="summary">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-11-04 00:50:00" itemprop="dateModified" datetime="2026-11-04T00:50:00+08:00">2026-11-04</time>
+                <time title="Modified: 2026-11-04 00:54:40" itemprop="dateModified" datetime="2026-11-04T00:54:40+08:00">2026-11-04</time>
               </span>
 
           
@@ -290,7 +290,9 @@
 <h4 id="编译速度与内存"><a href="#编译速度与内存" class="headerlink" title="编译速度与内存"></a>编译速度与内存</h4><p>开始编译后会发现构建信息里会提到内容与并行任务的数量</p>
 <p>他取决于内存的剩余容量，每1.5G就会增加一个任务</p>
 <p>如果发现容量过小，停止编译并清理一下内存重新编译</p>
-<h2 id="自定义引擎"><a href="#自定义引擎" class="headerlink" title="自定义引擎"></a>自定义引擎</h2><p>编译通过成功运行Editor了</p>
+<h2 id="自定义引擎"><a href="#自定义引擎" class="headerlink" title="自定义引擎"></a>自定义引擎</h2><p>编译通过成功运行 Editor 了，就可以进行源码的修改了</p>
+<p>正常修改应该触发增量编译，不会花太多时间</p>
+<p>但需要注意：如果修改 Engine 的公共头文件，则需要较大规模的重编译</p>
 
     </div>
 
